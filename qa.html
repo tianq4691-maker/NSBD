@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工程问答 - 南水北调</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0078d4;
+            --deep-blue: #004a82;
+            --light-blue: #4da6ff;
+            --cyan: #00b4d8;
+            --dark-bg: #0a1628;
+            --card-bg: rgba(0, 50, 100, 0.4);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--dark-bg);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: linear-gradient(180deg, rgba(0,50,100,0.9) 0%, transparent 100%);
+            padding: 1.5rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: var(--cyan);
+            color: var(--dark-bg);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            color: var(--light-blue);
+        }
+
+        /* 主内容 */
+        .main-content {
+            padding: 100px 2rem 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 搜索区域 */
+        .search-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .search-title {
+            font-size: 2rem;
+            color: var(--light-blue);
+            margin-bottom: 1rem;
+        }
+
+        .search-subtitle {
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: 2px solid rgba(0,180,216,0.3);
+            border-radius: 50px;
+            background: var(--card-bg);
+            color: #fff;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 20px rgba(0,180,216,0.3);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .search-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--cyan), var(--primary-blue));
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,180,216,0.4);
+        }
+
+        /* 快捷标签 */
+        .quick-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .tag {
+            padding: 0.5rem 1.2rem;
+            background: rgba(0,180,216,0.15);
+            border: 1px solid rgba(0,180,216,0.3);
+            border-radius: 20px;
+            color: var(--cyan);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .tag:hover, .tag.active {
+            background: var(--cyan);
+            color: var(--dark-bg);
+        }
+
+        .tag-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .tag-label {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+        }
+
+        /* 结果区域 */
+        .results-section {
+            margin-top: 2rem;
+        }
+
+        .results-title {
+            font-size: 1.3rem;
+            color: var(--cyan);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-count {
+            background: var(--cyan);
+            color: var(--dark-bg);
+            padding: 0.2rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+        }
+
+        /* 问答卡片 */
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .qa-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0,180,216,0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .qa-card:hover {
+            border-color: var(--cyan);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,180,216,0.2);
+        }
+
+        .qa-question {
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+        }
+
+        .qa-question::before {
+            content: 'Q';
+            background: linear-gradient(135deg, var(--cyan), var(--primary-blue));
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .qa-answer {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .qa-answer::before {
+            content: 'A';
+            color: var(--cyan);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .qa-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .qa-tag {
+            padding: 0.25rem 0.8rem;
+            background: rgba(0,180,216,0.1);
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* 无结果提示 */
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .no-results-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* 推荐问题 */
+        .suggestions-section {
+            margin-top: 3rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(0,180,216,0.2);
+        }
+
+        .suggestions-title {
+            font-size: 1.2rem;
+            color: var(--cyan);
+            margin-bottom: 1.5rem;
+        }
+
+        .suggestion-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .suggestion-item {
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .suggestion-item:hover {
+            background: rgba(0,180,216,0.15);
+            color: #fff;
+        }
+
+        .suggestion-icon {
+            margin-right: 0.5rem;
+        }
+
+        /* 实体类型说明 */
+        .entity-info {
+            background: linear-gradient(135deg, rgba(0,50,100,0.6), rgba(0,30,60,0.6));
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0,180,216,0.2);
+        }
+
+        .entity-title {
+            font-size: 1.1rem;
+            color: var(--cyan);
+            margin-bottom: 1rem;
+        }
+
+        .entity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .entity-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+
+        .entity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .entity-icon.year { background: rgba(255,193,7,0.2); }
+        .entity-icon.location { background: rgba(76,175,80,0.2); }
+        .entity-icon.person { background: rgba(233,30,99,0.2); }
+        .entity-icon.project { background: rgba(33,150,243,0.2); }
+        .entity-icon.org { background: rgba(156,39,176,0.2); }
+
+        .entity-text h4 {
+            font-size: 0.95rem;
+            color: #fff;
+            margin-bottom: 0.2rem;
+        }
+
+        .entity-text p {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+            }
+
+            .qa-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="back-btn">← 返回首页</a>
+            <h1 class="page-title">工程问答</h1>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- 搜索区域 -->
+        <section class="search-section">
+            <h2 class="search-title">🔍 智能问答</h2>
+            <p class="search-subtitle">输入关键词（年份、地点、人名、工程名等）即可查询相关问答</p>
+            
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="例如：1952年、丹江口、毛泽东...">
+                <button class="search-btn" onclick="performSearch()">搜索</button>
+            </div>
+
+            <div class="quick-tags">
+                <span class="tag" onclick="searchByTag('年份')">📅 年份</span>
+                <span class="tag" onclick="searchByTag('地名')">📍 地名</span>
+                <span class="tag" onclick="searchByTag('人物')">👤 人物</span>
+                <span class="tag" onclick="searchByTag('工程')">🏗️ 工程</span>
+                <span class="tag" onclick="searchByTag('政策')">📜 政策</span>
+            </div>
+        </section>
+
+        <!-- 实体类型说明 -->
+        <section class="entity-info">
+            <h3 class="entity-title">💡 支持的查询类型</h3>
+            <div class="entity-grid">
+                <div class="entity-item">
+                    <div class="entity-icon year">📅</div>
+                    <div class="entity-text">
+                        <h4>年份查询</h4>
+                        <p>如：1952、1968、2002</p>
+                    </div>
+                </div>
+                <div class="entity-item">
+                    <div class="entity-icon location">📍</div>
+                    <div class="entity-text">
+                        <h4>地点查询</h4>
+                        <p>如：丹江口、武汉、北京</p>
+                    </div>
+                </div>
+                <div class="entity-item">
+                    <div class="entity-icon person">👤</div>
+                    <div class="entity-text">
+                        <h4>人物查询</h4>
+                        <p>如：毛泽东、周恩来</p>
+                    </div>
+                </div>
+                <div class="entity-item">
+                    <div class="entity-icon project">🏗️</div>
+                    <div class="entity-text">
+                        <h4>工程查询</h4>
+                        <p>如：三峡、葛洲坝</p>
+                    </div>
+                </div>
+                <div class="entity-item">
+                    <div class="entity-icon org">🏛️</div>
+                    <div class="entity-text">
+                        <h4>机构查询</h4>
+                        <p>如：水利部、长办</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 结果区域 -->
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <h3 class="results-title" id="resultsTitle">
+                搜索结果 <span class="result-count" id="resultCount">0</span> 条
+            </h3>
+            <div class="qa-grid" id="resultsGrid"></div>
+        </section>
+
+        <!-- 推荐问题 -->
+        <section class="suggestions-section" id="suggestionsSection">
+            <h3 class="suggestions-title">🌟 选择分类浏览</h3>
+            <div class="suggestion-list" id="suggestionList"></div>
+        </section>
+    </main>
+
+    <script>
+        // ========== 问答数据库 ==========
+        const qaDatabase = [
+            // 1952年相关
+            {
+                question: "南水北调的宏伟设想最早是什么时候提出的？",
+                answer: "1952年10月30日，毛主席视察黄河时首次提出南水北调的宏伟设想。在听取黄河水利委员会主任王化云关于引江济黄设想的汇报后说：'南方水多，北方水少，如有可能，借点水来也是可以的'。",
+                keywords: ["1952", "毛泽东", "黄河", "南水北调", "设想"],
+                category: "年份"
+            },
+            {
+                question: "荆江分洪工程是哪一年建成的？",
+                answer: "荆江分洪工程于1952年建成。4月5日工程全面开工，6月20日主体工程竣工，比规定期限提前了15天。毛泽东和周恩来分别为工程题词。",
+                keywords: ["1952", "荆江", "分洪", "毛泽东", "周恩来"],
+                category: "年份"
+            },
+            {
+                question: "丹江口坝址是什么时候被认定为良好坝址的？",
+                answer: "1952年10月，水利部部长傅作义、副部长李葆华、水利专家张含英、须恺、林一山以及苏联专家布可夫组织近百人的查勘团查勘了汉江中、下游河段，认为丹江口是少有的良好坝址。",
+                keywords: ["1952", "丹江口", "傅作义", "林一山", "坝址"],
+                category: "年份"
+            },
+            // 1953年相关
+            {
+                question: "毛主席在长江舰上首次提出引水设想是哪一年？",
+                answer: "1953年2月19日至22日，毛主席乘'长江舰'从武汉至南京视察长江。19日在听取长江流域规划办公室主任林一山汇报时，毛主席首次提出从南方引水到北方的设想，并用铅笔指向地图上的腊子口、白龙江、西汉水，最后指向汉江和丹江口。",
+                keywords: ["1953", "毛泽东", "长江舰", "林一山", "丹江口"],
+                category: "年份"
+            },
+            // 1958年相关
+            {
+                question: "丹江口水利枢纽工程是哪一天正式开工的？",
+                answer: "1958年9月1日，丹江口水利枢纽工程正式开工。湖北省省长张体学剪彩并持锄破土，淅川县组织民兵2.8万人参与大坝建设。",
+                keywords: ["1958", "丹江口", "开工", "张体学", "枢纽"],
+                category: "年份"
+            },
+            {
+                question: "'南水北调'一词最早出现在哪个文件中？",
+                answer: "1958年8月，中共中央在北戴河召开的政治局扩大会议上，通过并发出了《关于水利工作的指示》，明确指出：'全国范围的较长远的水利规划，首先是以南水（主要指长江水系）北调为主要目的地'。这是'南水北调'一词第一次见于中央正式文献。",
+                keywords: ["1958", "南水北调", "中央文件", "北戴河", "指示"],
+                category: "年份"
+            },
+            {
+                question: "周恩来总理是什么时候开始分管三峡工程的？",
+                answer: "1958年1月中旬，中共中央在南宁召开工作会议。毛泽东要求讨论三峡工程问题，派飞机把林一山与李锐接到会上各陈己见。为了加强对三峡工程的领导，毛泽东请周恩来挂帅，周恩来欣然接受，并表示：'好，我来管。'",
+                keywords: ["1958", "周恩来", "三峡", "南宁会议", "毛泽东"],
+                category: "年份"
+            },
+            // 丹江口水库相关
+            {
+                question: "丹江口水库什么时候开始蓄水？",
+                answer: "1967年11月18日，丹江口水库正式落闸蓄水。月底，淅川县马镫镇以下被水淹没。",
+                keywords: ["1967", "丹江口", "蓄水", "水库", "淅川"],
+                category: "工程"
+            },
+            {
+                question: "丹江口大坝第一期工程什么时候完工？",
+                answer: "1970年7月29日，丹江口大坝浇筑至162米高程，第一期工程基本完成。",
+                keywords: ["1970", "丹江口", "大坝", "完工", "162米"],
+                category: "年份"
+            },
+            {
+                question: "丹江口水利枢纽初期工程什么时候全部建成？",
+                answer: "1973年丹江口水利枢纽初期工程全部建成。大坝高162米、蓄水位157米、大坝全长2494米。总投资10.2亿元（工程造价8.2亿+水库淹没搬迁及移民补助1.8亿）。",
+                keywords: ["1973", "丹江口", "完工", "枢纽", "移民"],
+                category: "年份"
+            },
+            {
+                question: "丹江口水电站第一台机组什么时候开始发电？",
+                answer: "1968年10月1日，丹江口水电站第一台水轮机组开始发电。151个单位627名代表来工地参加发电典礼。",
+                keywords: ["1968", "丹江口", "发电", "机组", "电站"],
+                category: "年份"
+            },
+            // 1962年停工相关
+            {
+                question: "丹江口工程为什么在1962年停工？",
+                answer: "1962年3月5日，丹江口主体工程正式停工。主要原因有三：1.大坝出现严重质量事故，混凝土出现架空、冷缝、裂缝等；2.国内'大跃进'时期的浮夸风影响；3.三年经济困难时期，国家投资大幅压缩。",
+                keywords: ["1962", "停工", "质量", "丹江口", "经济困难"],
+                category: "年份"
+            },
+            {
+                question: "丹江口大坝存在哪些质量问题？",
+                answer: "1961年11月检查发现：已浇筑的坝体混凝土出现架空、冷缝、裂缝等质量事故。架空和冷缝达427处，裂缝有2463条，其中基础贯穿裂缝17条。还有约8万立方米混凝土抗压强度不合格。",
+                keywords: ["1962", "质量", "裂缝", "混凝土", "丹江口"],
+                category: "工程"
+            },
+            // 三峡工程相关
+            {
+                question: "葛洲坝水利枢纽是什么时候开工的？",
+                answer: "1970年葛洲坝水利枢纽工程开工，成为长江干流上兴建的第一座水利枢纽工程。1970年12月26日，毛泽东审阅了相关文件后批示：'赞成兴建此坝'。",
+                keywords: ["1970", "葛洲坝", "三峡", "长江", "开工"],
+                category: "年份"
+            },
+            {
+                question: "毛泽东对三峡工程是什么态度？",
+                answer: "毛泽东对三峡工程持积极而谨慎的态度。1958年在成都会议上提出引江、引汉济黄问题；1969年5月当水电部再次建议修建三峡时，毛泽东从战备角度泼了冷水：'在目前战备时期，不宜作此设想'，但支持先修葛洲坝工程。",
+                keywords: ["毛泽东", "三峡", "葛洲坝", "战备"],
+                category: "人物"
+            },
+            // 南水北调正式立项相关
+            {
+                question: "南水北调工程是什么时候正式列入国家规划的？",
+                answer: "1978年，五届全国人大一次会议通过的《政府工作报告》正式提出：'兴建把长江水引到黄河以北的南水北调工程'。1979年12月，水利部正式成立南水北调规划办公室，统筹协调全国南水北调工作。",
+                keywords: ["1978", "1979", "南水北调", "规划", "人大"],
+                category: "年份"
+            },
+            {
+                question: "南水北调东线工程是什么时候全线通水的？",
+                answer: "2013年11月15日，南水北调东线一期工程全线通水。截至2020年9月累计抽江水420亿立方米，直接受益人口近1亿人，水质达标率从3%提升至100%。",
+                keywords: ["2013", "东线", "通水", "水质", "受益"],
+                category: "年份"
+            },
+            {
+                question: "南水北调中线工程是什么时候正式通水的？",
+                answer: "2014年12月12日，南水北调中线一期工程正式通水，向北京、天津、河北、河南调水。累计供水超12亿立方米，显著缓解北京供水压力，北京自来水硬度下降2/3。",
+                keywords: ["2014", "中线", "通水", "北京", "调水"],
+                category: "年份"
+            },
+            // 移民相关
+            {
+                question: "丹江口库区移民什么时候大规模搬迁完成？",
+                answer: "2011年，丹江口库区移民大规模搬迁完成。河南、湖北两省累计搬迁33万人，实现了'四年任务、两年基本完成'的目标，破解了工程建设的核心难题。",
+                keywords: ["2011", "移民", "丹江口", "搬迁", "33万"],
+                category: "年份"
+            },
+            {
+                question: "丹江口水库移民政策是什么？",
+                answer: "1965年4月21日，中南局在武昌召开会议，定下'河南管迁，湖北管安'的移民政策。1969年5月又提出'远迁不如近迁，近迁不如就地后靠自安'的办法，此后代建川移民不再跨省安置。",
+                keywords: ["移民", "河南", "湖北", "丹江口", "政策"],
+                category: "政策"
+            },
+            // 人物相关
+            {
+                question: "林一山是谁？他与南水北调有什么关系？",
+                answer: "林一山是长江流域规划办公室主任（长办主任），是南水北调工程的重要推动者。1953年2月，他向毛主席汇报长江治理工作时，首次聆听了毛主席关于南水北调的设想。此后他主持了丹江口工程的规划设计工作。",
+                keywords: ["林一山", "长办", "长江", "规划", "主任"],
+                category: "人物"
+            },
+            {
+                question: "张体学在丹江口工程中担任什么角色？",
+                answer: "张体学是湖北省省长兼汉江丹江口工程委员会主任，是丹江口水利枢纽工程建设的主要领导人。1958年9月1日工程开工时，他亲自剪彩并持锄破土。",
+                keywords: ["张体学", "丹江口", "省长", "主任", "开工"],
+                category: "人物"
+            },
+            {
+                question: "钱正英是谁？她与水利工程有什么关系？",
+                answer: "钱正英是水利电力部副部长，是中国著名水利专家。她多次视察丹江口工地，1962年2月参加了周恩来总理主持的丹江口工程质量处理会议，为工程质量处理和后续建设做出了重要贡献。",
+                keywords: ["钱正英", "水利", "丹江口", "副部长", "质量"],
+                category: "人物"
+            },
+            // 工程规划相关
+            {
+                question: "南水北调'四横三纵'总体布局是什么？",
+                answer: "'四横三纵'是2002年国务院批准的《南水北调工程总体规划》提出的总体布局：'四横'指长江、淮河、黄河、海河四大流域；'三纵'指东线、中线、西线三条调水线路。通过这一布局实现四大江河的水资源优化配置。",
+                keywords: ["四横三纵", "总体规划", "东线", "中线", "西线"],
+                category: "政策"
+            },
+            {
+                question: "南水北调'三先三后'原则是什么？",
+                answer: "2000年9月27日，朱镕基提出'先节水后调水、先治污后通水、先环保后用水'（三先三后原则），作为南水北调总体规划的核心指导思想。",
+                keywords: ["三先三后", "朱镕基", "节水", "治污", "环保"],
+                category: "政策"
+            },
+            {
+                question: "南水北调东线工程的起点和终点在哪里？",
+                answer: "南水北调东线工程从江苏省扬州市江都水利枢纽引水，利用京杭大运河及其平行河道逐级提水北送，经13级泵站提水至山东半岛，可向江苏、安徽、山东、河北、天津等地供水。",
+                keywords: ["东线", "江都", "京杭运河", "泵站", "调水"],
+                category: "工程"
+            },
+            {
+                question: "南水北调中线工程的调水起点在哪里？",
+                answer: "南水北调中线工程的调水起点是丹江口水库。水源来自汉江，通过加高丹江口大坝，将水位提高至170米左右，然后沿伏牛山、太行山麓向华北平原送水，直达北京、天津。",
+                keywords: ["中线", "丹江口", "水库", "汉江", "北京"],
+                category: "工程"
+            },
+            // 重要会议相关
+            {
+                question: "成都会议对丹江口工程有什么影响？",
+                answer: "1958年3月，中共中央在成都召开工作会议，毛泽东再次提出引江、引汉济黄和引黄济卫问题。3月25日，中央政治局成都会议通过'关于三峡水利枢纽和长江流域规划的意见'，同时指出要争取1959年丹江口工程开工。",
+                keywords: ["1958", "成都会议", "丹江口", "三峡", "毛泽东"],
+                category: "年份"
+            },
+            {
+                question: "周恩来总理对丹江口工程质量处理做了什么指示？",
+                answer: "1962年2月8日，周恩来总理在京主持召开丹江口工程质量处理会议。他指出：'丹江口工程成绩还是主要的，工程上有了毛病是可以医治好的。'他要求停工认真研究处理质量事故，施工必须服从设计。",
+                keywords: ["1962", "周恩来", "丹江口", "质量", "处理"],
+                category: "年份"
+            },
+            // 技术参数相关
+            {
+                question: "丹江口水库的正常蓄水位是多少？",
+                answer: "丹江口水库初期工程正常蓄水位为157米（设计水位155米，移民水位157米）。大坝坝顶高程162米，全长2494米。",
+                keywords: ["丹江口", "水位", "157米", "大坝", "蓄水"],
+                category: "工程"
+            },
+            {
+                question: "丹江口水电站在什么时间全部建成？发电能力多大？",
+                answer: "1973年9月25日，丹江口水电站第六号水轮发电机组发电并于10月1日正式投产。电站共安装6台15万千瓦水轮发电机组，总装机容量90万千瓦。",
+                keywords: ["1973", "丹江口", "发电", "机组", "90万"],
+                category: "年份"
+            },
+            // 历史意义相关
+            {
+                question: "丹江口工程'六二停工'有什么历史意义？",
+                answer: "'六二停工'（1962年停工）是丹江口工程建设的重要转折点。这次停工体现了实事求是、科学决策的精神，为后来中国水利工程建设提供了宝贵经验：必须坚持质量第一，施工必须服从设计。",
+                keywords: ["1962", "停工", "质量", "丹江口", "经验"],
+                category: "政策"
+            },
+            {
+                question: "南水北调工程有什么战略意义？",
+                answer: "南水北调工程是世界上规模最大的调水工程，规划年调水量448亿立方米。它对于优化我国水资源配置、保障国家粮食安全、改善生态环境、促进区域协调发展具有重大战略意义。",
+                keywords: ["南水北调", "战略", "水资源", "调水", "意义"],
+                category: "政策"
+            }
+        ];
+
+        // 热门推荐问题
+        const popularQuestions = [
+            { text: "按年份浏览所有问答", icon: "📅", type: "year" },
+            { text: "查看地点相关问答", icon: "📍", type: "location" },
+            { text: "查看人物相关问答", icon: "👤", type: "person" },
+            { text: "查看工程相关问答", icon: "🏗️", type: "project" },
+            { text: "查看政策相关问答", icon: "📜", type: "policy" }
+        ];
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderSuggestions();
+            
+            // 回车搜索
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        });
+
+        // 渲染推荐问题
+        function renderSuggestions() {
+            const container = document.getElementById('suggestionList');
+            container.innerHTML = popularQuestions.map(item => `
+                <div class="suggestion-item" onclick="handleSuggestion('${item.type}', '${item.text}')">
+                    <span class="suggestion-icon">${item.icon}</span>
+                    ${item.text}
+                </div>
+            `).join('');
+        }
+
+        // 处理推荐点击
+        function handleSuggestion(type, text) {
+            switch(type) {
+                case 'year':
+                    searchByTag.call({ target: { textContent: '年份' } }, '年份');
+                    break;
+                case 'location':
+                    searchByTag.call({ target: { textContent: '地名' } }, '地名');
+                    break;
+                case 'person':
+                    searchByTag.call({ target: { textContent: '人物' } }, '人物');
+                    break;
+                case 'project':
+                    searchByTag.call({ target: { textContent: '工程' } }, '工程');
+                    break;
+                case 'policy':
+                    searchByTag.call({ target: { textContent: '政策' } }, '政策');
+                    break;
+                default:
+                    searchSuggestion(text);
+            }
+        }
+
+        // 按标签搜索
+        function searchByTag(tag) {
+            document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            
+            document.getElementById('searchInput').value = '';
+            
+            switch(tag) {
+                case '年份':
+                    displayAllYearsQA();
+                    break;
+                case '地名':
+                    displayCategoryQA('地点');
+                    break;
+                case '人物':
+                    displayCategoryQA('人物');
+                    break;
+                case '工程':
+                    displayCategoryQA('工程');
+                    break;
+                case '政策':
+                    displayCategoryQA('政策');
+                    break;
+                default:
+                    performSearch();
+            }
+        }
+
+        // 推荐问题搜索
+        function searchSuggestion(text) {
+            document.getElementById('searchInput').value = text;
+            performSearch();
+        }
+
+        // 执行搜索
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            // 清空标签高亮
+            document.querySelectorAll('.tag').forEach(tag => tag.classList.remove('active'));
+            
+            if (!query) {
+                document.getElementById('resultsSection').style.display = 'none';
+                document.getElementById('suggestionsSection').style.display = 'block';
+                return;
+            }
+
+            // 搜索匹配
+            const results = searchQA(query);
+            displayResults(results);
+        }
+
+        // 问答搜索算法
+        function searchQA(query) {
+            const queryLower = query.toLowerCase();
+            const isYearQuery = /^\d{4}$/.test(query);
+            
+            return qaDatabase.filter(qa => {
+                // 如果搜索的是年份，精确匹配该年份
+                if (isYearQuery) {
+                    // 关键词中包含该年份
+                    const keywordMatch = qa.keywords.some(kw => {
+                        // 精确匹配年份（如搜索"2002"只匹配"2002"）
+                        const kwIsYear = /^\d{4}$/.test(kw);
+                        return kw === query;
+                    });
+                    
+                    // 问题中包含该年份（作为独立年份）
+                    const questionMatch = qa.question.includes(query);
+                    
+                    // 答案中包含该年份（作为独立年份，避免匹配其他数字）
+                    const answerMatch = new RegExp(`\\b${query}\\b`).test(qa.answer);
+                    
+                    return keywordMatch || questionMatch || answerMatch;
+                }
+                
+                // 非年份搜索：关键词、问题、答案匹配
+                const keywordMatch = qa.keywords.some(kw => 
+                    kw.toLowerCase().includes(queryLower) || 
+                    queryLower.includes(kw.toLowerCase())
+                );
+                
+                const questionMatch = qa.question.toLowerCase().includes(queryLower);
+                const answerMatch = qa.answer.toLowerCase().includes(queryLower);
+                
+                return keywordMatch || questionMatch || answerMatch;
+            }).sort((a, b) => {
+                if (isYearQuery) {
+                    // 年份搜索：优先按关键词精确匹配排序
+                    const aHasYearKeyword = a.keywords.some(kw => kw === query);
+                    const bHasYearKeyword = b.keywords.some(kw => kw === query);
+                    if (aHasYearKeyword && !bHasYearKeyword) return -1;
+                    if (!aHasYearKeyword && bHasYearKeyword) return 1;
+                    
+                    // 再按问题中是否直接包含年份排序
+                    const aInQuestion = a.question.includes(query);
+                    const bInQuestion = b.question.includes(query);
+                    if (aInQuestion && !bInQuestion) return -1;
+                    if (!aInQuestion && bInQuestion) return 1;
+                } else {
+                    // 非年份搜索：关键词匹配 > 问题匹配 > 答案匹配
+                    const aScore = (a.keywords.some(kw => kw.toLowerCase().includes(queryLower)) ? 3 : 0) +
+                                  (a.question.toLowerCase().includes(queryLower) ? 2 : 0) +
+                                  (a.answer.toLowerCase().includes(queryLower) ? 1 : 0);
+                    const bScore = (b.keywords.some(kw => kw.toLowerCase().includes(queryLower)) ? 3 : 0) +
+                                  (b.question.toLowerCase().includes(queryLower) ? 2 : 0) +
+                                  (b.answer.toLowerCase().includes(queryLower) ? 1 : 0);
+                    return bScore - aScore;
+                }
+                return 0;
+            });
+        }
+
+        // 类别匹配
+        function matchCategory(query, qa) {
+            const yearPattern = /^\d{4}$/;
+            if (yearPattern.test(query)) {
+                return qa.keywords.some(kw => kw === query || kw.includes(query));
+            }
+            return false;
+        }
+
+        // 实体匹配
+        function matchEntity(query, qa) {
+            // 提取的实体关键词
+            const entities = {
+                persons: ['毛泽东', '周恩来', '刘少奇', '朱德', '邓小平', '李先念', '林一山', '张体学', '钱正英', '傅作义', '王任重', '华罗庚'],
+                locations: ['丹江口', '长江', '黄河', '汉江', '武汉', '北京', '天津', '河南', '湖北', '河北', '淅川', '三峡', '葛洲坝'],
+                projects: ['三峡', '葛洲坝', '丹江口', '荆江', '三门峡', '刘家峡'],
+                years: ['1952', '1953', '1958', '1962', '1967', '1968', '1970', '1973', '1978', '2002', '2013', '2014']
+            };
+            
+            for (const [type, list] of Object.entries(entities)) {
+                if (list.some(e => query.includes(e) || e.includes(query))) {
+                    return qa.keywords.some(kw => 
+                        list.some(e => kw.includes(e) || e.includes(kw))
+                    );
+                }
+            }
+            return false;
+        }
+
+        // 显示结果
+        function displayResults(results) {
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsGrid = document.getElementById('resultsGrid');
+            const resultsTitle = document.getElementById('resultsTitle');
+            const suggestionsSection = document.getElementById('suggestionsSection');
+            const query = document.getElementById('searchInput').value.trim();
+
+            if (results.length === 0) {
+                resultsSection.style.display = 'block';
+                suggestionsSection.style.display = 'none';
+                resultsTitle.innerHTML = `搜索结果 <span class="result-count">0</span> 条`;
+                resultsGrid.innerHTML = `
+                    <div class="no-results" style="grid-column: 1/-1;">
+                        <div class="no-results-icon">🔍</div>
+                        <p>未找到相关问答</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">试试其他关键词，如：年份(1952)、地名(丹江口)、人物(毛泽东)等</p>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsSection.style.display = 'block';
+            suggestionsSection.style.display = 'none';
+            resultsTitle.innerHTML = `搜索"<strong style="color: var(--cyan);">${query}</strong>"结果 <span class="result-count">${results.length}</span> 条`;
+
+            resultsGrid.innerHTML = results.map((qa, index) => `
+                <div class="qa-card animate-in" style="animation-delay: ${index * 0.1}s">
+                    <div class="qa-question">${highlightKeyword(qa.question, query)}</div>
+                    <div class="qa-answer">${highlightKeyword(qa.answer, query)}</div>
+                    <div class="qa-tags">
+                        <span class="qa-tag">${qa.category}</span>
+                        ${qa.keywords.slice(0, 3).map(kw => `<span class="qa-tag">${kw}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 显示所有年份分类的问答
+        function displayAllYearsQA() {
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsGrid = document.getElementById('resultsGrid');
+            const resultsTitle = document.getElementById('resultsTitle');
+            const suggestionsSection = document.getElementById('suggestionsSection');
+            
+            // 更新标题
+            resultsTitle.innerHTML = '📅 按年份浏览 <span class="result-count">' + qaDatabase.length + '</span> 条问答';
+
+            // 按年份分组
+            const yearGroups = {};
+            const noYearQA = [];
+
+            qaDatabase.forEach(qa => {
+                // 从关键词中提取年份
+                const yearKeywords = qa.keywords.filter(kw => /^\d{4}$/.test(kw));
+                
+                if (yearKeywords.length > 0) {
+                    yearKeywords.forEach(year => {
+                        if (!yearGroups[year]) {
+                            yearGroups[year] = [];
+                        }
+                        yearGroups[year].push(qa);
+                    });
+                } else {
+                    noYearQA.push(qa);
+                }
+            });
+
+            // 排序年份（降序）
+            const sortedYears = Object.keys(yearGroups).sort((a, b) => b - a);
+
+            resultsSection.style.display = 'block';
+            suggestionsSection.style.display = 'none';
+
+            let html = '';
+            
+            // 按年份分组显示
+            sortedYears.forEach(year => {
+                html += `
+                    <div style="grid-column: 1/-1; margin-top: 1rem;">
+                        <h3 style="color: #FF9800; font-size: 1.3rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="background: rgba(255,152,0,0.2); padding: 0.3rem 0.8rem; border-radius: 20px;">📅 ${year}年</span>
+                            <span style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">(${yearGroups[year].length}条)</span>
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1rem;">
+                            ${yearGroups[year].map((qa, index) => `
+                                <div class="qa-card" style="animation-delay: ${index * 0.05}s">
+                                    <div class="qa-question">${qa.question}</div>
+                                    <div class="qa-answer">${qa.answer}</div>
+                                    <div class="qa-tags">
+                                        <span class="qa-tag">${qa.category}</span>
+                                        ${qa.keywords.slice(0, 3).map(kw => `<span class="qa-tag">${kw}</span>`).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 无年份的问答
+            if (noYearQA.length > 0) {
+                html += `
+                    <div style="grid-column: 1/-1; margin-top: 2rem;">
+                        <h3 style="color: #9E9E9E; font-size: 1.3rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="background: rgba(158,158,158,0.2); padding: 0.3rem 0.8rem; border-radius: 20px;">📋 其他分类</span>
+                            <span style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">(${noYearQA.length}条)</span>
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1rem;">
+                            ${noYearQA.map((qa, index) => `
+                                <div class="qa-card" style="animation-delay: ${index * 0.05}s">
+                                    <div class="qa-question">${qa.question}</div>
+                                    <div class="qa-answer">${qa.answer}</div>
+                                    <div class="qa-tags">
+                                        <span class="qa-tag">${qa.category}</span>
+                                        ${qa.keywords.slice(0, 3).map(kw => `<span class="qa-tag">${kw}</span>`).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultsGrid.innerHTML = html;
+        }
+
+        // 按分类显示问答
+        function displayCategoryQA(category) {
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsGrid = document.getElementById('resultsGrid');
+            const resultsTitle = document.getElementById('resultsTitle');
+            const suggestionsSection = document.getElementById('suggestionsSection');
+            
+            // 筛选该分类的问答
+            const categoryData = qaDatabase.filter(qa => qa.category === category);
+            
+            // 分类配置
+            const categoryConfig = {
+                '地点': { icon: '📍', color: '#4CAF50', bgColor: 'rgba(76,175,80,0.2)' },
+                '人物': { icon: '👤', color: '#E91E63', bgColor: 'rgba(233,30,99,0.2)' },
+                '工程': { icon: '🏗️', color: '#2196F3', bgColor: 'rgba(33,150,243,0.2)' },
+                '政策': { icon: '📜', color: '#9C27B0', bgColor: 'rgba(156,39,176,0.2)' }
+            };
+            
+            const config = categoryConfig[category] || { icon: '📋', color: '#9E9E9E', bgColor: 'rgba(158,158,158,0.2)' };
+            
+            // 更新标题
+            resultsTitle.innerHTML = `${config.icon} ${category}相关 <span class="result-count">${categoryData.length}</span> 条问答`;
+
+            resultsSection.style.display = 'block';
+            suggestionsSection.style.display = 'none';
+
+            if (categoryData.length === 0) {
+                resultsGrid.innerHTML = `
+                    <div class="no-results" style="grid-column: 1/-1;">
+                        <div class="no-results-icon">🔍</div>
+                        <p>暂无${category}相关问答</p>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsGrid.innerHTML = `
+                <div style="grid-column: 1/-1;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1rem;">
+                        ${categoryData.map((qa, index) => `
+                            <div class="qa-card animate-in" style="animation-delay: ${index * 0.05}s">
+                                <div class="qa-question">${qa.question}</div>
+                                <div class="qa-answer">${qa.answer}</div>
+                                <div class="qa-tags">
+                                    <span class="qa-tag" style="background: ${config.bgColor}; border-color: ${config.color}; color: ${config.color};">${qa.category}</span>
+                                    ${qa.keywords.slice(0, 3).map(kw => `<span class="qa-tag">${kw}</span>`).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 高亮关键词
+        function highlightKeyword(text, query) {
+            if (!query) return text;
+            
+            const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+            return text.replace(regex, '<mark style="background: rgba(0,180,216,0.3); padding: 0 2px; border-radius: 3px;">$1</mark>');
+        }
+
+        // 转义正则特殊字符
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+    </script>
+</body>
+</html>

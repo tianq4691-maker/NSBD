@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工程故事 - 南水北调·世纪工程</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0078d4;
+            --light-blue: #4da6ff;
+            --cyan: #00b4d8;
+            --dark-bg: #0a1628;
+            --card-bg: rgba(0, 50, 100, 0.4);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #0d2137 50%, var(--dark-bg) 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(0,50,100,0.8) 0%, transparent 100%);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            color: var(--light-blue);
+            text-shadow: 0 0 30px rgba(0,180,216,0.5);
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--card-bg);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: var(--cyan);
+            color: var(--dark-bg);
+        }
+
+        .story-container {
+            width: 95%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .volume {
+            background: var(--card-bg);
+            border: 1px solid rgba(0,180,216,0.3);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .volume::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--cyan), var(--light-blue), var(--cyan));
+        }
+
+        .volume-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--cyan), var(--primary-blue));
+            color: #fff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .volume h2 {
+            font-size: 1.8rem;
+            color: var(--light-blue);
+            margin-bottom: 1.5rem;
+        }
+
+        .volume p {
+            color: rgba(255,255,255,0.85);
+            font-size: 1.05rem;
+            line-height: 2;
+            margin-bottom: 1.2rem;
+            text-align: justify;
+        }
+
+        .volume blockquote {
+            background: rgba(0,180,216,0.1);
+            border-left: 4px solid var(--cyan);
+            padding: 1.2rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 10px 10px 0;
+            font-style: italic;
+            color: rgba(255,255,255,0.8);
+        }
+
+        @media (max-width: 768px) {
+            .back-btn {
+                position: static;
+                transform: none;
+                margin-bottom: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                padding-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="back-btn">
+            <span>←</span> 返回首页
+        </a>
+        <h1 class="header-title">工程纪实</h1>
+    </header>
+
+    <div class="story-container">
+        <div class="volume" id="volume1">
+            <span class="volume-badge">第一卷</span>
+            <h2>缘起：世纪的呼唤</h2>
+            <p>1952年，毛泽东同志在视察黄河时首次提出南水北调的伟大构想："南方水多，北方水少，如有可能，借点水来也是可以的。"这一构想开启了新中国水利事业的新篇章。</p>
+            <p>中国水资源分布极不均衡，南方长江流域水量充沛，而北方黄淮海流域却长期缺水。京津冀地区人均水资源量仅为全国平均水平的七分之一，水资源短缺已成为制约北方地区经济社会发展的瓶颈。</p>
+            <blockquote>"南水北调是优化水资源配置、促进区域协调发展的重大战略性基础设施。"</blockquote>
+            <p>经过近半个世纪的研究论证，2002年12月27日，国务院正式批复《南水北调工程总体规划》，东线工程率先动工，标志着这一世纪工程从梦想走向现实。</p>
+        </div>
+
+        <div class="volume" id="volume2">
+            <span class="volume-badge">第二卷</span>
+            <h2>攻坚：创造奇迹的人们</h2>
+            <p>2014年12月12日，这是一个值得铭记的日子。南水北调中线工程正式通水，甘甜的长江水穿越千里抵达北京。丹江口水库的清水顺着渡槽一路北上，滋润着干渴的华北大地。</p>
+            <p>工程建设的背后，是无数建设者的默默奉献。他们逢山开路、遇水架桥，攻克了一个又一个世界级难题。中线工程穿黄隧洞，创造了世界最深的调水竖井纪录；东线工程泵站群，实现了亚洲最大的平原泵站群建设。</p>
+            <blockquote>"我们这一代人吃了苦，但能为子孙后代留下这份遗产，一切都值得。" —— 一位参与建设的老工程师</blockquote>
+            <p>如今，南水北调工程已成为世界上规模最大的调水工程。截至目前，累计调水量已超过600亿立方米，直接受益人口超过1.5亿。这条人工天河，不仅输送着生命之水，更承载着中华民族伟大复兴的梦想。</p>
+        </div>
+    </div>
+</body>
+</html>

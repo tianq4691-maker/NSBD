@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D工程线路 - 南水北调·世纪工程</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0078d4;
+            --light-blue: #4da6ff;
+            --cyan: #00b4d8;
+            --dark-bg: #0a1628;
+            --card-bg: rgba(0, 50, 100, 0.4);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--dark-bg);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(0,50,100,0.8) 0%, transparent 100%);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            color: var(--light-blue);
+            text-shadow: 0 0 30px rgba(0,180,216,0.5);
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--card-bg);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: var(--cyan);
+            color: var(--dark-bg);
+        }
+
+        .map-container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0,180,216,0.2);
+        }
+
+        #mapChart {
+            width: 100%;
+            height: 500px;
+            border-radius: 15px;
+        }
+
+        .map-legend {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-line {
+            width: 40px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .legend-east { background: #4CAF50; }
+        .legend-middle { background: #FF9800; }
+        .legend-west { background: #E91E63; }
+
+        .map-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 95%;
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0,180,216,0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .info-card:hover {
+            border-color: var(--cyan);
+            transform: translateY(-5px);
+        }
+
+        .info-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card.east h4 { color: #4CAF50; }
+        .info-card.middle h4 { color: #FF9800; }
+        .info-card.west h4 { color: #E91E63; }
+
+        .info-card p {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 768px) {
+            .back-btn {
+                position: static;
+                transform: none;
+                margin-bottom: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                padding-top: 1rem;
+            }
+
+            #mapChart {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="back-btn">
+            <span>←</span> 返回首页
+        </a>
+        <h1 class="header-title">工程线路图</h1>
+    </header>
+
+    <div class="map-container">
+        <div id="mapChart"></div>
+    </div>
+
+    <div class="map-legend">
+        <div class="legend-item">
+            <div class="legend-line legend-east"></div>
+            <span>东线工程</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-line legend-middle"></div>
+            <span>中线工程</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-line legend-west"></div>
+            <span>西线工程</span>
+        </div>
+    </div>
+
+    <div class="map-info">
+        <div class="info-card east">
+            <h4><i class="fas fa-water"></i> 东线工程</h4>
+            <p>扬州江都抽引长江水→京杭运河→洪泽湖/骆马湖/南四湖/东平湖调蓄→分送天津、胶东半岛。全长约1156公里，年调水约88亿立方米。</p>
+        </div>
+        <div class="info-card middle">
+            <h4><i class="fas fa-water"></i> 中线工程</h4>
+            <p>丹江口水库引水→南阳→郑州→石家庄→北京团城湖/天津。全长约1432公里，全线自流供水，是华北地区水资源保障骨干工程。</p>
+        </div>
+        <div class="info-card west">
+            <h4><i class="fas fa-water"></i> 西线工程</h4>
+            <p>长江上游通天河/雅砻江/大渡河调水→穿越巴颜喀拉山→黄河上游。涉及海拔3500米以上青藏高原，工程规模最为宏大，目前仍在规划论证中。</p>
+        </div>
+    </div>
+
+    <script>
+        function initMap() {
+            const chartDom = document.getElementById('mapChart');
+            if (!chartDom) return;
+
+            const myChart = echarts.init(chartDom);
+
+            fetch('https://geojson.cn/api/china/100000.json')
+                .then(response => response.json())
+                .then(chinaJson => {
+                    echarts.registerMap('china', chinaJson);
+
+                    const option = {
+                        backgroundColor: 'transparent',
+                        tooltip: {
+                            trigger: 'item',
+                            backgroundColor: 'rgba(10, 22, 40, 0.9)',
+                            borderColor: '#00b4d8',
+                            textStyle: { color: '#fff' }
+                        },
+                        geo: {
+                            map: 'china',
+                            roam: true,
+                            zoom: 1.2,
+                            center: [105, 36],
+                            itemStyle: {
+                                areaColor: 'rgba(0, 60, 120, 0.3)',
+                                borderColor: 'rgba(0, 180, 216, 0.5)',
+                                borderWidth: 1
+                            },
+                            emphasis: {
+                                itemStyle: {
+                                    areaColor: 'rgba(0, 120, 212, 0.5)'
+                                }
+                            },
+                            label: {
+                                show: false
+                            }
+                        },
+                        series: [
+                            {
+                                name: '枢纽城市',
+                                type: 'scatter',
+                                coordinateSystem: 'geo',
+                                data: [
+                                    { name: '北京', value: [116.23, 40.00, 100] },
+                                    { name: '天津', value: [117.20, 39.13, 80] },
+                                    { name: '石家庄', value: [114.48, 38.04, 70] },
+                                    { name: '郑州', value: [113.65, 34.76, 80] },
+                                    { name: '南阳', value: [112.53, 33.01, 70] },
+                                    { name: '丹江口', value: [111.51, 32.54, 100] },
+                                    { name: '扬州', value: [119.42, 32.39, 80] },
+                                    { name: '东平湖', value: [116.00, 35.90, 60] }
+                                ],
+                                symbolSize: function(val) {
+                                    return val[2] / 15;
+                                },
+                                label: {
+                                    show: true,
+                                    position: 'right',
+                                    formatter: '{b}',
+                                    color: '#fff',
+                                    fontSize: 12
+                                },
+                                itemStyle: {
+                                    color: '#00b4d8',
+                                    shadowBlur: 10,
+                                    shadowColor: '#00b4d8'
+                                }
+                            },
+                            {
+                                name: '东线工程',
+                                type: 'lines',
+                                coordinateSystem: 'geo',
+                                zlevel: 2,
+                                effect: {
+                                    show: true,
+                                    period: 4,
+                                    trailLength: 0.4,
+                                    symbol: 'circle',
+                                    symbolSize: 6,
+                                    color: '#4CAF50'
+                                },
+                                lineStyle: {
+                                    width: 4,
+                                    color: '#4CAF50',
+                                    opacity: 0.8,
+                                    curveness: 0.2
+                                },
+                                data: [
+                                    {
+                                        coords: [
+                                            [119.42, 32.39],
+                                            [119.40, 32.78],
+                                            [118.80, 33.20],
+                                            [118.20, 34.10],
+                                            [116.90, 34.80],
+                                            [116.00, 35.90],
+                                            [115.70, 36.10],
+                                            [116.83, 38.30],
+                                            [117.20, 39.13]
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: '中线工程',
+                                type: 'lines',
+                                coordinateSystem: 'geo',
+                                zlevel: 2,
+                                effect: {
+                                    show: true,
+                                    period: 5,
+                                    trailLength: 0.4,
+                                    symbol: 'circle',
+                                    symbolSize: 6,
+                                    color: '#FF9800'
+                                },
+                                lineStyle: {
+                                    width: 4,
+                                    color: '#FF9800',
+                                    opacity: 0.8,
+                                    curveness: 0.1
+                                },
+                                data: [
+                                    {
+                                        coords: [
+                                            [111.51, 32.54],
+                                            [111.70, 32.70],
+                                            [112.53, 33.01],
+                                            [113.00, 33.25],
+                                            [113.65, 34.76],
+                                            [114.48, 36.62],
+                                            [114.50, 37.07],
+                                            [114.48, 38.04],
+                                            [115.48, 38.87],
+                                            [116.23, 40.00]
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: '西线工程',
+                                type: 'lines',
+                                coordinateSystem: 'geo',
+                                zlevel: 2,
+                                effect: {
+                                    show: true,
+                                    period: 6,
+                                    trailLength: 0.3,
+                                    symbol: 'circle',
+                                    symbolSize: 5,
+                                    color: '#E91E63'
+                                },
+                                lineStyle: {
+                                    width: 3,
+                                    color: '#E91E63',
+                                    opacity: 0.6,
+                                    curveness: 0.15,
+                                    type: 'dashed'
+                                },
+                                data: [
+                                    {
+                                        coords: [
+                                            [94.00, 33.50],
+                                            [96.50, 33.00],
+                                            [98.00, 32.50],
+                                            [101.00, 28.00],
+                                            [102.50, 31.50],
+                                            [100.00, 34.00],
+                                            [103.50, 35.00]
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    };
+
+                    myChart.setOption(option);
+                });
+
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initMap);
+    </script>
+</body>
+</html>

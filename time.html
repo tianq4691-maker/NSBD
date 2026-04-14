@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工程时间轴 - 南水北调·世纪工程</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0078d4;
+            --deep-blue: #004a82;
+            --light-blue: #4da6ff;
+            --cyan: #00b4d8;
+            --dark-bg: #0a1628;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--dark-bg);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(0,50,100,0.9) 0%, transparent 100%);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            color: var(--light-blue);
+            text-shadow: 0 0 30px rgba(0,180,216,0.5);
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 50, 100, 0.6);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: var(--cyan);
+            color: var(--dark-bg);
+        }
+
+        .timeline-container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+
+        .timeline-iframe {
+            width: 100%;
+            height: 700px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(0,50,100,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .back-btn {
+                position: static;
+                transform: none;
+                margin-bottom: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                padding-top: 1rem;
+            }
+
+            .timeline-iframe {
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="back-btn">
+            <span>←</span> 返回首页
+        </a>
+        <h1 class="header-title">工程建设历程</h1>
+    </header>
+
+    <div class="timeline-container">
+        <iframe src="https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=v2%3A2PACX-1vQ8NisScEU5rIHFIJ4azgMojyOZlP4urINxaEmEx0PW716sPALhYqx0AaxIZxYJZohMM5wz8oc7mNqT&font=Default&lang=zh-cn&initial_zoom=2&theme=contrast" 
+                class="timeline-iframe"
+                allowfullscreen
+                loading="lazy">
+        </iframe>
+    </div>
+</body>
+</html>

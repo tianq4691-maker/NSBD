@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>南水北调工程 · 卫星地图展示</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #000;
+            min-height: 100vh;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        /* 全屏地图 */
+        #map {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1;
+        }
+        
+        /* 顶部标题 */
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+            letter-spacing: 3px;
+        }
+        
+        /* 半透明控制面板 */
+        .panel {
+            position: fixed;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        
+        /* 返回按钮 */
+        .back-btn {
+            position: fixed;
+            top: 12px; left: 12px;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 18px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 30px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+        .back-btn:hover { 
+            background: rgba(30, 41, 59, 0.95);
+            border-color: rgba(255,255,255,0.3);
+        }
+        
+        /* 地图切换按钮 */
+        .map-switch {
+            position: fixed;
+            top: 12px; right: 12px;
+            display: flex;
+            gap: 8px;
+            z-index: 1001;
+        }
+        .map-btn {
+            padding: 10px 18px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 30px;
+            color: #fff;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .map-btn:hover, .map-btn.active {
+            background: rgba(59, 130, 246, 0.8);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+        
+        /* 左侧面板 */
+        .left-panel {
+            position: fixed;
+            top: 80px; left: 12px;
+            width: 240px;
+            padding: 20px;
+            z-index: 1000;
+        }
+        
+        .panel-section {
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        /* 路线卡片 */
+        .route-card {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .route-card:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .route-card.active {
+            background: rgba(255,255,255,0.1);
+        }
+        .route-card.east.active { border-color: #ef4444; }
+        .route-card.middle.active { border-color: #3b82f6; }
+        .route-card.west.active { border-color: #eab308; }
+        
+        .route-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            margin-right: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px currentColor;
+        }
+        .route-card.east .route-dot { background: #ef4444; color: #ef4444; }
+        .route-card.middle .route-dot { background: #3b82f6; color: #3b82f6; }
+        .route-card.west .route-dot { background: #eab308; color: #eab308; }
+        
+        .route-info h4 {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+        .route-info p {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        /* 右下角详情面板 */
+        .detail-panel {
+            position: fixed;
+            bottom: 12px; right: 12px;
+            width: 300px;
+            padding: 20px;
+            z-index: 1000;
+            transition: all 0.3s;
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        .detail-panel.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .detail-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .detail-close {
+            width: 28px; height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .detail-close:hover { background: rgba(255,255,255,0.2); }
+        
+        .detail-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .info-item {
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .info-label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 4px;
+        }
+        .info-value {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        .detail-desc {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.6;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+        }
+        
+        /* 底部图例 */
+        .legend-bar {
+            position: fixed;
+            bottom: 12px; left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            padding: 12px 24px;
+            z-index: 1000;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.8);
+        }
+        .legend-line {
+            width: 24px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        .legend-line.east { background: #ef4444; }
+        .legend-line.middle { background: #3b82f6; }
+        .legend-line.west { 
+            background: repeating-linear-gradient(90deg, #eab308, #eab308 4px, transparent 4px, transparent 8px);
+        }
+        
+        /* 加载动画 */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #0a0a0f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loading-spinner {
+            width: 50px; height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 2px;
+        }
+        
+        /* 卫星地图标记 */
+        .sat-marker {
+            background: none;
+            border: none;
+        }
+        .marker-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .marker-icon.start { background: #ef4444; }
+        .marker-icon.end { background: #3b82f6; }
+        .marker-icon.node { background: #fff; }
+        
+        .marker-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            opacity: 0;
+            animation: marker-pulse 2s infinite;
+        }
+        .marker-icon.start::after { border-color: #ef4444; }
+        .marker-icon.end::after { border-color: #3b82f6; }
+        
+        @keyframes marker-pulse {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+        }
+        
+        .marker-label {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .left-panel { width: calc(100% - 24px); top: auto; bottom: 60px; }
+            .detail-panel { width: calc(100% - 24px); }
+            .legend-bar { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载卫星地图...</div>
+    </div>
+    
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回</a>
+    
+    <div class="header">
+        <h1>南水北调工程 · 卫星地图</h1>
+    </div>
+    
+    <!-- 地图切换 -->
+    <div class="map-switch">
+        <button class="map-btn active" data-type="satellite" onclick="switchMap('satellite')">
+            <i class="fas fa-satellite"></i> 卫星
+        </button>
+        <button class="map-btn" data-type="terrain" onclick="switchMap('terrain')">
+            <i class="fas fa-mountain"></i> 地形
+        </button>
+        <button class="map-btn" data-type="dark" onclick="switchMap('dark')">
+            <i class="fas fa-moon"></i> 暗色
+        </button>
+    </div>
+    
+    <div id="map"></div>
+    
+    <!-- 左侧面板 -->
+    <div class="panel left-panel">
+        <div class="panel-section">
+            <div class="section-title">工程路线</div>
+            <div class="route-card east active" data-route="east" onclick="toggleRoute('east')">
+                <div class="route-dot"></div>
+                <div class="route-info">
+                    <h4>东线工程</h4>
+                    <p>扬州 → 天津</p>
+                </div>
+            </div>
+            <div class="route-card middle active" data-route="middle" onclick="toggleRoute('middle')">
+                <div class="route-dot"></div>
+                <div class="route-info">
+                    <h4>中线工程</h4>
+                    <p>丹江口 → 北京</p>
+                </div>
+            </div>
+            <div class="route-card west active" data-route="west" onclick="toggleRoute('west')">
+                <div class="route-dot"></div>
+                <div class="route-info">
+                    <h4>西线工程</h4>
+                    <p>通天河 → 黄河上游</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="section-title">操作提示</div>
+            <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); line-height: 1.6;">
+                <p><i class="fas fa-mouse"></i> 滚轮缩放地图</p>
+                <p><i class="fas fa-hand-paper"></i> 拖动平移</p>
+                <p><i class="fas fa-mouse-pointer"></i> 点击节点查看详情</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 详情面板 -->
+    <div class="panel detail-panel" id="detailPanel">
+        <div class="detail-header">
+            <span class="detail-title" id="detailTitle">节点名称</span>
+            <div class="detail-close" onclick="hideDetail()"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="detail-info">
+            <div class="info-item">
+                <div class="info-label">类型</div>
+                <div class="info-value" id="detailType">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">所属线路</div>
+                <div class="info-value" id="detailRoute">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">纬度</div>
+                <div class="info-value" id="detailLat">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">经度</div>
+                <div class="info-value" id="detailLng">-</div>
+            </div>
+        </div>
+        <div class="detail-desc" id="detailDesc">-</div>
+    </div>
+    
+    <!-- 底部图例 -->
+    <div class="panel legend-bar">
+        <div class="legend-item"><div class="legend-line east"></div><span>东线工程</span></div>
+        <div class="legend-item"><div class="legend-line middle"></div><span>中线工程</span></div>
+        <div class="legend-item"><div class="legend-line west"></div><span>西线工程(规划)</span></div>
+    </div>
+
+    <script>
+        // 路线数据
+        const routeData = {
+            east: {
+                name: '东线工程',
+                color: '#ef4444',
+                points: [
+                    {name: '扬州', coord: [32.39, 119.42], type: 'start', desc: '东线工程起点，江都水利枢纽所在地，长江水由此抽引北上'},
+                    {name: '洪泽湖', coord: [33.20, 118.80], type: 'node', desc: '中国第四大淡水湖，东线重要调蓄枢纽'},
+                    {name: '骆马湖', coord: [34.10, 118.20], type: 'node', desc: '江苏省重要湖泊，起调蓄作用'},
+                    {name: '南四湖', coord: [34.80, 116.90], type: 'node', desc: '微山湖、昭阳湖等组成，山东最大淡水湖群'},
+                    {name: '东平湖', coord: [35.90, 116.00], type: 'node', desc: '山东省最大湖泊，咽喉调蓄枢纽'},
+                    {name: '济南', coord: [36.67, 117.00], type: 'node', desc: '山东省省会，穿黄工程经过地'},
+                    {name: '沧州', coord: [38.30, 116.83], type: 'node', desc: '河北省重要城市，东线输水通道'},
+                    {name: '天津', coord: [39.13, 117.20], type: 'end', desc: '东线工程终点，北方重要受水城市'}
+                ]
+            },
+            middle: {
+                name: '中线工程',
+                color: '#3b82f6',
+                points: [
+                    {name: '丹江口', coord: [32.54, 111.51], type: 'start', desc: '中线工程起点，丹江口水库，南水北调中线水源地'},
+                    {name: '渠首', coord: [32.70, 111.70], type: 'node', desc: '陶岔渠首，中线工程取水口'},
+                    {name: '南阳', coord: [33.01, 112.53], type: 'node', desc: '河南省重要城市，伏牛山南麓'},
+                    {name: '方城', coord: [33.25, 113.00], type: 'node', desc: '方城垭口，重要的地理分水岭'},
+                    {name: '平顶山', coord: [33.77, 113.20], type: 'node', desc: '河南省重要城市'},
+                    {name: '郑州', coord: [34.76, 113.65], type: 'node', desc: '河南省省会，穿黄工程所在地'},
+                    {name: '安阳', coord: [36.10, 114.40], type: 'node', desc: '河南省重要城市'},
+                    {name: '邯郸', coord: [36.62, 114.48], type: 'node', desc: '河北省重要城市'},
+                    {name: '石家庄', coord: [38.04, 114.48], type: 'node', desc: '河北省省会'},
+                    {name: '保定', coord: [38.87, 115.48], type: 'node', desc: '河北省重要城市'},
+                    {name: '北京', coord: [40.00, 116.23], type: 'end', desc: '中线工程终点，首都重要受水城市'}
+                ]
+            },
+            west: {
+                name: '西线工程',
+                color: '#eab308',
+                points: [
+                    {name: '通天河', coord: [33.5, 94.0], type: 'start', desc: '长江上游源头，青藏高原腹地'},
+                    {name: '金沙江', coord: [32.5, 98.0], type: 'node', desc: '长江上游重要支流'},
+                    {name: '雅砻江', coord: [28.0, 101.0], type: 'node', desc: '长江上游重要支流'},
+                    {name: '大渡河', coord: [31.5, 102.5], type: 'node', desc: '长江上游重要支流'},
+                    {name: '黄河上游', coord: [35.0, 103.5], type: 'end', desc: '西线工程终点，规划中'}
+                ]
+            }
+        };
+
+        let map, currentMapType = 'satellite';
+        let mapLayers = {};
+        let activeRoutes = {east: true, middle: true, west: true};
+        let routePolylines = {};
+        let routeMarkers = {};
+
+        // 地图瓦片源
+        const mapSources = {
+            satellite: {
+                url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                attribution: '© Esri'
+            },
+            terrain: {
+                url: 'https://t{s}.tianditu.gov.cn/ter_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ter&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=174705aebfe31b79b3587279e211cb9a',
+                subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
+                attribution: '© 天地图'
+            },
+            dark: {
+                url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                attribution: '© CARTO'
+            }
+        };
+
+        // 标注图层
+        const labelSources = {
+            satellite: {
+                url: 'https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=174705aebfe31b79b3587279e211cb9a',
+                subdomains: ['0', '1', '2', '3', '4', '5', '6', '7']
+            },
+            terrain: {
+                url: 'https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=174705aebfe31b79b3587279e211cb9a',
+                subdomains: ['0', '1', '2', '3', '4', '5', '6', '7']
+            },
+            dark: {
+                url: 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png'
+            }
+        };
+
+        function initMap() {
+            map = L.map('map', {
+                center: [35, 105],
+                zoom: 5,
+                minZoom: 4,
+                maxZoom: 16,
+                zoomControl: false
+            });
+
+            // 添加默认卫星图层
+            addMapLayer('satellite');
+            
+            // 绘制所有路线
+            Object.keys(routeData).forEach(key => {
+                drawRoute(key);
+            });
+
+            // 隐藏加载动画
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }, 1000);
+        }
+
+        function addMapLayer(type) {
+            // 移除现有图层
+            if (mapLayers.base) map.removeLayer(mapLayers.base);
+            if (mapLayers.label) map.removeLayer(mapLayers.label);
+
+            const source = mapSources[type];
+            const labelSource = labelSources[type];
+
+            mapLayers.base = L.tileLayer(source.url, {
+                subdomains: source.subdomains || ['a', 'b', 'c', 'd'],
+                attribution: source.attribution,
+                maxZoom: 18
+            }).addTo(map);
+
+            mapLayers.label = L.tileLayer(labelSource.url, {
+                subdomains: labelSource.subdomains || ['a', 'b', 'c', 'd'],
+                maxZoom: 18
+            }).addTo(map);
+        }
+
+        function switchMap(type) {
+            currentMapType = type;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.map-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+
+            addMapLayer(type);
+        }
+
+        function drawRoute(routeKey) {
+            const route = routeData[routeKey];
+            const latlngs = route.points.map(p => p.coord);
+
+            // 路线阴影
+            const shadowLine = L.polyline(latlngs, {
+                color: '#000',
+                weight: 8,
+                opacity: 0.3,
+                lineJoin: 'round'
+            });
+
+            // 主路线
+            const polyline = L.polyline(latlngs, {
+                color: route.color,
+                weight: 4,
+                opacity: 0.9,
+                lineJoin: 'round',
+                lineCap: 'round',
+                dashArray: routeKey === 'west' ? '12, 8' : null
+            });
+
+            routePolylines[routeKey] = { shadow: shadowLine, main: polyline };
+
+            // 添加标记
+            routeMarkers[routeKey] = [];
+            route.points.forEach(point => {
+                const marker = createMarker(point, route.color);
+                routeMarkers[routeKey].push(marker);
+            });
+
+            // 根据激活状态添加/移除
+            if (activeRoutes[routeKey]) {
+                shadowLine.addTo(map);
+                polyline.addTo(map);
+                routeMarkers[routeKey].forEach(m => m.addTo(map));
+            }
+        }
+
+        function createMarker(point, routeColor) {
+            const icon = L.divIcon({
+                className: 'sat-marker',
+                html: `
+                    <div class="marker-icon ${point.type}" style="color: ${routeColor}"></div>
+                    <div class="marker-label">${point.name}</div>
+                `,
+                iconSize: [20, 30],
+                iconAnchor: [10, 15]
+            });
+
+            const marker = L.marker(point.coord, { icon });
+
+            marker.on('click', () => {
+                const route = Object.values(routeData).find(r => 
+                    r.points.some(p => p.name === point.name)
+                );
+                showDetail(point, route.name, routeColor);
+            });
+
+            return marker;
+        }
+
+        function toggleRoute(route) {
+            const card = document.querySelector(`.route-card[data-route="${route}"]`);
+            card.classList.toggle('active');
+            activeRoutes[route] = card.classList.contains('active');
+
+            const layers = routePolylines[route];
+            const markers = routeMarkers[route];
+
+            if (activeRoutes[route]) {
+                layers.shadow.addTo(map);
+                layers.main.addTo(map);
+                markers.forEach(m => m.addTo(map));
+            } else {
+                map.removeLayer(layers.shadow);
+                map.removeLayer(layers.main);
+                markers.forEach(m => map.removeLayer(m));
+            }
+        }
+
+        function showDetail(point, routeName, routeColor) {
+            const panel = document.getElementById('detailPanel');
+            document.getElementById('detailTitle').textContent = point.name;
+            document.getElementById('detailTitle').style.color = routeColor;
+            document.getElementById('detailType').textContent = 
+                point.type === 'start' ? '起点' : 
+                point.type === 'end' ? '终点' : '节点';
+            document.getElementById('detailRoute').textContent = routeName;
+            document.getElementById('detailLat').textContent = point.coord[0].toFixed(4) + '°';
+            document.getElementById('detailLng').textContent = point.coord[1].toFixed(4) + '°';
+            document.getElementById('detailDesc').textContent = point.desc;
+            panel.classList.add('show');
+        }
+
+        function hideDetail() {
+            document.getElementById('detailPanel').classList.remove('show');
+        }
+
+        // 初始化
+        initMap();
+    </script>
+</body>
+</html>
