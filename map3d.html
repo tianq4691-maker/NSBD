@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>南水北调工程 · 卫星地图展示</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -16,6 +16,7 @@
             min-height: 100vh;
             color: #fff;
             overflow: hidden;
+            touch-action: none;
         }
         
         /* 全屏地图 */
@@ -45,16 +46,107 @@
             letter-spacing: 3px;
         }
         
-        /* 半透明控制面板 */
-        .panel {
+        /* 可拖动面板基础样式 */
+        .draggable-panel {
             position: fixed;
-            background: rgba(15, 23, 42, 0.92);
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.12);
             border-radius: 16px;
             z-index: 1000;
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            overflow: visible;
+            transition: box-shadow 0.2s;
+            min-width: 180px;
+            min-height: 60px;
+        }
+        .draggable-panel:active {
+            box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+        }
+        
+        /* 拖动手柄 */
+        .drag-handle {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            border-radius: 16px 16px 0 0;
+            background: rgba(255,255,255,0.03);
+        }
+        .drag-handle::before {
+            content: '';
+            width: 40px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+        }
+        .drag-handle:hover {
+            background: rgba(255,255,255,0.06);
+        }
+        .drag-handle:hover::before {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* 大小调整手柄 */
+        .resize-handle {
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 24px;
+            height: 24px;
+            cursor: se-resize;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            padding: 6px;
+            opacity: 0.4;
+            transition: opacity 0.2s;
+        }
+        .resize-handle:hover {
+            opacity: 1;
+        }
+        .resize-handle::before,
+        .resize-handle::after {
+            content: '';
+            position: absolute;
+            background: rgba(255,255,255,0.4);
+            border-radius: 1px;
+        }
+        .resize-handle::before {
+            width: 10px; height: 2px;
+            bottom: 6px; right: 6px;
+        }
+        .resize-handle::after {
+            width: 2px; height: 10px;
+            bottom: 6px; right: 6px;
+        }
+        
+        /* 重置按钮 */
+        .reset-btn {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 20px; height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.08);
+            border: none;
+            border-radius: 6px;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s;
+            opacity: 0;
+        }
+        .draggable-panel:hover .reset-btn {
+            opacity: 1;
+        }
+        .reset-btn:hover {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
         }
         
         /* 返回按钮 */
@@ -107,32 +199,34 @@
         
         /* 左侧面板 */
         .left-panel {
-            position: fixed;
             top: 80px; left: 12px;
-            width: 240px;
-            padding: 20px;
-            z-index: 1000;
+            width: 220px;
+            padding: 40px 16px 16px;
+        }
+        .left-panel .panel-content {
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
         }
         
         .panel-section {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
         .section-title {
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.5);
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.4);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         /* 路线卡片 */
         .route-card {
             display: flex;
             align-items: center;
-            padding: 14px;
+            padding: 12px;
             background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            margin-bottom: 8px;
+            border-radius: 10px;
+            margin-bottom: 6px;
             cursor: pointer;
             transition: all 0.3s;
             border: 2px solid transparent;
@@ -148,125 +242,167 @@
         .route-card.west.active { border-color: #eab308; }
         
         .route-dot {
-            width: 12px; height: 12px;
+            width: 10px; height: 10px;
             border-radius: 50%;
-            margin-right: 12px;
+            margin-right: 10px;
             flex-shrink: 0;
-            box-shadow: 0 0 10px currentColor;
         }
-        .route-card.east .route-dot { background: #ef4444; color: #ef4444; }
-        .route-card.middle .route-dot { background: #3b82f6; color: #3b82f6; }
-        .route-card.west .route-dot { background: #eab308; color: #eab308; }
+        .route-card.east .route-dot { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.6); }
+        .route-card.middle .route-dot { background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.6); }
+        .route-card.west .route-dot { background: #eab308; box-shadow: 0 0 8px rgba(234,179,8,0.6); }
         
         .route-info h4 {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 500;
             color: #fff;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         .route-info p {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.5);
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
         }
         
-        /* 右下角详情面板 */
+        /* 详情面板 */
         .detail-panel {
-            position: fixed;
-            bottom: 12px; right: 12px;
-            width: 300px;
-            padding: 20px;
-            z-index: 1000;
-            transition: all 0.3s;
-            transform: translateY(100%);
+            width: 280px;
+            padding: 40px 16px 16px;
+            transform: translateY(20px);
             opacity: 0;
+            pointer-events: none;
         }
         .detail-panel.show {
             transform: translateY(0);
             opacity: 1;
+            pointer-events: auto;
         }
         
         .detail-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
         }
         .detail-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #fff;
         }
         .detail-close {
-            width: 28px; height: 28px;
+            width: 24px; height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
+            color: rgba(255,255,255,0.6);
         }
-        .detail-close:hover { background: rgba(255,255,255,0.2); }
+        .detail-close:hover { 
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
         
         .detail-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 8px;
+            margin-bottom: 12px;
         }
         .info-item {
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 8px;
         }
         .info-label {
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.4);
-            margin-bottom: 4px;
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 3px;
         }
         .info-value {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 500;
             color: #fff;
         }
         
         .detail-desc {
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             color: rgba(255,255,255,0.7);
             line-height: 1.6;
-            padding: 12px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            max-height: 150px;
+            overflow-y: auto;
         }
+        
+        /* 详细统计信息 */
+        .detail-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .stat-item {
+            background: rgba(255,255,255,0.04);
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+        .stat-label {
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.4);
+        }
+        
+        /* 路线总览信息 */
+        .route-overview {
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.5;
+        }
+        
+        /* 统计值颜色 */
+        .stat-value.water { color: #60a5fa; }
+        .stat-value.migrate { color: #fb923c; }
+        .stat-value.eco { color: #4ade80; }
+        .stat-value.time { color: #a78bfa; }
         
         /* 底部图例 */
         .legend-bar {
-            position: fixed;
             bottom: 12px; left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 20px;
-            padding: 12px 24px;
-            z-index: 1000;
+            gap: 16px;
+            padding: 10px 20px;
         }
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.8);
+            gap: 6px;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
         }
         .legend-line {
-            width: 24px;
+            width: 20px;
             height: 3px;
             border-radius: 2px;
         }
         .legend-line.east { background: #ef4444; }
         .legend-line.middle { background: #3b82f6; }
         .legend-line.west { 
-            background: repeating-linear-gradient(90deg, #eab308, #eab308 4px, transparent 4px, transparent 8px);
+            background: repeating-linear-gradient(90deg, #eab308, #eab308 3px, transparent 3px, transparent 6px);
         }
         
         /* 加载动画 */
@@ -306,8 +442,8 @@
             border: none;
         }
         .marker-icon {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             border: 3px solid #fff;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
@@ -322,7 +458,7 @@
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 30px; height: 30px;
+            width: 28px; height: 28px;
             border-radius: 50%;
             border: 2px solid currentColor;
             opacity: 0;
@@ -338,24 +474,36 @@
         
         .marker-label {
             position: absolute;
-            top: -30px;
+            top: -28px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.85);
             color: #fff;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.7rem;
             font-weight: 500;
             white-space: nowrap;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         
-        /* 响应式 */
-        @media (max-width: 768px) {
-            .left-panel { width: calc(100% - 24px); top: auto; bottom: 60px; }
-            .detail-panel { width: calc(100% - 24px); }
-            .legend-bar { display: none; }
+        /* 提示信息 */
+        .drag-hint {
+            position: fixed;
+            bottom: 60px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: rgba(255,255,255,0.7);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .drag-hint.show {
+            opacity: 1;
         }
     </style>
 </head>
@@ -388,44 +536,56 @@
     <div id="map"></div>
     
     <!-- 左侧面板 -->
-    <div class="panel left-panel">
-        <div class="panel-section">
-            <div class="section-title">工程路线</div>
-            <div class="route-card east active" data-route="east" onclick="toggleRoute('east')">
-                <div class="route-dot"></div>
-                <div class="route-info">
-                    <h4>东线工程</h4>
-                    <p>扬州 → 天津</p>
+    <div class="draggable-panel left-panel" id="leftPanel">
+        <div class="drag-handle"></div>
+        <button class="reset-btn" onclick="resetPanel('left')" title="双击重置"><i class="fas fa-undo"></i></button>
+        <div class="panel-content">
+            <div class="panel-section">
+                <div class="section-title">工程路线</div>
+                <div class="route-card east active" data-route="east" onclick="toggleRoute('east')">
+                    <div class="route-dot"></div>
+                    <div class="route-info">
+                        <h4>东线工程</h4>
+                        <p>扬州 → 天津</p>
+                    </div>
                 </div>
-            </div>
-            <div class="route-card middle active" data-route="middle" onclick="toggleRoute('middle')">
-                <div class="route-dot"></div>
-                <div class="route-info">
-                    <h4>中线工程</h4>
-                    <p>丹江口 → 北京</p>
+                <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35); padding: 0 12px 8px; margin-top: -4px;">利用京杭大运河，13级泵站提水北送</div>
+                
+                <div class="route-card middle active" data-route="middle" onclick="toggleRoute('middle')">
+                    <div class="route-dot"></div>
+                    <div class="route-info">
+                        <h4>中线工程</h4>
+                        <p>丹江口 → 北京</p>
+                    </div>
                 </div>
+                <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35); padding: 0 12px 8px; margin-top: -4px;">全程自流北上，受益人口超1.18亿</div>
+                
+                <div class="route-card west active" data-route="west" onclick="toggleRoute('west')">
+                    <div class="route-dot"></div>
+                    <div class="route-info">
+                        <h4>西线工程</h4>
+                        <p>通天河 → 黄河</p>
+                    </div>
+                </div>
+                <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35); padding: 0 12px 0; margin-top: -4px;">规划中，调水170亿m³入西北</div>
             </div>
-            <div class="route-card west active" data-route="west" onclick="toggleRoute('west')">
-                <div class="route-dot"></div>
-                <div class="route-info">
-                    <h4>西线工程</h4>
-                    <p>通天河 → 黄河上游</p>
+            
+            <div class="panel-section">
+                <div class="section-title">操作提示</div>
+                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.4); line-height: 1.5;">
+                    <p><i class="fas fa-arrows-alt"></i> 拖动面板</p>
+                    <p><i class="fas fa-expand-arrows-alt"></i> 调整大小</p>
+                    <p><i class="fas fa-mouse-pointer"></i> 点击节点详情</p>
                 </div>
             </div>
         </div>
-        
-        <div class="panel-section">
-            <div class="section-title">操作提示</div>
-            <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); line-height: 1.6;">
-                <p><i class="fas fa-mouse"></i> 滚轮缩放地图</p>
-                <p><i class="fas fa-hand-paper"></i> 拖动平移</p>
-                <p><i class="fas fa-mouse-pointer"></i> 点击节点查看详情</p>
-            </div>
-        </div>
+        <div class="resize-handle"></div>
     </div>
     
-    <!-- 详情面板 -->
-    <div class="panel detail-panel" id="detailPanel">
+        <!-- 详情面板 -->
+    <div class="draggable-panel detail-panel" id="detailPanel">
+        <div class="drag-handle"></div>
+        <button class="reset-btn" onclick="resetPanel('detail')" title="双击重置"><i class="fas fa-undo"></i></button>
         <div class="detail-header">
             <span class="detail-title" id="detailTitle">节点名称</span>
             <div class="detail-close" onclick="hideDetail()"><i class="fas fa-times"></i></div>
@@ -448,59 +608,200 @@
                 <div class="info-value" id="detailLng">-</div>
             </div>
         </div>
+        <!-- 详细统计数据 -->
+        <div class="detail-stats" id="detailStats"></div>
         <div class="detail-desc" id="detailDesc">-</div>
+        <div class="resize-handle"></div>
     </div>
     
     <!-- 底部图例 -->
-    <div class="panel legend-bar">
-        <div class="legend-item"><div class="legend-line east"></div><span>东线工程</span></div>
-        <div class="legend-item"><div class="legend-line middle"></div><span>中线工程</span></div>
-        <div class="legend-item"><div class="legend-line west"></div><span>西线工程(规划)</span></div>
+    <div class="draggable-panel legend-bar">
+        <div class="legend-item"><div class="legend-line east"></div><span>东线</span></div>
+        <div class="legend-item"><div class="legend-line middle"></div><span>中线</span></div>
+        <div class="legend-item"><div class="legend-line west"></div><span>西线</span></div>
     </div>
+    
+    <!-- 拖动提示 -->
+    <div class="drag-hint" id="dragHint">拖动顶部区域调整面板位置</div>
 
     <script>
-        // 路线数据
+        // 面板拖动和大小调整功能
+        class DraggablePanel {
+            constructor(element, options = {}) {
+                this.el = element;
+                this.handle = element.querySelector('.drag-handle');
+                this.resizeHandle = element.querySelector('.resize-handle');
+                this.isDragging = false;
+                this.isResizing = false;
+                this.startX = 0;
+                this.startY = 0;
+                this.startWidth = 0;
+                this.startHeight = 0;
+                this.startLeft = 0;
+                this.startTop = 0;
+                
+                this.defaultPos = options.defaultPos || { top: '80px', left: '12px', width: '220px' };
+                this.minWidth = options.minWidth || 180;
+                this.minHeight = options.minHeight || 100;
+                this.maxWidth = options.maxWidth || 400;
+                
+                this.init();
+            }
+            
+            init() {
+                // 拖动事件
+                this.handle.addEventListener('mousedown', this.onDragStart.bind(this));
+                this.handle.addEventListener('touchstart', this.onDragStart.bind(this), { passive: false });
+                
+                // 调整大小事件
+                if (this.resizeHandle) {
+                    this.resizeHandle.addEventListener('mousedown', this.onResizeStart.bind(this));
+                    this.resizeHandle.addEventListener('touchstart', this.onResizeStart.bind(this), { passive: false });
+                }
+                
+                // 双击重置
+                this.handle.addEventListener('dblclick', () => {
+                    this.reset();
+                });
+                
+                document.addEventListener('mousemove', this.onMove.bind(this));
+                document.addEventListener('touchmove', this.onMove.bind(this), { passive: false });
+                document.addEventListener('mouseup', this.onEnd.bind(this));
+                document.addEventListener('touchend', this.onEnd.bind(this));
+            }
+            
+            onDragStart(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const touch = e.touches ? e.touches[0] : e;
+                this.isDragging = true;
+                this.startX = touch.clientX;
+                this.startY = touch.clientY;
+                
+                const rect = this.el.getBoundingClientRect();
+                this.startLeft = rect.left;
+                this.startTop = rect.top;
+                
+                this.el.style.transition = 'none';
+                this.el.style.zIndex = '1002';
+            }
+            
+            onResizeStart(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const touch = e.touches ? e.touches[0] : e;
+                this.isResizing = true;
+                this.startX = touch.clientX;
+                this.startY = touch.clientY;
+                
+                const rect = this.el.getBoundingClientRect();
+                this.startWidth = rect.width;
+                this.startHeight = rect.height;
+                
+                this.el.style.transition = 'none';
+                this.el.style.zIndex = '1002';
+            }
+            
+            onMove(e) {
+                if (!this.isDragging && !this.isResizing) return;
+                e.preventDefault();
+                
+                const touch = e.touches ? e.touches[0] : e;
+                const deltaX = touch.clientX - this.startX;
+                const deltaY = touch.clientY - this.startY;
+                
+                if (this.isDragging) {
+                    let newLeft = this.startLeft + deltaX;
+                    let newTop = this.startTop + deltaY;
+                    
+                    // 边界限制
+                    const maxLeft = window.innerWidth - 100;
+                    const maxTop = window.innerHeight - 50;
+                    newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+                    newTop = Math.max(60, Math.min(newTop, maxTop));
+                    
+                    this.el.style.left = newLeft + 'px';
+                    this.el.style.top = newTop + 'px';
+                    this.el.style.right = 'auto';
+                    this.el.style.bottom = 'auto';
+                }
+                
+                if (this.isResizing) {
+                    const deltaW = touch.clientX - this.startX;
+                    const deltaH = touch.clientY - this.startY;
+                    
+                    let newWidth = Math.max(this.minWidth, Math.min(this.startWidth + deltaW, this.maxWidth));
+                    let newHeight = Math.max(this.minHeight, this.startHeight + deltaH);
+                    
+                    this.el.style.width = newWidth + 'px';
+                    this.el.style.height = newHeight + 'px';
+                }
+            }
+            
+            onEnd() {
+                this.isDragging = false;
+                this.isResizing = false;
+                this.el.style.transition = '';
+                this.el.style.zIndex = '1000';
+            }
+            
+            reset() {
+                this.el.style.top = this.defaultPos.top;
+                this.el.style.left = this.defaultPos.left;
+                this.el.style.right = 'auto';
+                this.el.style.bottom = 'auto';
+                this.el.style.width = this.defaultPos.width;
+                this.el.style.height = 'auto';
+            }
+        }
+        
+        // 路线数据（基于公开权威资料整理）
         const routeData = {
             east: {
                 name: '东线工程',
                 color: '#ef4444',
+                desc: '利用京杭大运河及沿线湖泊，通过13级泵站提水北送，是世界上规模最大的泵站群',
                 points: [
-                    {name: '扬州', coord: [32.39, 119.42], type: 'start', desc: '东线工程起点，江都水利枢纽所在地，长江水由此抽引北上'},
-                    {name: '洪泽湖', coord: [33.20, 118.80], type: 'node', desc: '中国第四大淡水湖，东线重要调蓄枢纽'},
-                    {name: '骆马湖', coord: [34.10, 118.20], type: 'node', desc: '江苏省重要湖泊，起调蓄作用'},
-                    {name: '南四湖', coord: [34.80, 116.90], type: 'node', desc: '微山湖、昭阳湖等组成，山东最大淡水湖群'},
-                    {name: '东平湖', coord: [35.90, 116.00], type: 'node', desc: '山东省最大湖泊，咽喉调蓄枢纽'},
-                    {name: '济南', coord: [36.67, 117.00], type: 'node', desc: '山东省省会，穿黄工程经过地'},
-                    {name: '沧州', coord: [38.30, 116.83], type: 'node', desc: '河北省重要城市，东线输水通道'},
-                    {name: '天津', coord: [39.13, 117.20], type: 'end', desc: '东线工程终点，北方重要受水城市'}
+                    {name: '扬州', coord: [32.39, 119.42], type: 'start', desc: '东线工程的源头，江都水利枢纽是"江水北调的龙头"。自1977年建成以来，累计向北方输送"放心水"超450亿立方米。当地通过整治"散乱污"企业、退让长江岸线6.3公里，守护了源头水质，让长江水从这里一路向北。', stats: {flow: '450亿m³', since: '1977年'}},
+                    {name: '洪泽湖', coord: [33.20, 118.80], type: 'node', desc: '东线重要调蓄湖泊，非汛期蓄水位从13.0米抬高至13.5米，提升了淮河水资源利用率。通过实施退圩还湖、退渔还湿工程，洪泽湖湿地面积大幅恢复，成为丹顶鹤、东方白鹳等珍稀鸟类的栖息地。', stats: {storage: '13.5m', area: '湿地恢复'}},
+                    {name: '骆马湖', coord: [34.10, 118.20], type: 'node', desc: '东线第六梯级泵站——皂河抽水站所在地，这里的"亚洲第一泵"每秒可抽取一个普通家庭一年的用水量。作为沂沭泗洪水调蓄枢纽，骆马湖既保障调水安全，又承担防洪任务。', stats: {pump: '亚洲第一', function: '调蓄枢纽'}},
+                    {name: '南四湖', coord: [34.80, 116.90], type: 'node', desc: '东线治污的"攻坚战主战场"。通水前因工业污染被称为"酱油湖"，山东投入804亿元治理，关停重污染企业1.07万家，水质从劣Ⅴ类提升至Ⅲ类，如今"鸟中大熊猫"青头潜鸭已重返这里定居。', stats: {investment: '804亿', enterprises: '1.07万家', quality: 'Ⅲ类'}},
+                    {name: '东平湖', coord: [35.90, 116.00], type: 'node', desc: '东线穿黄河工程的起点，也是黄河下游重要滞洪区。2024年汛期，东平湖通过泄洪闸向徒骇河等河道分洪，保护了平阴县近9万亩农田。当地取缔了湖内所有养殖网箱，通过增殖放流白鲢净化水质，如今湖水透明度突破3米。', stats: {clarity: '3m+', farmland: '9万亩'}},
+                    {name: '济南', coord: [36.67, 117.00], type: 'node', desc: '东线工程让泉城"保泉"更有底气。济平干渠贯穿济南长清区，为玉符河补水，让干涸多年的河道重现碧波。2017、2018年山东大旱期间，东线工程为济南等城市应急供水，成为保障供水安全的"主力军"，助力趵突泉实现连续喷涌。', stats: {impact: '趵突泉连续喷涌'}},
+                    {name: '沧州', coord: [38.30, 116.83], type: 'node', desc: '全国为数不多同时接受中线、东线双水源的城市。东线北延应急供水工程累计向沧州调引近3亿立方米长江水，让断流多年的南运河恢复通航和生态功能，南川楼文化街区因水而兴。2025年超额完成9181万立方米调水任务。', stats: {water: '3亿m³', task: '9181万m³'}},
+                    {name: '天津', coord: [39.13, 117.20], type: 'end', desc: '东线工程的终点，九宣闸是江水入津的门户。自2019年北延工程启动以来，累计向天津供水超10亿立方米，加上中线供水，天津主城区实现100%使用外调水。江水改善了天津的水生态，缓解了地下水超采问题。', stats: {water: '10亿m³', since: '2019年'}}
                 ]
             },
             middle: {
                 name: '中线工程',
                 color: '#3b82f6',
+                desc: '从丹江口水库陶岔渠首引水，全程自流北上，惠及京津冀豫四省市，受益人口超1.18亿',
                 points: [
-                    {name: '丹江口', coord: [32.54, 111.51], type: 'start', desc: '中线工程起点，丹江口水库，南水北调中线水源地'},
-                    {name: '渠首', coord: [32.70, 111.70], type: 'node', desc: '陶岔渠首，中线工程取水口'},
-                    {name: '南阳', coord: [33.01, 112.53], type: 'node', desc: '河南省重要城市，伏牛山南麓'},
-                    {name: '方城', coord: [33.25, 113.00], type: 'node', desc: '方城垭口，重要的地理分水岭'},
-                    {name: '平顶山', coord: [33.77, 113.20], type: 'node', desc: '河南省重要城市'},
-                    {name: '郑州', coord: [34.76, 113.65], type: 'node', desc: '河南省省会，穿黄工程所在地'},
-                    {name: '安阳', coord: [36.10, 114.40], type: 'node', desc: '河南省重要城市'},
-                    {name: '邯郸', coord: [36.62, 114.48], type: 'node', desc: '河北省重要城市'},
-                    {name: '石家庄', coord: [38.04, 114.48], type: 'node', desc: '河北省省会'},
-                    {name: '保定', coord: [38.87, 115.48], type: 'node', desc: '河北省重要城市'},
-                    {name: '北京', coord: [40.00, 116.23], type: 'end', desc: '中线工程终点，首都重要受水城市'}
+                    {name: '丹江口', coord: [32.54, 111.51], type: 'start', desc: '南水北调中线的"源头心脏"，亚洲第一大人工淡水湖。为满足调水要求，丹江口大坝加高工程将水库正常蓄水位从157米提升至170米，新增库容116亿立方米。库区26万移民告别故土，用"舍小家为大家"的奉献守护了这一库碧水。自通水以来，水库累计向北方供水超780亿立方米，水质常年稳定在Ⅱ类以上。', stats: {migrate: '26万', storage: '116亿m³', water: '780亿m³', quality: 'Ⅱ类+'}},
+                    {name: '渠首', coord: [32.70, 111.70], type: 'node', desc: '中线工程的"渠首所在地"，陶岔渠首枢纽被誉为"南水北调水龙头"。2021年5月，习近平总书记亲临渠首考察，强调要"守好这一库碧水"。当地组建了水上综合执法大队，通过"空天地水"智慧监测守护水质，确保每一滴水都安全北上。', stats: {monitor: '空天地水智慧监测'}},
+                    {name: '南阳', coord: [33.01, 112.53], type: 'node', desc: '南阳与北京开展对口协作，累计投入帮扶资金超20亿元，助力水源地绿色发展。当地组建了水上综合执法大队，通过"空天地水"智慧监测守护水质，确保每一滴水都安全北上。', stats: {aid: '20亿+'}},
+                    {name: '方城', coord: [33.25, 113.00], type: 'node', desc: '中线干渠的"咽喉要道"，方城垭口是秦岭山脉的天然缺口，也是北宋时期古人"南水北调"尝试的遗址。千年前宋太宗征调10万人开凿襄汉漕渠，终因膨胀土难题失败；如今工程团队攻克了十几米厚淤泥开挖、膨胀土处理等技术难关，让这条千年"水脉"重获新生。', stats: {history: '千年水脉遗址', breakthrough: '膨胀土技术'}},
+                    {name: '平顶山', coord: [33.77, 113.20], type: 'node', desc: '中线工程首个"救命水"受惠城市。2014年平顶山遭遇60年一遇大旱，城市"大水缸"白龟山水库几近干涸，百万市民饮水告急。国家紧急协调，通过尚未完全通水的中线干渠，连续45天向平顶山调水5130万立方米，缓解了供水危机。', stats: {relief: '5130万m³', period: '45天', year: '2014年'}},
+                    {name: '郑州', coord: [34.76, 113.65], type: 'node', desc: '中线工程的"穿黄节点"，干渠在此以隧洞形式穿越黄河，实现"江水不犯河水"。穿黄隧洞深埋河床下23-35米，全长19.3公里，是世界上规模最大的穿越黄河输水隧洞。郑州累计安置丹江口移民1.87万人，如今主城区90%以上的生活用水来自南水。', stats: {tunnel: '19.3km', depth: '23-35m', migrate: '1.87万', ratio: '90%+'}},
+                    {name: '安阳', coord: [36.10, 114.40], type: 'node', desc: '红旗渠故乡的"新水脉"。中线工程通水以来，累计向安阳供水超9.3亿立方米，受益人口达332万。汤河下游因生态补水重现碧波，沿岸5.2万亩农田告别"靠天收"；林州市通过西部调水工程，让南水爬上太行山，续写了"红旗渠精神"的新篇章。', stats: {water: '9.3亿m³', people: '332万', farmland: '5.2万亩'}},
+                    {name: '邯郸', coord: [36.62, 114.48], type: 'node', desc: '河北首个受益城市，城区70%的自来水来自丹江水。过去当地居民水壶里水垢厚重，如今江水烧开后清澈透亮。洺河渡槽退水渠首次为洺河生态补水，这条千年古河重现了"洺河春涨"的盛景。', stats: {ratio: '70%', history: '千年古河'}},
+                    {name: '石家庄', coord: [38.04, 114.48], type: 'node', desc: '中线工程让干涸40多年的滹沱河重焕生机。截至2025年，石家庄累计受水超66亿立方米，其中32亿立方米用于生态补水，滹沱河成为常年有水的"城市绿廊"。干渠在元氏县为保护常山郡故城遗址主动改道，实现了文物保护与工程建设双赢。', stats: {water: '66亿m³', eco: '32亿m³', history: '40年重焕生机'}},
+                    {name: '保定', coord: [38.87, 115.48], type: 'node', desc: '中线工程的"雄安水保障基地"，漕河渡槽是全国中小学生研学实践教育基地，每年开展50余次水利科普活动。2023年海河特大洪水期间，保定管理处组建"党员突击队"，确保干渠安全运行；雄安调蓄库建成后，可将新区供水保证率提升至97%。', stats: {guarantee: '97%', activity: '50+次/年'}},
+                    {name: '北京', coord: [40.00, 116.23], type: 'end', desc: '中线工程的终点，也是首都的"生命线"。自2014年通水以来，累计向北京调水超106亿立方米，城区80%以上的生活用水来自南水。江水替代了超采的地下水，让北京地下水位连续10年回升，密云水库蓄水量也创下历史新高。', stats: {water: '106亿m³', ratio: '80%+', rise: '连续10年'}}
                 ]
             },
             west: {
                 name: '西线工程',
                 color: '#eab308',
+                desc: '目前处于前期论证阶段，规划从长江上游通天河、雅砻江、大渡河调水入黄河上游，解决西北六省区缺水问题',
                 points: [
-                    {name: '通天河', coord: [33.5, 94.0], type: 'start', desc: '长江上游源头，青藏高原腹地'},
-                    {name: '金沙江', coord: [32.5, 98.0], type: 'node', desc: '长江上游重要支流'},
-                    {name: '雅砻江', coord: [28.0, 101.0], type: 'node', desc: '长江上游重要支流'},
-                    {name: '大渡河', coord: [31.5, 102.5], type: 'node', desc: '长江上游重要支流'},
-                    {name: '黄河上游', coord: [35.0, 103.5], type: 'end', desc: '西线工程终点，规划中'}
+                    {name: '通天河', coord: [33.5, 94.0], type: 'start', desc: '西线工程的上游水源地，位于三江源自然保护区。早在1952年，黄河水利委员会就组织了通天河调水线路查勘，历经70余年论证，形成了自流调水方案。工程将通过隧洞穿越巴颜喀拉山，减少对高原生态的影响。', stats: {since: '1952年', research: '70+年', eco: '三江源'}},
+                    {name: '金沙江', coord: [32.5, 98.0], type: 'node', desc: '西线"下线方案"的重要水源，叶巴滩水电站作为调水节点，2025年主厂房机电安装全面启动。规划通过隧洞将金沙江水引入雅砻江，实现跨流域调水，补充黄河上游水量，缓解西北干旱缺水问题。', stats: {project: '叶巴滩水电站', year: '2025年'}},
+                    {name: '雅砻江', coord: [28.0, 101.0], type: 'node', desc: '西线工程的核心水源地，两河口水库年径流量达209亿立方米，可通过梯级调度向北调水50-100亿立方米。"上线方案"规划从雅砻江干支流调水，通过隧洞自流至黄河支流贾曲，为西北地区提供稳定水源。', stats: {runoff: '209亿m³', transfer: '50-100亿m³'}},
+                    {name: '大渡河', coord: [31.5, 102.5], type: 'node', desc: '西线一期工程的调水起点，双江口水库被纳入战略规划，可作为调水节点为下游引大济岷工程提供水源。工程规划从大渡河支流调水，通过输水隧洞穿越分水岭，自流进入黄河上游，预计调水量40亿立方米。', stats: {project: '双江口水库', plan: '40亿m³'}},
+                    {name: '黄河上游', coord: [35.0, 103.5], type: 'end', desc: '西线工程的终点，调水将汇入黄河上游龙羊峡以上河段，规划年调水量170亿立方米，约占黄河多年平均径流量的29%。工程实施后，将增强黄河水源保障能力，缓解下游断流问题，为西北六省区1.1亿人口提供用水支撑。', stats: {transfer: '170亿m³', ratio: '29%', people: '1.1亿'}}
                 ]
             }
         };
@@ -510,6 +811,7 @@
         let activeRoutes = {east: true, middle: true, west: true};
         let routePolylines = {};
         let routeMarkers = {};
+        let leftPanel, detailPanel;
 
         // 地图瓦片源
         const mapSources = {
@@ -528,7 +830,6 @@
             }
         };
 
-        // 标注图层
         const labelSources = {
             satellite: {
                 url: 'https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=174705aebfe31b79b3587279e211cb9a',
@@ -552,22 +853,22 @@
                 zoomControl: false
             });
 
-            // 添加默认卫星图层
             addMapLayer('satellite');
             
-            // 绘制所有路线
             Object.keys(routeData).forEach(key => {
                 drawRoute(key);
             });
 
-            // 隐藏加载动画
             setTimeout(() => {
                 document.getElementById('loadingOverlay').classList.add('hidden');
+                // 显示拖动提示
+                const hint = document.getElementById('dragHint');
+                hint.classList.add('show');
+                setTimeout(() => hint.classList.remove('show'), 3000);
             }, 1000);
         }
 
         function addMapLayer(type) {
-            // 移除现有图层
             if (mapLayers.base) map.removeLayer(mapLayers.base);
             if (mapLayers.label) map.removeLayer(mapLayers.label);
 
@@ -588,12 +889,9 @@
 
         function switchMap(type) {
             currentMapType = type;
-            
-            // 更新按钮状态
             document.querySelectorAll('.map-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.type === type);
             });
-
             addMapLayer(type);
         }
 
@@ -601,7 +899,6 @@
             const route = routeData[routeKey];
             const latlngs = route.points.map(p => p.coord);
 
-            // 路线阴影
             const shadowLine = L.polyline(latlngs, {
                 color: '#000',
                 weight: 8,
@@ -609,7 +906,6 @@
                 lineJoin: 'round'
             });
 
-            // 主路线
             const polyline = L.polyline(latlngs, {
                 color: route.color,
                 weight: 4,
@@ -621,14 +917,12 @@
 
             routePolylines[routeKey] = { shadow: shadowLine, main: polyline };
 
-            // 添加标记
             routeMarkers[routeKey] = [];
             route.points.forEach(point => {
                 const marker = createMarker(point, route.color);
                 routeMarkers[routeKey].push(marker);
             });
 
-            // 根据激活状态添加/移除
             if (activeRoutes[routeKey]) {
                 shadowLine.addTo(map);
                 polyline.addTo(map);
@@ -682,22 +976,115 @@
             const panel = document.getElementById('detailPanel');
             document.getElementById('detailTitle').textContent = point.name;
             document.getElementById('detailTitle').style.color = routeColor;
-            document.getElementById('detailType').textContent = 
-                point.type === 'start' ? '起点' : 
+            document.getElementById('detailType').textContent =
+                point.type === 'start' ? '起点' :
                 point.type === 'end' ? '终点' : '节点';
             document.getElementById('detailRoute').textContent = routeName;
             document.getElementById('detailLat').textContent = point.coord[0].toFixed(4) + '°';
             document.getElementById('detailLng').textContent = point.coord[1].toFixed(4) + '°';
             document.getElementById('detailDesc').textContent = point.desc;
+
+            // 渲染统计数据
+            const statsContainer = document.getElementById('detailStats');
+            statsContainer.innerHTML = '';
+            if (point.stats) {
+                const entries = Object.entries(point.stats);
+                entries.forEach(([key, value]) => {
+                    const statDiv = document.createElement('div');
+                    statDiv.className = 'stat-item';
+                    // 根据数据类型设置颜色
+                    let colorClass = '';
+                    if (key === 'water' || key === 'storage' || key === 'runoff' || key === 'transfer') colorClass = 'water';
+                    else if (key === 'migrate' || key === 'people') colorClass = 'migrate';
+                    else if (key === 'eco' || key === 'quality' || key === 'clarity' || key === 'guarantee') colorClass = 'eco';
+                    else colorClass = 'time';
+                    statDiv.innerHTML = `
+                        <div class="stat-value ${colorClass}">${value}</div>
+                        <div class="stat-label">${getStatLabel(key)}</div>
+                    `;
+                    statsContainer.appendChild(statDiv);
+                });
+            }
+
             panel.classList.add('show');
+        }
+
+        // 统计数据标签映射
+        function getStatLabel(key) {
+            const labels = {
+                water: '累计调水',
+                storage: '库容/水位',
+                migrate: '移民人数',
+                quality: '水质等级',
+                flow: '输送水量',
+                since: '建成/启动',
+                area: '恢复面积',
+                pump: '泵站规模',
+                function: '主要功能',
+                investment: '治理投资',
+                enterprises: '关停企业',
+                clarity: '透明度',
+                farmland: '保护农田',
+                impact: '生态效益',
+                aid: '对口帮扶',
+                task: '调水任务',
+                history: '历史意义',
+                breakthrough: '技术突破',
+                relief: '应急供水',
+                period: '调水天数',
+                year: '关键年份',
+                tunnel: '隧洞长度',
+                depth: '埋深',
+                ratio: '供水占比',
+                people: '受益人口',
+                monitor: '监测方式',
+                eco: '生态补水',
+                rise: '地下水位',
+                guarantee: '保证率',
+                activity: '科普活动',
+                runoff: '年径流量',
+                plan: '规划调水',
+                project: '配套工程',
+                research: '论证时间'
+            };
+            return labels[key] || key;
         }
 
         function hideDetail() {
             document.getElementById('detailPanel').classList.remove('show');
         }
+        
+        function resetPanel(type) {
+            if (type === 'left') {
+                leftPanel.reset();
+            } else {
+                document.getElementById('detailPanel').style.top = 'auto';
+                document.getElementById('detailPanel').style.left = 'auto';
+                document.getElementById('detailPanel').style.right = '12px';
+                document.getElementById('detailPanel').style.bottom = '12px';
+                document.getElementById('detailPanel').style.width = '280px';
+            }
+        }
 
         // 初始化
-        initMap();
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            
+            // 初始化可拖动面板
+            leftPanel = new DraggablePanel(document.getElementById('leftPanel'), {
+                defaultPos: { top: '80px', left: '12px', width: '220px' },
+                minWidth: 180,
+                minHeight: 150,
+                maxWidth: 350
+            });
+            
+            new DraggablePanel(document.getElementById('detailPanel'), {
+                defaultPos: { top: 'auto', left: 'auto', right: '12px', bottom: '12px', width: '280px' },
+                minWidth: 220,
+                minHeight: 180,
+                maxWidth: 400
+            });
+        });
     </script>
 </body>
 </html>
