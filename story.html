@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <base href="https://tianq4691-maker.github.io/NSBD/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工程故事 - 南水北调</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --water-deep: #0b5e52;
+            --water-mid: #0d9488;
+            --water-light: #14b8a6;
+            --water-cyan: #06b6d4;
+            --water-glow: #22d3ee;
+            --river-green: #10b981;
+            --card-glass: rgba(8, 30, 28, 0.72);
+            --card-border: rgba(13, 148, 136, 0.30);
+            --text-primary: #f0faf7;
+            --text-secondary: rgba(215, 245, 238, 0.82);
+            --text-muted: rgba(190, 230, 220, 0.58);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #041a1a;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 页面包裹层 */
+        .page-wrapper {
+            position: relative;
+        }
+
+        /* 背景 */
+        .bg-layer {
+            position: absolute;
+            inset: 0; z-index: 0;
+            background-image: url('工程故事.jpg');
+            background-repeat: repeat-y;
+            background-size: 100% auto;
+            filter: brightness(0.55) saturate(1.05);
+        }
+        .bg-overlay {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg,
+                    rgba(2, 15, 15, 0.40) 0%,
+                    rgba(3, 20, 18, 0.22) 35%,
+                    rgba(4, 22, 20, 0.22) 70%,
+                    rgba(2, 14, 12, 0.40) 100%
+                );
+            z-index: 1;
+        }
+
+        .main-content {
+            position: relative; z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem 3rem;
+        }
+
+        /* 顶部导航 */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(4, 26, 26, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(13, 148, 136, 0.2);
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .header h1 {
+            font-size: 1.3rem; font-weight: 700;
+            color: var(--water-glow);
+            letter-spacing: 3px;
+            white-space: nowrap;
+        }
+        .back-btn {
+            display: flex; align-items: center; gap: 0.4rem;
+            background: var(--card-glass);
+            border: 1px solid var(--card-border);
+            color: var(--water-light);
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .back-btn:hover { background: var(--water-mid); color: #fff; }
+
+        /* 目录导航 */
+        .toc {
+            background: var(--card-glass);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .toc h3 {
+            font-size: 1rem; color: var(--water-glow);
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 0.5rem;
+        }
+        .toc-link {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+        .toc-link:hover {
+            color: var(--water-glow);
+            border-color: var(--card-border);
+            background: rgba(13,148,136,0.1);
+        }
+
+        /* 统计卡片 */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--card-glass);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.2rem;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .stat-card .num {
+            font-size: 1.8rem; font-weight: 700;
+            color: var(--water-glow);
+            display: block;
+        }
+        .stat-card .lbl {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        /* 章节 */;
+        .section {
+            background: var(--card-glass);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+        }
+        .section::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--water-mid), var(--water-glow), var(--water-mid));
+        }
+        .section h2 {
+            font-size: 1.5rem; color: var(--water-light);
+            margin-bottom: 1.5rem;
+            display: flex; align-items: center; gap: 0.6rem;
+            letter-spacing: 2px;
+        }
+        .section h2 i { color: var(--water-glow); font-size: 1.3rem; }
+        .section h3 {
+            font-size: 1.1rem; color: var(--water-cyan);
+            margin: 1.5rem 0 0.8rem;
+            letter-spacing: 1px;
+        }
+        .section p {
+            color: var(--text-secondary);
+            line-height: 2;
+            margin-bottom: 0.8rem;
+            text-align: justify;
+            font-size: 0.95rem;
+        }
+
+        /* 时间线 */
+        .timeline { position: relative; padding-left: 1.5rem; }
+        .timeline::before {
+            content: '';
+            position: absolute; left: 6px; top: 0; bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--water-mid), var(--water-glow), var(--water-mid));
+        }
+        .tl-item {
+            position: relative;
+            padding: 0.6rem 0 0.6rem 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+        .tl-item::before {
+            content: '';
+            position: absolute; left: -22px; top: 1rem;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--water-glow);
+            box-shadow: 0 0 8px var(--water-glow);
+        }
+        .tl-date {
+            font-size: 0.8rem; color: var(--water-glow);
+            font-weight: 500; margin-bottom: 0.2rem;
+        }
+        .tl-text {
+            font-size: 0.9rem; color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* 引用 */
+        blockquote {
+            background: rgba(6, 182, 212, 0.08);
+            border-left: 3px solid var(--water-glow);
+            padding: 1rem 1.5rem;
+            margin: 1.2rem 0;
+            border-radius: 0 10px 10px 0;
+            color: var(--text-secondary);
+            font-style: italic;
+            line-height: 1.8;
+        }
+
+        /* 三线对比卡片 */
+        .route-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .route-card {
+            background: rgba(6, 182, 212, 0.06);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 1.2rem;
+        }
+        .route-card h4 {
+            color: var(--water-glow);
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+        .route-card p {
+            font-size: 0.85rem; line-height: 1.8;
+            color: var(--text-secondary);
+            text-align: left;
+        }
+
+        /* 数据高亮 */;
+        .highlight {
+            display: inline-block;
+            background: rgba(34, 211, 238, 0.12);
+            color: var(--water-glow);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 0.8rem 1rem 2rem; }
+            .section { padding: 1.5rem 1.2rem; }
+            .section h2 { font-size: 1.2rem; }
+            .header { padding: 0.6rem 1rem; }
+            .header h1 { font-size: 1.1rem; letter-spacing: 1px; }
+            .toc-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+        }
+
+        /* ========== 词云图谱 ========== */
+        .wc-section { margin-bottom: 2rem; }
+        .wc-header { text-align: center; margin-bottom: 0.9rem; }
+        .wc-header h2 { font-size: 1.2rem; font-weight: 600; letter-spacing: 3px; color: var(--water-light); margin-bottom: 0.25rem; }
+        .wc-header .wc-sub { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1.5px; }
+        .wc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem 0.8rem; }
+        .wc-item { cursor: pointer; transition: transform 0.3s ease; }
+        .wc-item:hover { transform: translateY(-3px); }
+        .wc-card { position: relative; overflow: hidden; aspect-ratio: 2 / 3; border-radius: 8px; border: 1px solid var(--card-border); transition: border-color 0.3s ease, box-shadow 0.3s ease; background: rgba(10,50,45,0.15); }
+        .wc-item:hover .wc-card { border-color: var(--water-mid); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .wc-card img { width: 105%; height: 105%; object-fit: contain; object-position: center; margin: -2.5%; transition: transform 0.35s ease; }
+        .wc-item:hover .wc-card img { transform: scale(1.06); }
+        .wc-label { text-align: center; margin-top: 0.35rem; }
+        .wc-label span { font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); letter-spacing: 1.5px; }
+
+        /* ========== 图片灯箱 ========== */
+        .lb-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; cursor: pointer; }
+        .lb-overlay.show { opacity: 1; pointer-events: auto; }
+        .lb-overlay img { max-width: 92vw; max-height: 88vh; object-fit: contain; border-radius: 6px; transform: scale(0.9); transition: transform 0.35s ease; }
+        .lb-overlay.show img { transform: scale(1); }
+        .lb-close { position: absolute; top: 20px; right: 24px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #fff; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.15); z-index: 2; }
+        .lb-close:hover { background: rgba(255,255,255,0.2); }
+        .lb-label { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.7); font-size: 0.95rem; letter-spacing: 3px; transition: opacity 0.3s; }
+
+        @media (max-width: 768px) { .wc-grid { grid-template-columns: repeat(2, 1fr); gap: 0.9rem 0.6rem; } }
+        @media (max-width: 480px) { .wc-grid { gap: 0.7rem 0.4rem; } .wc-label { margin-top: 0.25rem; } .wc-label span { font-size: 0.68rem; letter-spacing: 1px; } }
+    </style>
+    <link rel="stylesheet" href="https://tianq4691-maker.github.io/NSBD-redesign/archive-theme.css">
+</head>
+<body>
+<div class="page-wrapper">
+<div class="bg-layer">
+    <div class="bg-overlay"></div>
+</div>
+
+<header class="header">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>
+    <h1>工程纪实</h1>
+    <div style="width:80px;"></div>
+</header>
+
+<div class="main-content">
+
+    <!-- 目录 -->
+    <div class="toc">
+        <h3>📑 目录导航</h3>
+        <div class="toc-grid">
+            <a class="toc-link" href="#sec1">一、缘起构想</a>
+            <a class="toc-link" href="#sec2">二、研究论证</a>
+            <a class="toc-link" href="#sec3">三、审批立项</a>
+            <a class="toc-link" href="#sec4">四、工程建设</a>
+            <a class="toc-link" href="#sec5">五、验收通水</a>
+            <a class="toc-link" href="#sec6">六、通水历程</a>
+            <a class="toc-link" href="#sec7">七、规划方案</a>
+            <a class="toc-link" href="#sec8">八、建设成果</a>
+            <a class="toc-link" href="#sec9">九、移民奉献</a>
+            <a class="toc-link" href="#sec10">十、深远意义</a>
+        </div>
+    </div>
+
+    <!-- 关键数据 -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <span class="num">880亿m³</span>
+            <span class="lbl">累计调水量</span>
+        </div>
+        <div class="stat-card">
+            <span class="num">1.95亿</span>
+            <span class="lbl">直接受益人口</span>
+        </div>
+        <div class="stat-card">
+            <span class="num">48座</span>
+            <span class="lbl">惠及大中城市</span>
+        </div>
+        <div class="stat-card">
+            <span class="num">1432km</span>
+            <span class="lbl">中线总干渠长度</span>
+        </div>
+    </div>
+
+    <!-- 词云图谱 -->
+    <section class="wc-section">
+        <div class="wc-header">
+            <h2>群像记忆 · 词云图谱</h2>
+            <p class="wc-sub">六类建设者群体的口述关键词</p>
+        </div>
+        <div class="wc-grid">
+            <div class="wc-item" title="原住民" onclick="openLB('词云图/词云_原住民.png','原住民')">
+                <div class="wc-card">
+                    <img src="词云图/词云_原住民.png" alt="原住民词云" loading="lazy">
+                </div>
+                <div class="wc-label"><span>原 住 民</span></div>
+            </div>
+            <div class="wc-item" title="工程师" onclick="openLB('词云图/词云_工程师.png','工程师')">
+                <div class="wc-card">
+                    <img src="词云图/词云_工程师.png" alt="工程师词云" loading="lazy">
+                </div>
+                <div class="wc-label"><span>工 程 师</span></div>
+            </div>
+            <div class="wc-item" title="后勤保障人员" onclick="openLB('词云图/词云_后勤保障人员.png','后勤保障人员')">
+                <div class="wc-card">
+                    <img src="词云图/词云_后勤保障人员.png" alt="后勤保障人员词云" loading="lazy">
+                </div>
+                <div class="wc-label"><span>后勤保障人员</span></div>
+            </div>
+            <div class="wc-item" title="基层干部" onclick="openLB('词云图/词云_基层干部.png','基层干部')">
+                <div class="wc-card">
+                    <img src="词云图/词云_基层干部.png" alt="基层干部词云" loading="lazy">
+                </div>
+                <div class="wc-label"><span>基层干部</span></div>
+            </div>
+            <div class="wc-item" title="民工" onclick="openLB('词云图/词云_民工.png','民工')">
+                <div class="wc-card">
+                    <img src="词云图/词云_民工.png" alt="民工词云" loading="lazy">
+                </div>
+                <div class="wc-label"><span>民 工</span></div>
+            </div>
+            <div class="wc-item" title="移民" onclick="openLB('词云图/词云_移民.png','移民')">
+                <div class="wc-card">
+                    <img src="词云图/词云_移民.png" alt="移民词云" loading="lazy">
+                </div>
+                <div class="wc-label"><span>移 民</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== 一、缘起构想 ======== -->
+    <div class="section" id="sec1">
+        <h2><i class="fas fa-lightbulb"></i> 一、缘起：世纪的构想</h2>
+        <p><span class="highlight">1952年10月30日</span>，毛泽东登临郑州市邙山，俯视脚下滔滔黄河，以诗人的浪漫说道：<strong>"南方水多，北方水少，如有可能，借点水来也是可以的！"</strong></p>
+        <blockquote>1953年2月19日，毛泽东视察长江时，站在"长江"号军舰的甲板上问水利专家林一山："南方水多，北方水少，能不能把南方的水借给北方一些？"他用手中的铅笔在地图上久久地指着丹江口。就在这次视察中，毛泽东明确提出了"南水北调"的设想。</blockquote>
+        <p><span class="highlight">1958年3月25日</span>，中央政治局成都会议，周恩来总理正式提议兴建丹江口水利枢纽工程，获得会议支持与批准。毛泽东在会上兴奋地说："打开通天河、白龙江，借长江水济黄、丹江口引汉济黄，引黄济卫，同北京联系起来了。"</p>
+        <p><span class="highlight">1958年8月</span>，《中共中央关于水利工作的指示》颁布，第一次正式提出"南水北调"。</p>
+        <p><span class="highlight">1959年</span>，中科院、水电部确定南水北调指导方针：<strong>"蓄调兼施，综合利用，统筹兼顾，南北两利，以有济无，以多补少，使水尽其用，地尽其利。"</strong></p>
+        <p><span class="highlight">1979年</span>，五届全国人大一次会议《政府工作报告》正式提出："兴建把长江水引到黄河以北的南水北调工程"。</p>
+    </div>
+
+    <!-- ======== 二、研究论证 ======== -->
+    <div class="section" id="sec2">
+        <h2><i class="fas fa-search"></i> 二、研究论证（1979—2000）</h2>
+        <div class="timeline">
+            <div class="tl-item">
+                <div class="tl-date">1979年12月</div>
+                <div class="tl-text">水利部正式成立南水北调规划办公室，统筹领导协调全国南水北调工作。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">1987年7月</div>
+                <div class="tl-text">国家计委决定将南水北调西线工程列入"七五"超前期工作项目。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">1991年4月</div>
+                <div class="tl-text">七届全国人大四次会议将"南水北调"列入"八五"计划和十年规划。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">1992年10月</div>
+                <div class="tl-text">中共十四大把"南水北调"列入中国跨世纪骨干工程之一。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">1995年12月</div>
+                <div class="tl-text">南水北调工程开始全面论证。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2000年6月</div>
+                <div class="tl-text">经过数十年研究，总体格局定为西、中、东三条线路，分别从长江上、中、下游调水。</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== 三、审批立项 ======== -->
+    <div class="section" id="sec3">
+        <h2><i class="fas fa-file-signature"></i> 三、审批立项（2002）</h2>
+        <p><span class="highlight">2002年10月10日</span>，中共中央政治局常务委员会会议审议并通过了经国务院同意的《南水北调工程总体规划》。</p>
+        <p><span class="highlight">2002年12月23日</span>，国务院正式批复《南水北调总体规划》，规划最终调水规模<span class="highlight">448亿立方米</span>——东线148亿m³、中线130亿m³、西线170亿m³。</p>
+        <p><span class="highlight">2002年12月27日</span>，南水北调工程正式开工！江苏段三潼宝工程和山东段济平干渠工程成为东线首批开工工程。</p>
+    </div>
+
+    <!-- ======== 四、工程建设 ======== -->
+    <div class="section" id="sec4">
+        <h2><i class="fas fa-hard-hat"></i> 四、工程建设（2002—2014）</h2>
+        <div class="timeline">
+            <div class="tl-item">
+                <div class="tl-date">2003年12月30日</div>
+                <div class="tl-text">中线京石段应急供水工程动工，中线一期工程正式启动。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2005年9月26日</div>
+                <div class="tl-text">丹江口大坝加高工程正式动工——中线标志性工程，坝高由162m加至176.6m，水位从157m提至170m。中线工程进入全面实施阶段。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2008年9月28日</div>
+                <div class="tl-text">中线京石段应急供水工程建成通水。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2008年11月25日</div>
+                <div class="tl-text">丹江口库区移民试点工作全面启动。中线最大难题——移民搬迁正式开始。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2009年2月26日</div>
+                <div class="tl-text">兴隆水利枢纽工程开工，东、中线七省市全部开工。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2010年3月31日</div>
+                <div class="tl-text">丹江口大坝54个坝段全部加高到顶。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2012年9月</div>
+                <div class="tl-text">丹江口库区移民搬迁全面完成——南水北调中线工程规划区人口4.38亿人。</div>
+            </div>
+        </div>
+        <blockquote>"四横三纵"总体布局：通过三条调水线路与长江、黄河、淮河、海河四大江河联系，实现中国水资源南北调配、东西互济。</blockquote>
+    </div>
+
+    <!-- ======== 五、验收通水 ======== -->
+    <div class="section" id="sec5">
+        <h2><i class="fas fa-check-circle"></i> 五、试运行与验收通水（2013—2014）</h2>
+        <div class="timeline">
+            <div class="tl-item">
+                <div class="tl-date">2013年5月31日</div>
+                <div class="tl-text">东线一期工程江苏段试通水圆满成功。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2013年8月15日</div>
+                <div class="tl-text">东线一期工程通过全线通水验收，具备通水条件。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2013年11月15日</div>
+                <div class="tl-text"><strong>东线一期工程正式通水运行。</strong></div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2014年6月—9月</div>
+                <div class="tl-text">中线黄河以北、以南总干渠先后充水试验；穿黄工程隧洞充水成功。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2014年9月29日</div>
+                <div class="tl-text">中线工程一期通过全线通水验收，具备通水条件。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2014年12月12日</div>
+                <div class="tl-text" style="color:var(--water-glow);font-weight:600;"><strong>中线工程一期正式通水运行！</strong>长1432公里、历时11年建设。14时32分开闸——寓意总干渠长度1432公里。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2014年12月27日</div>
+                <div class="tl-text">丹江口水库江水正式进入北京市民家中，北京开启24小时不间断值守。</div>
+            </div>
+        </div>
+        <blockquote>南水北调东线工程创造了世界上规模最大的泵站群——东线泵站群工程。中线工程水源地丹江口水库水质常年保持国家Ⅱ类以上，"双封闭"渠道确保沿途水质安全。</blockquote>
+    </div>
+
+    <!-- ======== 六、通水历程 ======== -->
+    <div class="section" id="sec6">
+        <h2><i class="fas fa-tint"></i> 六、通水运行历程</h2>
+        <div class="timeline">
+            <div class="tl-item">
+                <div class="tl-date">2016年</div>
+                <div class="tl-text">北京市平原地区地下水位实现止跌回升，至2019年储量增加13.9亿m³。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2019年9月5日</div>
+                <div class="tl-text">北京累计接收丹江口水库来水达50亿m³，直接受益人口超1200万。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2019年11月28日</div>
+                <div class="tl-text">北延应急供水工程正式开工建设。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2020年6月3日</div>
+                <div class="tl-text">中线一期工程安全输水2000天，累计向北输水300亿m³，沿线6000万人口受益。北京中心城区供水安全系数由1提升至1.2。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2020年10月23日</div>
+                <div class="tl-text"><strong>中国南水北调集团有限公司正式揭牌</strong>，注册资本1500亿元。南水北调工程投资已超三峡工程，成为世界最大水利工程。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2021年</div>
+                <div class="tl-text">中线年度调水超90亿m³创历史新高。丹江口大坝加高工程通过完工验收。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2022年</div>
+                <div class="tl-text">东中线一期工程155个设计单元全部通过验收，全线转入正式运行。累计调水超500亿m³。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2023年</div>
+                <div class="tl-text">累计调水突破600亿m³，受益人口超1.5亿。东线向山东调水突破60亿m³。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2024年3月18日</div>
+                <div class="tl-text">累计调水突破700亿m³，受益人口1.76亿。北京接收"南水"超96亿m³，地下水位累计回升超10米。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2024年12月12日</div>
+                <div class="tl-text"><strong>中线通水十周年！</strong>累计向北方输水687亿m³。"南水"占北京城区供水70%以上，天津市主城区供水几乎全部为"南水"。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2025年7月</div>
+                <div class="tl-text">累计调水突破800亿m³，受益人口1.85亿人。</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-date">2026年5月</div>
+                <div class="tl-text" style="color:var(--water-glow);font-weight:600;">累计调水超880亿m³，惠及7省份48座大中城市1.95亿人！</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== 七、规划方案 ======== -->
+    <div class="section" id="sec7">
+        <h2><i class="fas fa-draw-polygon"></i> 七、三线规划方案</h2>
+        <p>经过数十年的勘查与论证，广大科技工作者在分析比较50多种方案的基础上，形成了东线、中线和西线调水的基本方案。规划调水总规模<span class="highlight">448亿m³</span>，建设时间约需40—50年。</p>
+
+        <div class="route-cards">
+            <div class="route-card">
+                <h4><i class="fas fa-arrow-right"></i> 东线工程</h4>
+                <p>从长江下游扬州抽引长江水，利用京杭大运河及平行河道逐级提水北送，连通洪泽湖、骆马湖、南四湖、东平湖。出东平湖后分两路：一路向北穿黄河至天津（约1156km），一路向东输水至烟台、威海。规划调水<span class="highlight">148亿m³</span>。创造了世界上规模最大的泵站群。</p>
+            </div>
+            <div class="route-card">
+                <h4><i class="fas fa-arrow-up"></i> 中线工程</h4>
+                <p>水源70%从汉江汇聚至丹江口水库，由丹江口大坝加高后调水。从河南淅川陶岔渠首出水，经方城垭口过长江与淮河分水岭，在郑州以西穿黄河，沿京广铁路西侧北上，自流至北京团城湖。总干渠长<span class="highlight">1432km</span>，规划调水<span class="highlight">130亿m³</span>。</p>
+            </div>
+            <div class="route-card">
+                <h4><i class="fas fa-mountain"></i> 西线工程</h4>
+                <p>在长江上游通天河、雅砻江、大渡河筑坝建库，开凿穿巴颜喀拉山输水隧洞调水入黄河上游。解决青、甘、宁、蒙、陕、晋6省缺水问题。规划调水<span class="highlight">170亿m³</span>。地处青藏高原，海拔2900—4000m，目前仍在规划论证阶段。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== 八、建设成果 ======== -->
+    <div class="section" id="sec8">
+        <h2><i class="fas fa-chart-bar"></i> 八、建设成果</h2>
+        <p>南水北调工程已成为优化水资源配置、保障群众饮水安全、复苏河湖生态环境、畅通南北经济循环的<strong>"生命线"</strong>。</p>
+        <h3>供水效益</h3>
+        <p>"南水"已占北京城区供水<span class="highlight">70%以上</span>，天津市主城区供水几乎全部为"南水"，河南省10余个省辖市用上"南水"，郑州中心城区<span class="highlight">90%以上</span>居民用上"南水"。</p>
+        <h3>生态效益</h3>
+        <p>累计向北方50多条河流生态补水超<span class="highlight">118亿m³</span>。滹沱河、瀑河、大清河、白洋淀等重现生机，永定河实现1996年来865km河道首次全线通水。北京密云水库蓄水量突破历史最高纪录<span class="highlight">35.79亿m³</span>。</p>
+        <h3>地下水恢复</h3>
+        <p>北京平原区地下水位累计回升超<span class="highlight">10米</span>。河北省浅层地下水水位由治理前每年上升0.48m增加到0.74m。6省市压减城区地下水超采量超<span class="highlight">30亿m³</span>。</p>
+    </div>
+
+    <!-- ======== 九、移民奉献 ======== -->
+    <div class="section" id="sec9">
+        <h2><i class="fas fa-hands-helping"></i> 九、移民奉献：无言丰碑</h2>
+        <p>南水北调丹江口库区移民共搬迁安置农村移民<span class="highlight">16.59万人</span>，两次移民共计<span class="highlight">46.9万人</span>。淹没土地面积144km²，各项淹没损失达90多亿元。</p>
+        <blockquote>在整个移民搬迁过程中，没有发生一起移民重大伤亡事件，却有300多名干部晕倒在搬迁现场，100多名干部因公负伤，<strong>10名干部倒下牺牲</strong>。他们的名字和事迹，在中国水利史上树起了一座无言丰碑。</blockquote>
+        <p>为保证水质，十堰市关停"十五小"企业329家、关闭黄姜加工企业106家，6万职工下岗。汉中市严控矿产资源开发，每年影响利税近20亿元。安康市累计关停"两高"企业300余家，直接减少产值近300亿。商洛市每年减少税收约8亿元。</p>
+        <blockquote>"1100多万南阳人民，像爱护自己的眼睛一样呵护着丹江口水库清水。"</blockquote>
+    </div>
+
+    <!-- ======== 十、深远意义 ======== -->
+    <div class="section" id="sec10">
+        <h2><i class="fas fa-globe-asia"></i> 十、深远意义</h2>
+        <h3>社会意义</h3>
+        <p>解决北方缺水问题，增加水资源承载能力；使北方地区逐步成为水资源配置合理、水环境良好的节水防污型社会；缓解水资源短缺对城市化发展的制约。</p>
+        <h3>经济意义</h3>
+        <p>为北方经济发展提供水资源保障，支撑受水区40多座大中城市超<span class="highlight">16万亿GDP</span>增长，优化产业结构，促进经济结构战略性调整。</p>
+        <h3>生态意义</h3>
+        <p>改善黄淮海地区生态环境；改善北方饮水质量，解决高氟水、苦咸水等水质问题；回补北方地下水，保护湿地和生物多样性。</p>
+        <blockquote>"南水北调工程事关战略全局、事关长远发展、事关人民福祉。一渠清水奔流北上不舍昼夜，寄托着民族复兴的伟大梦想，涌动着家国天下的赤子情怀。"</blockquote>
+    </div>
+
+
+</div>
+</div>
+
+<!-- 页面加载进度条 -->
+<script>
+(function(){
+    var css='.pl-wrap{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;pointer-events:none;}'+
+        '.pl-box{text-align:center;padding:28px 32px;border-radius:10px;background:rgba(8,20,18,0.82);backdrop-filter:blur(6px);}'+
+        '.pl-bar{width:220px;height:5px;background:rgba(255,255,255,0.12);border-radius:5px;overflow:hidden;margin:0 auto;}'+
+        '.pl-bar-fill{height:100%;width:0;border-radius:5px;background:linear-gradient(90deg,#0d9488,#10b981,#22d3ee,#0d9488);background-size:300% 100%;animation:plShim 1.5s linear infinite;transition:width 0.25s ease-out;}'+
+        '@keyframes plShim{0%{background-position:300% 0}100%{background-position:-300% 0}}'+
+        '.pl-text{color:rgba(255,255,255,0.72);font-size:13px;margin-top:12px;letter-spacing:2px;font-family:system-ui,sans-serif;}'+
+        '.pl-done{opacity:0;transition:opacity 0.35s ease 0.15s;}';
+    var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+    var w=document.createElement('div'),fill,txt,done=false;
+    w.className='pl-wrap';
+    w.innerHTML='<div class="pl-box"><div class="pl-bar"><div class="pl-bar-fill"></div></div><div class="pl-text">正 在 加 载 ...</div></div>';
+    function ins(){if(!document.body)return setTimeout(ins,10);document.body.appendChild(w);fill=w.querySelector('.pl-bar-fill');txt=w.querySelector('.pl-text');_();}
+    var p=0,iv;
+    function _(){iv=setInterval(function(){var r=85-p;if(r<=0)return;p=Math.min(85,p+Math.max(1,r*0.12+Math.random()*3));if(fill)fill.style.width=p+'%';},200);}
+    function fin(){if(done)return;done=true;clearInterval(iv);if(fill)fill.style.width='100%';if(txt)txt.textContent='加 载 完 成';setTimeout(function(){w.classList.add('pl-done');setTimeout(function(){if(w.parentNode)w.parentNode.removeChild(w);},400);},350);}
+    window.addEventListener('load',fin);
+    setTimeout(function(){if(p<95)fin();},7000);
+    if(document.readyState==='complete')fin();else ins();
+})();
+</script>
+
+<!-- 图片灯箱 -->
+<div class="lb-overlay" id="lbOverlay" onclick="closeLB()">
+    <div class="lb-close" onclick="closeLB()"><i class="fas fa-times"></i></div>
+    <img id="lbImage" src="" alt="">
+    <div class="lb-label" id="lbLabel"></div>
+</div>
+<script>
+    function openLB(src, label) {
+        document.getElementById('lbImage').src = src;
+        document.getElementById('lbLabel').textContent = label;
+        document.getElementById('lbOverlay').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeLB() {
+        document.getElementById('lbOverlay').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeLB();
+    });
+</script>
+
+    <script src="https://tianq4691-maker.github.io/NSBD-redesign/archive-shell.js"></script>
+</body>
+</html>
