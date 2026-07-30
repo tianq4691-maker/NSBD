@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <base href="https://tianq4691-maker.github.io/NSBD/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>南水北调工程 · 卫星地图展示</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #000;
+            min-height: 100vh;
+            color: #fff;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        /* 全屏地图 */
+        #map {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1;
+        }
+        
+        /* 顶部标题 */
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+            letter-spacing: 3px;
+        }
+        
+        /* 可拖动面板基础样式 */
+        .draggable-panel {
+            position: fixed;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            overflow: visible;
+            transition: box-shadow 0.2s;
+            min-width: 180px;
+            min-height: 60px;
+        }
+        .draggable-panel:active {
+            box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+        }
+        
+        /* 拖动手柄 */
+        .drag-handle {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            border-radius: 16px 16px 0 0;
+            background: rgba(255,255,255,0.03);
+        }
+        .drag-handle::before {
+            content: '';
+            width: 40px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+        }
+        .drag-handle:hover {
+            background: rgba(255,255,255,0.06);
+        }
+        .drag-handle:hover::before {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* 大小调整手柄 */
+        .resize-handle {
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 24px;
+            height: 24px;
+            cursor: se-resize;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            padding: 6px;
+            opacity: 0.4;
+            transition: opacity 0.2s;
+        }
+        .resize-handle:hover {
+            opacity: 1;
+        }
+        .resize-handle::before,
+        .resize-handle::after {
+            content: '';
+            position: absolute;
+            background: rgba(255,255,255,0.4);
+            border-radius: 1px;
+        }
+        .resize-handle::before {
+            width: 10px; height: 2px;
+            bottom: 6px; right: 6px;
+        }
+        .resize-handle::after {
+            width: 2px; height: 10px;
+            bottom: 6px; right: 6px;
+        }
+        
+        /* 重置按钮 */
+        .reset-btn {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 20px; height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.08);
+            border: none;
+            border-radius: 6px;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s;
+            opacity: 0;
+        }
+        .draggable-panel:hover .reset-btn {
+            opacity: 1;
+        }
+        .reset-btn:hover {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+        
+        /* 返回按钮 */
+        .back-btn {
+            position: fixed;
+            top: 12px; left: 12px;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 18px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 30px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+        .back-btn:hover { 
+            background: rgba(30, 41, 59, 0.95);
+            border-color: rgba(255,255,255,0.3);
+        }
+        
+        /* 地图切换按钮 */
+        .map-switch {
+            position: fixed;
+            top: 12px; right: 12px;
+            display: flex;
+            gap: 8px;
+            z-index: 1001;
+        }
+        .map-btn {
+            padding: 10px 18px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 30px;
+            color: #fff;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .map-btn:hover, .map-btn.active {
+            background: rgba(59, 130, 246, 0.8);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+        
+        /* 左侧面板 */
+        .left-panel {
+            top: 80px; left: 12px;
+            width: 220px;
+            padding: 40px 16px 16px;
+        }
+        .left-panel .panel-content {
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+        
+        .panel-section {
+            margin-bottom: 14px;
+        }
+        .section-title {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        /* 路线卡片 */
+        .route-card {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .route-card:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .route-card.active {
+            background: rgba(255,255,255,0.1);
+        }
+        .route-card.east.active { border-color: #ef4444; }
+        .route-card.middle.active { border-color: #3b82f6; }
+        .route-card.west.active { border-color: #eab308; }
+        
+        .route-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .route-card.east .route-dot { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.6); }
+        .route-card.middle .route-dot { background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.6); }
+        .route-card.west .route-dot { background: #eab308; box-shadow: 0 0 8px rgba(234,179,8,0.6); }
+        
+        .route-info h4 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+        .route-info p {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
+        }
+        
+        /* 详情面板 */
+        .detail-panel {
+            width: 280px;
+            padding: 40px 16px 16px;
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .detail-panel.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .detail-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .detail-close {
+            width: 24px; height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.08);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: rgba(255,255,255,0.6);
+        }
+        .detail-close:hover { 
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+        
+        .detail-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .info-item {
+            padding: 10px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 8px;
+        }
+        .info-label {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 3px;
+        }
+        .info-value {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        .detail-desc {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.6;
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        /* 详情面板中的照片 */
+        .detail-photos {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .detail-photos:empty { display: none; }
+        .detail-photo-item {
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .detail-photo-item:hover {
+            transform: scale(1.05);
+        }
+        .detail-photo-item img {
+            width: 110px;
+            height: 75px;
+            object-fit: cover;
+            display: block;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+        }
+        
+        /* 详细统计信息 */
+        .detail-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .stat-item {
+            background: rgba(255,255,255,0.04);
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+        .stat-label {
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.4);
+        }
+        
+        /* 路线总览信息 */
+        .route-overview {
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.5;
+        }
+        
+        /* 统计值颜色 */
+        .stat-value.water { color: #60a5fa; }
+        .stat-value.migrate { color: #fb923c; }
+        .stat-value.eco { color: #4ade80; }
+        .stat-value.time { color: #a78bfa; }
+        
+        /* 底部图例 */
+        .legend-bar {
+            bottom: 12px; left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 16px;
+            padding: 10px 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+        }
+        .legend-line {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        .legend-line.east { background: #ef4444; }
+        .legend-line.middle { background: #3b82f6; }
+        .legend-line.west { 
+            background: repeating-linear-gradient(90deg, #eab308, #eab308 3px, transparent 3px, transparent 6px);
+        }
+        
+        /* 加载动画 */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #0a0a0f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loading-spinner {
+            width: 50px; height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 2px;
+        }
+        
+        /* 卫星地图标记 */
+        .sat-marker {
+            background: none;
+            border: none;
+        }
+        .marker-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .marker-icon.start { background: #ef4444; }
+        .marker-icon.end { background: #3b82f6; }
+        .marker-icon.node { background: #fff; }
+        
+        .marker-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            opacity: 0;
+            animation: marker-pulse 2s infinite;
+        }
+        .marker-icon.start::after { border-color: #ef4444; }
+        .marker-icon.end::after { border-color: #3b82f6; }
+        
+        @keyframes marker-pulse {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+        }
+        
+        .marker-label {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        /* 提示信息 */
+        .drag-hint {
+            position: fixed;
+            bottom: 60px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: rgba(255,255,255,0.7);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .drag-hint.show {
+            opacity: 1;
+        }
+
+        /* 照片浮窗 */
+        .photo-tooltip {
+            background: rgba(10, 15, 25, 0.92) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 12px !important;
+            padding: 8px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+            font-size: 0 !important;
+            line-height: 0 !important;
+        }
+        .photo-tooltip::before {
+            border-top-color: rgba(10, 15, 25, 0.92) !important;
+        }
+        .photo-tooltip .photo-grid {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            max-width: 420px;
+        }
+        .photo-tooltip .photo-item {
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .photo-tooltip .photo-item:hover {
+            transform: scale(1.04);
+        }
+        .photo-tooltip .photo-item img {
+            width: 180px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            display: block;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+        }
+        .photo-tooltip .photo-label {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .photo-tooltip .photo-grid { max-width: 300px; }
+            .photo-tooltip .photo-item img { width: 130px; height: 90px; }
+        }
+
+        /* 图片灯箱 */
+        .lightbox-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.92);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            cursor: zoom-out;
+        }
+        .lightbox-overlay.active { display: flex; }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 28px;
+            z-index: 10;
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            font-size: 1.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .lightbox-close:hover { background: rgba(255,255,255,0.25); }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 50px;
+            height: 80px;
+            border: none;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lightbox-nav:hover { background: rgba(255,255,255,0.2); }
+        .lightbox-nav.prev { left: 10px; border-radius: 0 8px 8px 0; }
+        .lightbox-nav.next { right: 10px; border-radius: 8px 0 0 8px; }
+        .lightbox-nav:disabled { opacity: 0.25; cursor: default; }
+        .lightbox-img-wrap {
+            max-width: 90vw;
+            max-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .lightbox-img-wrap img {
+            max-width: 90vw;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+        }
+        .lightbox-caption {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .lightbox-counter {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+        @media (max-width: 768px) {
+            .lightbox-nav { width: 36px; height: 56px; font-size: 1.4rem; }
+            .lightbox-nav.prev { left: 4px; }
+            .lightbox-nav.next { right: 4px; }
+            .lightbox-img-wrap img { max-width: 95vw; max-height: 70vh; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://tianq4691-maker.github.io/NSBD-redesign/archive-theme.css">
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载卫星地图...</div>
+    </div>
+    
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回</a>
+    
+    <div class="header">
+        <h1>南水北调工程 · 卫星地图</h1>
+    </div>
+    
+    <!-- 地图切换 -->
+    <div class="map-switch">
+        <button class="map-btn active" data-type="satellite" onclick="switchMap('satellite')">
+            <i class="fas fa-satellite"></i> 卫星
+        </button>
+        <button class="map-btn" data-type="terrain" onclick="switchMap('terrain')">
+            <i class="fas fa-mountain"></i> 地形
+        </button>
+        <button class="map-btn" data-type="dark" onclick="switchMap('dark')">
+            <i class="fas fa-moon"></i> 暗色
+        </button>
+    </div>
+    
+    <div id="map"></div>
+    
+    <!-- 左侧面板 -->
+    <div class="draggable-panel left-panel" id="leftPanel">
+        <div class="drag-handle"></div>
+        <button class="reset-btn" onclick="resetPanel('left')" title="双击重置"><i class="fas fa-undo"></i></button>
+        <div class="panel-content">
+            <div class="panel-section">
+                <div class="section-title">工程路线</div>
+                <div class="route-card east active" data-route="east" onclick="toggleRoute('east')">
+                    <div class="route-dot"></div>
+                    <div class="route-info">
+                        <h4>东线工程</h4>
+                        <p>扬州 → 天津</p>
+                    </div>
+                </div>
+                <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35); padding: 0 12px 8px; margin-top: -4px;">利用京杭大运河，13级泵站提水北送</div>
+                
+                <div class="route-card middle active" data-route="middle" onclick="toggleRoute('middle')">
+                    <div class="route-dot"></div>
+                    <div class="route-info">
+                        <h4>中线工程</h4>
+                        <p>丹江口 → 北京</p>
+                    </div>
+                </div>
+                <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35); padding: 0 12px 8px; margin-top: -4px;">全程自流北上，受益人口超1.18亿</div>
+                
+                <div class="route-card west active" data-route="west" onclick="toggleRoute('west')">
+                    <div class="route-dot"></div>
+                    <div class="route-info">
+                        <h4>西线工程</h4>
+                        <p>通天河 → 黄河</p>
+                    </div>
+                </div>
+                <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35); padding: 0 12px 0; margin-top: -4px;">规划中，调水170亿m³入西北</div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="section-title">操作提示</div>
+                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.4); line-height: 1.5;">
+                    <p><i class="fas fa-arrows-alt"></i> 拖动面板</p>
+                    <p><i class="fas fa-expand-arrows-alt"></i> 调整大小</p>
+                    <p><i class="fas fa-mouse-pointer"></i> 点击节点详情</p>
+                </div>
+            </div>
+        </div>
+        <div class="resize-handle"></div>
+    </div>
+    
+        <!-- 详情面板 -->
+    <div class="draggable-panel detail-panel" id="detailPanel">
+        <div class="drag-handle"></div>
+        <button class="reset-btn" onclick="resetPanel('detail')" title="双击重置"><i class="fas fa-undo"></i></button>
+        <div class="detail-header">
+            <span class="detail-title" id="detailTitle">节点名称</span>
+            <div class="detail-close" onclick="hideDetail()"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="detail-info">
+            <div class="info-item">
+                <div class="info-label">类型</div>
+                <div class="info-value" id="detailType">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">所属线路</div>
+                <div class="info-value" id="detailRoute">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">纬度</div>
+                <div class="info-value" id="detailLat">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">经度</div>
+                <div class="info-value" id="detailLng">-</div>
+            </div>
+        </div>
+        <!-- 详细统计数据 -->
+        <div class="detail-stats" id="detailStats"></div>
+        <!-- 该地点对应图片 -->
+        <div class="detail-photos" id="detailPhotos"></div>
+        <div class="detail-desc" id="detailDesc">-</div>
+        <div class="resize-handle"></div>
+    </div>
+    
+    <!-- 底部图例 -->
+    <div class="draggable-panel legend-bar">
+        <div class="legend-item"><div class="legend-line east"></div><span>东线</span></div>
+        <div class="legend-item"><div class="legend-line middle"></div><span>中线</span></div>
+        <div class="legend-item"><div class="legend-line west"></div><span>西线</span></div>
+    </div>
+    
+    <!-- 拖动提示 -->
+    <div class="drag-hint" id="dragHint">拖动顶部区域调整面板位置</div>
+
+    <script>
+        // 面板拖动和大小调整功能
+        class DraggablePanel {
+            constructor(element, options = {}) {
+                this.el = element;
+                this.handle = element.querySelector('.drag-handle');
+                this.resizeHandle = element.querySelector('.resize-handle');
+                this.isDragging = false;
+                this.isResizing = false;
+                this.startX = 0;
+                this.startY = 0;
+                this.startWidth = 0;
+                this.startHeight = 0;
+                this.startLeft = 0;
+                this.startTop = 0;
+                
+                this.defaultPos = options.defaultPos || { top: '80px', left: '12px', width: '220px' };
+                this.minWidth = options.minWidth || 180;
+                this.minHeight = options.minHeight || 100;
+                this.maxWidth = options.maxWidth || 400;
+                
+                this.init();
+            }
+            
+            init() {
+                // 拖动事件
+                this.handle.addEventListener('mousedown', this.onDragStart.bind(this));
+                this.handle.addEventListener('touchstart', this.onDragStart.bind(this), { passive: false });
+                
+                // 调整大小事件
+                if (this.resizeHandle) {
+                    this.resizeHandle.addEventListener('mousedown', this.onResizeStart.bind(this));
+                    this.resizeHandle.addEventListener('touchstart', this.onResizeStart.bind(this), { passive: false });
+                }
+                
+                // 双击重置
+                this.handle.addEventListener('dblclick', () => {
+                    this.reset();
+                });
+                
+                document.addEventListener('mousemove', this.onMove.bind(this));
+                document.addEventListener('touchmove', this.onMove.bind(this), { passive: false });
+                document.addEventListener('mouseup', this.onEnd.bind(this));
+                document.addEventListener('touchend', this.onEnd.bind(this));
+            }
+            
+            onDragStart(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const touch = e.touches ? e.touches[0] : e;
+                this.isDragging = true;
+                this.startX = touch.clientX;
+                this.startY = touch.clientY;
+                
+                const rect = this.el.getBoundingClientRect();
+                this.startLeft = rect.left;
+                this.startTop = rect.top;
+                
+                this.el.style.transition = 'none';
+                this.el.style.zIndex = '1002';
+            }
+            
+            onResizeStart(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const touch = e.touches ? e.touches[0] : e;
+                this.isResizing = true;
+                this.startX = touch.clientX;
+                this.startY = touch.clientY;
+                
+                const rect = this.el.getBoundingClientRect();
+                this.startWidth = rect.width;
+                this.startHeight = rect.height;
+                
+                this.el.style.transition = 'none';
+                this.el.style.zIndex = '1002';
+            }
+            
+            onMove(e) {
+                if (!this.isDragging && !this.isResizing) return;
+                e.preventDefault();
+                
+                const touch = e.touches ? e.touches[0] : e;
+                const deltaX = touch.clientX - this.startX;
+                const deltaY = touch.clientY - this.startY;
+                
+                if (this.isDragging) {
+                    let newLeft = this.startLeft + deltaX;
+                    let newTop = this.startTop + deltaY;
+                    
+                    // 边界限制
+                    const maxLeft = window.innerWidth - 100;
+                    const maxTop = window.innerHeight - 50;
+                    newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+                    newTop = Math.max(60, Math.min(newTop, maxTop));
+                    
+                    this.el.style.left = newLeft + 'px';
+                    this.el.style.top = newTop + 'px';
+                    this.el.style.right = 'auto';
+                    this.el.style.bottom = 'auto';
+                }
+                
+                if (this.isResizing) {
+                    const deltaW = touch.clientX - this.startX;
+                    const deltaH = touch.clientY - this.startY;
+                    
+                    let newWidth = Math.max(this.minWidth, Math.min(this.startWidth + deltaW, this.maxWidth));
+                    let newHeight = Math.max(this.minHeight, this.startHeight + deltaH);
+                    
+                    this.el.style.width = newWidth + 'px';
+                    this.el.style.height = newHeight + 'px';
+                }
+            }
+            
+            onEnd() {
+                this.isDragging = false;
+                this.isResizing = false;
+                this.el.style.transition = '';
+                this.el.style.zIndex = '1000';
+            }
+            
+            reset() {
+                this.el.style.top = this.defaultPos.top;
+                this.el.style.left = this.defaultPos.left;
+                this.el.style.right = 'auto';
+                this.el.style.bottom = 'auto';
+                this.el.style.width = this.defaultPos.width;
+                this.el.style.height = 'auto';
+            }
+        }
+        
+        // 路线数据（基于公开权威资料整理）
+        const routeData = {
+            east: {
+                name: '东线工程',
+                color: '#ef4444',
+                desc: '利用京杭大运河及沿线湖泊，通过13级泵站提水北送，是世界上规模最大的泵站群',
+                points: [
+                    {name: '扬州', coord: [32.39, 119.42], type: 'start', desc: '东线工程的源头，江都水利枢纽是"江水北调的龙头"。自1977年建成以来，累计向北方输送"放心水"超450亿立方米。当地通过整治"散乱污"企业、退让长江岸线6.3公里，守护了源头水质，让长江水从这里一路向北。', stats: {flow: '450亿m³', since: '1977年'}},
+                    {name: '洪泽湖', coord: [33.20, 118.80], type: 'node', desc: '东线重要调蓄湖泊，非汛期蓄水位从13.0米抬高至13.5米，提升了淮河水资源利用率。通过实施退圩还湖、退渔还湿工程，洪泽湖湿地面积大幅恢复，成为丹顶鹤、东方白鹳等珍稀鸟类的栖息地。', stats: {storage: '13.5m', area: '湿地恢复'}},
+                    {name: '骆马湖', coord: [34.10, 118.20], type: 'node', desc: '东线第六梯级泵站——皂河抽水站所在地，这里的"亚洲第一泵"每秒可抽取一个普通家庭一年的用水量。作为沂沭泗洪水调蓄枢纽，骆马湖既保障调水安全，又承担防洪任务。', stats: {pump: '亚洲第一', function: '调蓄枢纽'}},
+                    {name: '南四湖', coord: [34.80, 116.90], type: 'node', desc: '东线治污的"攻坚战主战场"。通水前因工业污染被称为"酱油湖"，山东投入804亿元治理，关停重污染企业1.07万家，水质从劣Ⅴ类提升至Ⅲ类，如今"鸟中大熊猫"青头潜鸭已重返这里定居。', stats: {investment: '804亿', enterprises: '1.07万家', quality: 'Ⅲ类'}},
+                    {name: '东平湖', coord: [35.90, 116.00], type: 'node', desc: '东线穿黄河工程的起点，也是黄河下游重要滞洪区。2024年汛期，东平湖通过泄洪闸向徒骇河等河道分洪，保护了平阴县近9万亩农田。当地取缔了湖内所有养殖网箱，通过增殖放流白鲢净化水质，如今湖水透明度突破3米。', stats: {clarity: '3m+', farmland: '9万亩'}},
+                    {name: '济南', coord: [36.67, 117.00], type: 'node', desc: '东线工程让泉城"保泉"更有底气。济平干渠贯穿济南长清区，为玉符河补水，让干涸多年的河道重现碧波。2017、2018年山东大旱期间，东线工程为济南等城市应急供水，成为保障供水安全的"主力军"，助力趵突泉实现连续喷涌。', stats: {impact: '趵突泉连续喷涌'}},
+                    {name: '沧州', coord: [38.30, 116.83], type: 'node', desc: '全国为数不多同时接受中线、东线双水源的城市。东线北延应急供水工程累计向沧州调引近3亿立方米长江水，让断流多年的南运河恢复通航和生态功能，南川楼文化街区因水而兴。2025年超额完成9181万立方米调水任务。', stats: {water: '3亿m³', task: '9181万m³'}},
+                    {name: '天津', coord: [39.13, 117.20], type: 'end', desc: '东线工程的终点，九宣闸是江水入津的门户。自2019年北延工程启动以来，累计向天津供水超10亿立方米，加上中线供水，天津主城区实现100%使用外调水。江水改善了天津的水生态，缓解了地下水超采问题。', stats: {water: '10亿m³', since: '2019年'}}
+                ]
+            },
+            middle: {
+                name: '中线工程',
+                color: '#3b82f6',
+                desc: '从丹江口水库陶岔渠首引水，全程自流北上，惠及京津冀豫四省市，受益人口超1.18亿',
+                points: [
+                    {name: '丹江口', coord: [32.54, 111.51], type: 'start', desc: '南水北调中线的"源头心脏"，亚洲第一大人工淡水湖。为满足调水要求，丹江口大坝加高工程将水库正常蓄水位从157米提升至170米，新增库容116亿立方米。库区26万移民告别故土，用"舍小家为大家"的奉献守护了这一库碧水。自通水以来，水库累计向北方供水超780亿立方米，水质常年稳定在Ⅱ类以上。', stats: {migrate: '26万', storage: '116亿m³', water: '780亿m³', quality: 'Ⅱ类+'}},
+                    {name: '渠首', coord: [32.70, 111.70], type: 'node', desc: '中线工程的"渠首所在地"，陶岔渠首枢纽被誉为"南水北调水龙头"。2021年5月，习近平总书记亲临渠首考察，强调要"守好这一库碧水"。当地组建了水上综合执法大队，通过"空天地水"智慧监测守护水质，确保每一滴水都安全北上。', stats: {monitor: '空天地水智慧监测'}},
+                    {name: '南阳', coord: [33.01, 112.53], type: 'node', desc: '南阳与北京开展对口协作，累计投入帮扶资金超20亿元，助力水源地绿色发展。当地组建了水上综合执法大队，通过"空天地水"智慧监测守护水质，确保每一滴水都安全北上。', stats: {aid: '20亿+'}},
+                    {name: '方城', coord: [33.25, 113.00], type: 'node', desc: '中线干渠的"咽喉要道"，方城垭口是秦岭山脉的天然缺口，也是北宋时期古人"南水北调"尝试的遗址。千年前宋太宗征调10万人开凿襄汉漕渠，终因膨胀土难题失败；如今工程团队攻克了十几米厚淤泥开挖、膨胀土处理等技术难关，让这条千年"水脉"重获新生。', stats: {history: '千年水脉遗址', breakthrough: '膨胀土技术'}},
+                    {name: '平顶山', coord: [33.77, 113.20], type: 'node', desc: '中线工程首个"救命水"受惠城市。2014年平顶山遭遇60年一遇大旱，城市"大水缸"白龟山水库几近干涸，百万市民饮水告急。国家紧急协调，通过尚未完全通水的中线干渠，连续45天向平顶山调水5130万立方米，缓解了供水危机。', stats: {relief: '5130万m³', period: '45天', year: '2014年'}},
+                    {name: '郑州', coord: [34.76, 113.65], type: 'node', desc: '中线工程的"穿黄节点"，干渠在此以隧洞形式穿越黄河，实现"江水不犯河水"。穿黄隧洞深埋河床下23-35米，全长19.3公里，是世界上规模最大的穿越黄河输水隧洞。郑州累计安置丹江口移民1.87万人，如今主城区90%以上的生活用水来自南水。', stats: {tunnel: '19.3km', depth: '23-35m', migrate: '1.87万', ratio: '90%+'}},
+                    {name: '安阳', coord: [36.10, 114.40], type: 'node', desc: '红旗渠故乡的"新水脉"。中线工程通水以来，累计向安阳供水超9.3亿立方米，受益人口达332万。汤河下游因生态补水重现碧波，沿岸5.2万亩农田告别"靠天收"；林州市通过西部调水工程，让南水爬上太行山，续写了"红旗渠精神"的新篇章。', stats: {water: '9.3亿m³', people: '332万', farmland: '5.2万亩'}},
+                    {name: '邯郸', coord: [36.62, 114.48], type: 'node', desc: '河北首个受益城市，城区70%的自来水来自丹江水。过去当地居民水壶里水垢厚重，如今江水烧开后清澈透亮。洺河渡槽退水渠首次为洺河生态补水，这条千年古河重现了"洺河春涨"的盛景。', stats: {ratio: '70%', history: '千年古河'}},
+                    {name: '石家庄', coord: [38.04, 114.48], type: 'node', desc: '中线工程让干涸40多年的滹沱河重焕生机。截至2025年，石家庄累计受水超66亿立方米，其中32亿立方米用于生态补水，滹沱河成为常年有水的"城市绿廊"。干渠在元氏县为保护常山郡故城遗址主动改道，实现了文物保护与工程建设双赢。', stats: {water: '66亿m³', eco: '32亿m³', history: '40年重焕生机'}},
+                    {name: '保定', coord: [38.87, 115.48], type: 'node', desc: '中线工程的"雄安水保障基地"，漕河渡槽是全国中小学生研学实践教育基地，每年开展50余次水利科普活动。2023年海河特大洪水期间，保定管理处组建"党员突击队"，确保干渠安全运行；雄安调蓄库建成后，可将新区供水保证率提升至97%。', stats: {guarantee: '97%', activity: '50+次/年'}},
+                    {name: '北京', coord: [40.00, 116.23], type: 'end', desc: '中线工程的终点，也是首都的"生命线"。自2014年通水以来，累计向北京调水超106亿立方米，城区80%以上的生活用水来自南水。江水替代了超采的地下水，让北京地下水位连续10年回升，密云水库蓄水量也创下历史新高。', stats: {water: '106亿m³', ratio: '80%+', rise: '连续10年'}}
+                ]
+            },
+            west: {
+                name: '西线工程',
+                color: '#eab308',
+                desc: '目前处于前期论证阶段，规划从长江上游通天河、雅砻江、大渡河调水入黄河上游，解决西北六省区缺水问题',
+                points: [
+                    {name: '通天河', coord: [33.5, 94.0], type: 'start', desc: '西线工程的上游水源地，位于三江源自然保护区。早在1952年，黄河水利委员会就组织了通天河调水线路查勘，历经70余年论证，形成了自流调水方案。工程将通过隧洞穿越巴颜喀拉山，减少对高原生态的影响。', stats: {since: '1952年', research: '70+年', eco: '三江源'}},
+                    {name: '金沙江', coord: [32.5, 98.0], type: 'node', desc: '西线"下线方案"的重要水源，叶巴滩水电站作为调水节点，2025年主厂房机电安装全面启动。规划通过隧洞将金沙江水引入雅砻江，实现跨流域调水，补充黄河上游水量，缓解西北干旱缺水问题。', stats: {project: '叶巴滩水电站', year: '2025年'}},
+                    {name: '雅砻江', coord: [28.0, 101.0], type: 'node', desc: '西线工程的核心水源地，两河口水库年径流量达209亿立方米，可通过梯级调度向北调水50-100亿立方米。"上线方案"规划从雅砻江干支流调水，通过隧洞自流至黄河支流贾曲，为西北地区提供稳定水源。', stats: {runoff: '209亿m³', transfer: '50-100亿m³'}},
+                    {name: '大渡河', coord: [31.5, 102.5], type: 'node', desc: '西线一期工程的调水起点，双江口水库被纳入战略规划，可作为调水节点为下游引大济岷工程提供水源。工程规划从大渡河支流调水，通过输水隧洞穿越分水岭，自流进入黄河上游，预计调水量40亿立方米。', stats: {project: '双江口水库', plan: '40亿m³'}},
+                    {name: '黄河上游', coord: [35.0, 103.5], type: 'end', desc: '西线工程的终点，调水将汇入黄河上游龙羊峡以上河段，规划年调水量170亿立方米，约占黄河多年平均径流量的29%。工程实施后，将增强黄河水源保障能力，缓解下游断流问题，为西北六省区1.1亿人口提供用水支撑。', stats: {transfer: '170亿m³', ratio: '29%', people: '1.1亿'}}
+                ]
+            }
+        };
+
+        // 照片映射：根据文件夹中图片命名规则，匹配节点名称到图片路径
+        const photoBasePath = '照片/';
+        const photoMapping = {
+            east: {
+                '扬州': ['东线/扬州.jpg'],
+                '洪泽湖': ['东线/洪泽湖.jpeg'],
+                '骆马湖': ['东线/骆马湖.jpg'],
+                '南四湖': ['东线/南四湖.png'],
+                '东平湖': ['东线/东平湖.jpg'],
+                '济南': ['东线/济南.jpeg'],
+                '沧州': ['东线/沧州.jpg'],
+                '天津': ['东线/天津-景.jpeg'],
+            },
+            middle: {
+                '丹江口': ['中线/丹江口.jpg', '中线/60年代丹江口.webp', '中线/70年代丹江口.webp'],
+                '渠首': ['中线/渠首.jpeg', '中线/渠首.webp'],
+                '南阳': ['中线/南阳.webp', '中线/南阳2.webp'],
+                '方城': ['中线/方城.jpg'],
+                '平顶山': ['中线/平顶山.jpg'],
+                '郑州': ['中线/郑州.jpg'],
+                '安阳': ['中线/安阳-红旗渠.webp'],
+                '邯郸': ['中线/邯郸.jpg'],
+                '石家庄': ['中线/石家庄-景.webp'],
+                '保定': ['中线/保定.png'],
+                '北京': ['中线/北京-景.jpg'],
+            },
+            west: {
+                '黄河上游': ['西线/黄河上游.png'],
+            }
+        };
+
+        // 获取节点对应的照片列表
+        function getPhotosForNode(routeKey, nodeName) {
+            const routePhotos = photoMapping[routeKey];
+            if (!routePhotos) return [];
+            return routePhotos[nodeName] || [];
+        }
+
+        let map, currentMapType = 'satellite';
+        let mapLayers = {};
+        let activeRoutes = {east: true, middle: true, west: true};
+        let routePolylines = {};
+        let routeMarkers = {};
+        let leftPanel, detailPanel;
+
+        // 地图瓦片源
+        const mapSources = {
+            satellite: {
+                url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                attribution: '© Esri'
+            },
+            terrain: {
+                url: 'https://t{s}.tianditu.gov.cn/ter_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ter&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=174705aebfe31b79b3587279e211cb9a',
+                subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
+                attribution: '© 天地图'
+            },
+            dark: {
+                url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                attribution: '© CARTO'
+            }
+        };
+
+        const labelSources = {
+            satellite: {
+                url: 'https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=174705aebfe31b79b3587279e211cb9a',
+                subdomains: ['0', '1', '2', '3', '4', '5', '6', '7']
+            },
+            terrain: {
+                url: 'https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=174705aebfe31b79b3587279e211cb9a',
+                subdomains: ['0', '1', '2', '3', '4', '5', '6', '7']
+            },
+            dark: {
+                url: 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png'
+            }
+        };
+
+        function initMap() {
+            map = L.map('map', {
+                center: [35, 105],
+                zoom: 5,
+                minZoom: 4,
+                maxZoom: 16,
+                zoomControl: false
+            });
+
+            addMapLayer('satellite');
+            
+            Object.keys(routeData).forEach(key => {
+                drawRoute(key);
+            });
+
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                // 显示拖动提示
+                const hint = document.getElementById('dragHint');
+                hint.classList.add('show');
+                setTimeout(() => hint.classList.remove('show'), 3000);
+            }, 1000);
+        }
+
+        function addMapLayer(type) {
+            if (mapLayers.base) map.removeLayer(mapLayers.base);
+            if (mapLayers.label) map.removeLayer(mapLayers.label);
+
+            const source = mapSources[type];
+            const labelSource = labelSources[type];
+
+            mapLayers.base = L.tileLayer(source.url, {
+                subdomains: source.subdomains || ['a', 'b', 'c', 'd'],
+                attribution: source.attribution,
+                maxZoom: 18
+            }).addTo(map);
+
+            mapLayers.label = L.tileLayer(labelSource.url, {
+                subdomains: labelSource.subdomains || ['a', 'b', 'c', 'd'],
+                maxZoom: 18
+            }).addTo(map);
+        }
+
+        function switchMap(type) {
+            currentMapType = type;
+            document.querySelectorAll('.map-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+            addMapLayer(type);
+        }
+
+        function drawRoute(routeKey) {
+            const route = routeData[routeKey];
+            const latlngs = route.points.map(p => p.coord);
+
+            const shadowLine = L.polyline(latlngs, {
+                color: '#000',
+                weight: 8,
+                opacity: 0.3,
+                lineJoin: 'round'
+            });
+
+            const polyline = L.polyline(latlngs, {
+                color: route.color,
+                weight: 4,
+                opacity: 0.9,
+                lineJoin: 'round',
+                lineCap: 'round',
+                dashArray: routeKey === 'west' ? '12, 8' : null
+            });
+
+            routePolylines[routeKey] = { shadow: shadowLine, main: polyline };
+
+            routeMarkers[routeKey] = [];
+            route.points.forEach(point => {
+                const marker = createMarker(point, route.color, routeKey);
+                routeMarkers[routeKey].push(marker);
+            });
+
+            if (activeRoutes[routeKey]) {
+                shadowLine.addTo(map);
+                polyline.addTo(map);
+                routeMarkers[routeKey].forEach(m => m.addTo(map));
+            }
+        }
+
+        function createMarker(point, routeColor, routeKey) {
+            const icon = L.divIcon({
+                className: 'sat-marker',
+                html: `
+                    <div class="marker-icon ${point.type}" style="color: ${routeColor}"></div>
+                    <div class="marker-label">${point.name}</div>
+                `,
+                iconSize: [20, 30],
+                iconAnchor: [10, 15]
+            });
+
+            const marker = L.marker(point.coord, { icon });
+
+            // 鼠标悬停显示该地点对应的照片
+            const photos = getPhotosForNode(routeKey, point.name);
+            if (photos && photos.length > 0) {
+                const imgsHtml = photos.map((p, idx) => {
+                    return `<div class="photo-item" onclick="event.stopPropagation();openLightboxForNode('${routeKey}','${point.name}',${idx})" title="点击放大"><img src="${photoBasePath}${p}" alt="${point.name}" loading="lazy"></div>`;
+                }).join('');
+                marker.bindTooltip(
+                    `<div class="photo-grid">${imgsHtml}</div>`,
+                    {
+                        direction: 'top',
+                        offset: L.point(0, -18),
+                        className: 'photo-tooltip',
+                        opacity: 1,
+                        sticky: true
+                    }
+                );
+            }
+
+            marker.on('click', () => {
+                const route = Object.values(routeData).find(r => 
+                    r.points.some(p => p.name === point.name)
+                );
+                showDetail(point, route.name, routeColor, routeKey);
+            });
+
+            return marker;
+        }
+
+        function toggleRoute(route) {
+            const card = document.querySelector(`.route-card[data-route="${route}"]`);
+            card.classList.toggle('active');
+            activeRoutes[route] = card.classList.contains('active');
+
+            const layers = routePolylines[route];
+            const markers = routeMarkers[route];
+
+            if (activeRoutes[route]) {
+                layers.shadow.addTo(map);
+                layers.main.addTo(map);
+                markers.forEach(m => m.addTo(map));
+            } else {
+                map.removeLayer(layers.shadow);
+                map.removeLayer(layers.main);
+                markers.forEach(m => map.removeLayer(m));
+            }
+        }
+
+        function showDetail(point, routeName, routeColor, routeKey) {
+            const panel = document.getElementById('detailPanel');
+            document.getElementById('detailTitle').textContent = point.name;
+            document.getElementById('detailTitle').style.color = routeColor;
+            document.getElementById('detailType').textContent =
+                point.type === 'start' ? '起点' :
+                point.type === 'end' ? '终点' : '节点';
+            document.getElementById('detailRoute').textContent = routeName;
+            document.getElementById('detailLat').textContent = point.coord[0].toFixed(4) + '°';
+            document.getElementById('detailLng').textContent = point.coord[1].toFixed(4) + '°';
+            document.getElementById('detailDesc').textContent = point.desc;
+
+            // 渲染统计数据
+            const statsContainer = document.getElementById('detailStats');
+            statsContainer.innerHTML = '';
+            if (point.stats) {
+                const entries = Object.entries(point.stats);
+                entries.forEach(([key, value]) => {
+                    const statDiv = document.createElement('div');
+                    statDiv.className = 'stat-item';
+                    // 根据数据类型设置颜色
+                    let colorClass = '';
+                    if (key === 'water' || key === 'storage' || key === 'runoff' || key === 'transfer') colorClass = 'water';
+                    else if (key === 'migrate' || key === 'people') colorClass = 'migrate';
+                    else if (key === 'eco' || key === 'quality' || key === 'clarity' || key === 'guarantee') colorClass = 'eco';
+                    else colorClass = 'time';
+                    statDiv.innerHTML = `
+                        <div class="stat-value ${colorClass}">${value}</div>
+                        <div class="stat-label">${getStatLabel(key)}</div>
+                    `;
+                    statsContainer.appendChild(statDiv);
+                });
+            }
+
+            // 渲染该地点的照片（固定在面板中）
+            const photosContainer = document.getElementById('detailPhotos');
+            photosContainer.innerHTML = '';
+            if (routeKey) {
+                const photos = getPhotosForNode(routeKey, point.name);
+                if (photos && photos.length > 0) {
+                    photos.forEach((p, idx) => {
+                        const item = document.createElement('div');
+                        item.className = 'detail-photo-item';
+                        item.title = '点击放大';
+                        item.onclick = function(e) {
+                            e.stopPropagation();
+                            openLightboxForNode(routeKey, point.name, idx);
+                        };
+                        item.innerHTML = `<img src="${photoBasePath}${p}" alt="${point.name}" loading="lazy">`;
+                        photosContainer.appendChild(item);
+                    });
+                }
+            }
+
+            panel.classList.add('show');
+        }
+
+        // 统计数据标签映射
+        function getStatLabel(key) {
+            const labels = {
+                water: '累计调水',
+                storage: '库容/水位',
+                migrate: '移民人数',
+                quality: '水质等级',
+                flow: '输送水量',
+                since: '建成/启动',
+                area: '恢复面积',
+                pump: '泵站规模',
+                function: '主要功能',
+                investment: '治理投资',
+                enterprises: '关停企业',
+                clarity: '透明度',
+                farmland: '保护农田',
+                impact: '生态效益',
+                aid: '对口帮扶',
+                task: '调水任务',
+                history: '历史意义',
+                breakthrough: '技术突破',
+                relief: '应急供水',
+                period: '调水天数',
+                year: '关键年份',
+                tunnel: '隧洞长度',
+                depth: '埋深',
+                ratio: '供水占比',
+                people: '受益人口',
+                monitor: '监测方式',
+                eco: '生态补水',
+                rise: '地下水位',
+                guarantee: '保证率',
+                activity: '科普活动',
+                runoff: '年径流量',
+                plan: '规划调水',
+                project: '配套工程',
+                research: '论证时间'
+            };
+            return labels[key] || key;
+        }
+
+        function hideDetail() {
+            document.getElementById('detailPanel').classList.remove('show');
+        }
+        
+        function resetPanel(type) {
+            if (type === 'left') {
+                leftPanel.reset();
+            } else {
+                document.getElementById('detailPanel').style.top = 'auto';
+                document.getElementById('detailPanel').style.left = 'auto';
+                document.getElementById('detailPanel').style.right = '12px';
+                document.getElementById('detailPanel').style.bottom = '12px';
+                document.getElementById('detailPanel').style.width = '320px';
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            
+            // 初始化可拖动面板
+            leftPanel = new DraggablePanel(document.getElementById('leftPanel'), {
+                defaultPos: { top: '80px', left: '12px', width: '220px' },
+                minWidth: 180,
+                minHeight: 150,
+                maxWidth: 350
+            });
+            
+            new DraggablePanel(document.getElementById('detailPanel'), {
+                defaultPos: { top: 'auto', left: 'auto', right: '12px', bottom: '12px', width: '320px' },
+                minWidth: 240,
+                minHeight: 200,
+                maxWidth: 480
+            });
+        });
+    </script>
+
+    <!-- 图片灯箱 -->
+    <div class="lightbox-overlay" id="lightboxOverlay">
+        <button class="lightbox-close" id="lightboxClose" title="关闭">&times;</button>
+        <button class="lightbox-nav prev" id="lightboxPrev" title="上一张">&lsaquo;</button>
+        <button class="lightbox-nav next" id="lightboxNext" title="下一张">&rsaquo;</button>
+        <div class="lightbox-img-wrap" id="lightboxImage">
+            <img src="" alt="">
+        </div>
+        <div class="lightbox-caption" id="lightboxCaption"></div>
+        <div class="lightbox-counter" id="lightboxCounter"></div>
+    </div>
+
+    <script>
+        // 灯箱状态
+        let lightboxPhotos = [];
+        let lightboxIndex = 0;
+        let lightboxNodeName = '';
+
+        function openLightboxForNode(routeKey, nodeName, startIndex) {
+            const photos = getPhotosForNode(routeKey, nodeName);
+            if (!photos || photos.length === 0) return;
+            lightboxPhotos = photos;
+            lightboxIndex = startIndex;
+            lightboxNodeName = nodeName;
+            showLightboxImage();
+            document.getElementById('lightboxOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showLightboxImage() {
+            const photo = lightboxPhotos[lightboxIndex];
+            const imgEl = document.querySelector('#lightboxImage img');
+            imgEl.src = photoBasePath + photo;
+            imgEl.alt = lightboxNodeName;
+            const fileName = photo.split('/').pop().replace(/\.[^.]+$/, '');
+            document.getElementById('lightboxCaption').textContent = lightboxNodeName + ' · ' + fileName;
+            document.getElementById('lightboxCounter').textContent =
+                (lightboxIndex + 1) + ' / ' + lightboxPhotos.length;
+
+            document.getElementById('lightboxPrev').disabled = lightboxIndex === 0;
+            document.getElementById('lightboxNext').disabled = lightboxIndex === lightboxPhotos.length - 1;
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightboxOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function lightboxPrev() {
+            if (lightboxIndex > 0) { lightboxIndex--; showLightboxImage(); }
+        }
+
+        function lightboxNext() {
+            if (lightboxIndex < lightboxPhotos.length - 1) { lightboxIndex++; showLightboxImage(); }
+        }
+
+        document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+        document.getElementById('lightboxPrev').addEventListener('click', lightboxPrev);
+        document.getElementById('lightboxNext').addEventListener('click', lightboxNext);
+
+        // 点击背景关闭灯箱
+        document.getElementById('lightboxOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeLightbox();
+        });
+
+        // 键盘控制
+        document.addEventListener('keydown', function(e) {
+            const overlay = document.getElementById('lightboxOverlay');
+            if (!overlay.classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') lightboxPrev();
+            if (e.key === 'ArrowRight') lightboxNext();
+        });
+    </script>
+
+    <!-- 页面加载进度条 -->
+    <script>
+    (function(){
+        var css='.pl-wrap{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;pointer-events:none;}'+
+            '.pl-box{text-align:center;padding:28px 32px;border-radius:10px;background:rgba(8,20,18,0.82);backdrop-filter:blur(6px);}'+
+            '.pl-bar{width:220px;height:5px;background:rgba(255,255,255,0.12);border-radius:5px;overflow:hidden;margin:0 auto;}'+
+            '.pl-bar-fill{height:100%;width:0;border-radius:5px;background:linear-gradient(90deg,#0d9488,#14b8a6,#22d3ee,#0d9488);background-size:300% 100%;animation:plShim 1.5s linear infinite;transition:width 0.25s ease-out;}'+
+            '@keyframes plShim{0%{background-position:300% 0}100%{background-position:-300% 0}}'+
+            '.pl-text{color:rgba(255,255,255,0.72);font-size:13px;margin-top:12px;letter-spacing:2px;font-family:system-ui,sans-serif;}'+
+            '.pl-done{opacity:0;transition:opacity 0.35s ease 0.15s;}';
+        var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+        var w=document.createElement('div'),fill,txt,done=false;
+        w.className='pl-wrap';
+        w.innerHTML='<div class="pl-box"><div class="pl-bar"><div class="pl-bar-fill"></div></div><div class="pl-text">正 在 加 载 ...</div></div>';
+        function ins(){if(!document.body)return setTimeout(ins,10);document.body.appendChild(w);fill=w.querySelector('.pl-bar-fill');txt=w.querySelector('.pl-text');_();}
+        var p=0,iv;
+        function _(){iv=setInterval(function(){var r=85-p;if(r<=0)return;p=Math.min(85,p+Math.max(1,r*0.12+Math.random()*3));if(fill)fill.style.width=p+'%';},200);}
+        function fin(){if(done)return;done=true;clearInterval(iv);if(fill)fill.style.width='100%';if(txt)txt.textContent='加 载 完 成';setTimeout(function(){w.classList.add('pl-done');setTimeout(function(){if(w.parentNode)w.parentNode.removeChild(w);},400);},350);}
+        window.addEventListener('load',fin);
+        setTimeout(function(){if(p<95)fin();},7000);
+        if(document.readyState==='complete')fin();else ins();
+    })();
+    </script>
+
+    <script src="https://tianq4691-maker.github.io/NSBD-redesign/archive-shell.js"></script>
+</body>
+</html>
