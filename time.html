@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <base href="https://tianq4691-maker.github.io/NSBD/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>调水纪事 · 筹备年表</title>
+    <style>
+        :root {
+            --bg: #0a121e;
+            --surface: #0f1d2e;
+            --accent: #06b6d4;
+            --accent2: #eab308;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --nav-h: 210px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #000; color: var(--text);
+            height: 100vh; height: 100dvh;
+            overflow: hidden;
+            user-select: none; -webkit-user-select: none;
+        }
+
+        /* ── Top bar ── */
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0));
+            padding: 1rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            pointer-events: none;
+        }
+        .top-bar > * { pointer-events: auto; }
+        .back-btn {
+            display: flex; align-items: center; gap: 0.5rem;
+            color: var(--accent); text-decoration: none;
+            font-size: 0.85rem; letter-spacing: 1px;
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px; padding: 0.5rem 1rem;
+            transition: all 0.3s; backdrop-filter: blur(8px);
+        }
+        .back-btn:hover { background: rgba(6,182,212,0.2); border-color: var(--accent); }
+        .top-title {
+            font-size: 1.1rem; font-weight: 600; letter-spacing: 4px;
+            background: rgba(0,0,0,0.45); border-radius: 8px;
+            padding: 0.4rem 1.4rem; backdrop-filter: blur(8px);
+        }
+        .top-spacer { width: 80px; }
+
+        /* ── Loading ── */
+        .loading-screen {
+            display: flex; align-items: center; justify-content: center;
+            height: 100vh; flex-direction: column; gap: 1rem;
+            color: var(--text-dim); letter-spacing: 4px; font-size: 0.95rem;
+        }
+        .loading-spinner {
+            width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { text-align: center; }
+        .loading-sub { font-size: 0.7rem; color: rgba(255,255,255,0.3); margin-top: 0.3rem; letter-spacing: 2px; }
+
+        /* ── Iframe ── */
+        #timeline-frame {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; border: none; display: none;
+        }
+
+        /* ── Slide area (custom fallback) ── */
+        #slide-area {
+            position: fixed; top: 0; left: 0; right: 0; bottom: var(--nav-h);
+            overflow: hidden; display: none;
+        }
+        .bg-layer {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            transition: opacity 0.8s ease;
+        }
+        .bg-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(10,18,30,0.83) 0%, rgba(7,16,30,0.65) 40%, rgba(10,18,30,0.80) 100%);
+        }
+        .bg-vignette {
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+        }
+        .slide {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 5rem 3rem 3rem;
+            opacity: 0; transform: translateX(60px);
+            transition: opacity 0.55s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94);
+            pointer-events: none;
+        }
+        .slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+        .slide.exit-left { opacity: 0; transform: translateX(-60px); }
+        .slide.exit-right { opacity: 0; transform: translateX(60px); }
+        .slide-era {
+            font-size: 0.7rem; letter-spacing: 5px; color: var(--accent2);
+            text-transform: uppercase; margin-bottom: 0.6rem;
+        }
+        .slide-date {
+            font-size: 3.2rem; font-weight: 200; color: #fff;
+            letter-spacing: 2px; line-height: 1; margin-bottom: 0.5rem;
+        }
+        .slide-date .month-day {
+            font-size: 1.2rem; font-weight: 300; color: var(--accent);
+            vertical-align: super; margin-left: 0.3rem;
+        }
+        .slide h2 {
+            font-size: 1.8rem; font-weight: 700; color: #fff;
+            margin-bottom: 1rem; max-width: 640px; text-align: center; line-height: 1.35;
+        }
+        .slide p {
+            font-size: 0.95rem; color: var(--text-dim);
+            line-height: 1.85; max-width: 560px; text-align: center;
+        }
+        .slide-counter {
+            position: absolute; bottom: 3rem; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; gap: 0.6rem;
+            color: var(--text-dim); font-size: 0.75rem; letter-spacing: 2px; z-index: 5;
+        }
+        .slide-counter .line { width: 40px; height: 1px; background: rgba(255,255,255,0.2); }
+
+        /* ── Arrows ── */
+        .nav-arrow {
+            position: fixed; top: calc(50% - 40px); z-index: 20;
+            width: 48px; height: 48px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.5); color: var(--accent); font-size: 1.4rem;
+            display: none; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s; backdrop-filter: blur(8px);
+            transform: translateY(-50%);
+        }
+        .nav-arrow:hover { background: rgba(6,182,212,0.2); border-color: var(--accent); }
+        .nav-arrow.left { left: 1.2rem; }
+        .nav-arrow.right { right: 1.2rem; }
+
+        /* ── Bottom nav ── */
+        #timenav {
+            position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h);
+            background: var(--surface); border-top: 1px solid rgba(6,182,212,0.2);
+            cursor: grab; z-index: 50; overflow: hidden; touch-action: pan-x;
+            display: none;
+        }
+        #timenav:active { cursor: grabbing; }
+        #timenav-scroll {
+            position: absolute; top: 0; left: 0;
+            height: 100%; white-space: nowrap;
+            transition: transform 0.05s linear;
+        }
+        .timenav-group {
+            display: inline-flex; flex-direction: column; align-items: center;
+            justify-content: flex-end; height: 100%;
+            padding: 0 1.4rem; vertical-align: middle; position: relative;
+            cursor: pointer; min-width: 72px;
+        }
+        .timenav-group .dot {
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--accent); margin-bottom: 4px;
+            transition: all 0.3s; box-shadow: 0 0 6px rgba(6,182,212,0.4);
+        }
+        .timenav-group .tick {
+            width: 2px; height: 18px; background: rgba(6,182,212,0.3);
+            margin-bottom: 3px; transition: all 0.3s;
+        }
+        .timenav-group .year-label {
+            font-size: 0.95rem; color: var(--text-dim);
+            letter-spacing: 1px; transition: all 0.3s;
+        }
+        .timenav-group .mini-title {
+            font-size: 0.78rem; color: rgba(255,255,255,0.35);
+            margin-top: 4px; max-width: 80px;
+            white-space: normal; text-align: center;
+            line-height: 1.3; transition: all 0.3s;
+            overflow: hidden; text-overflow: ellipsis;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        }
+        .timenav-group.active .dot {
+            background: var(--accent2); width: 16px; height: 16px;
+            box-shadow: 0 0 12px rgba(234,179,8,0.7);
+        }
+        .timenav-group.active .tick { background: var(--accent2); height: 28px; }
+        .timenav-group.active .year-label { color: var(--accent2); font-weight: 700; font-size: 1.05rem; }
+        .timenav-group.active .mini-title { color: rgba(255,255,255,0.7); }
+        .timenav-decade {
+            display: inline-flex; flex-direction: column; align-items: center;
+            justify-content: flex-end; height: 100%;
+            padding: 0 1rem; vertical-align: middle; position: relative; cursor: pointer;
+        }
+        .timenav-decade .line {
+            width: 1px; height: 40px;
+            background: linear-gradient(to bottom, transparent, rgba(234,179,8,0.4));
+            margin-bottom: 3px;
+        }
+        .timenav-decade .decade-label {
+            font-size: 0.75rem; color: var(--accent2);
+            letter-spacing: 3px; font-weight: 600;
+        }
+        #timenav-handle {
+            position: absolute; bottom: 0; left: 50%;
+            width: 3px; height: 45px;
+            background: var(--accent2); transform: translateX(-50%);
+            pointer-events: none; z-index: 2;
+            box-shadow: 0 0 12px rgba(234,179,8,0.5);
+        }
+        #timenav-handle::after {
+            content: ''; position: absolute; top: -7px; left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 7px solid var(--accent2);
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 640px) {
+            :root { --nav-h: 170px; }
+            .top-bar { padding: 0.6rem 0.8rem; }
+            .top-title { font-size: 0.9rem; letter-spacing: 2px; padding: 0.3rem 0.8rem; }
+            .top-spacer { display: none; }
+            .back-btn { font-size: 0.75rem; padding: 0.4rem 0.7rem; }
+            .slide { padding: 4rem 1.2rem 2rem; }
+            .slide-date { font-size: 2.2rem; }
+            .slide h2 { font-size: 1.3rem; max-width: 100%; }
+            .slide p { font-size: 0.85rem; max-width: 100%; }
+            .nav-arrow { width: 38px; height: 38px; font-size: 1.1rem; }
+            .nav-arrow.left { left: 0.4rem; }
+            .nav-arrow.right { right: 0.4rem; }
+            .timenav-group { padding: 0 0.9rem; min-width: 55px; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://tianq4691-maker.github.io/NSBD-redesign/archive-theme.css">
+</head>
+<body>
+
+<!-- Loading screen -->
+<div class="loading-screen" id="loading-screen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">正在检测网络连接…</div>
+    <div class="loading-sub" id="loading-sub">尝试加载 TimelineJS</div>
+</div>
+
+<!-- Iframe (TimelineJS) -->
+<iframe id="timeline-frame"
+    src="https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=v2%3A2PACX-1vQ8NisScEU5rIHFIJ4azgMojyOZlP4urINxaEmEx0PW716sPALhYqx0AaxIZxYJZohMM5wz8oc7mNqT&font=Default&lang=zh-cn&initial_zoom=2&width=100%25&height=650"
+    allow="fullscreen">
+</iframe>
+
+<!-- Slide area (custom fallback) -->
+<div id="slide-area">
+    <div class="bg-layer" id="bg-layer"></div>
+    <div class="bg-overlay"></div>
+    <div class="bg-vignette"></div>
+</div>
+
+<!-- Top bar -->
+<header class="top-bar">
+    <a href="index.html" class="back-btn">&#8592; 返回首页</a>
+    <span class="top-title">调水纪事 · 筹备年表</span>
+    <span class="top-spacer"></span>
+</header>
+
+<!-- Arrows -->
+<button class="nav-arrow left" id="prev-btn">&#8592;</button>
+<button class="nav-arrow right" id="next-btn">&#8594;</button>
+
+<!-- Bottom nav -->
+<div id="timenav">
+    <div id="timenav-scroll"></div>
+    <div id="timenav-handle"></div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+
+    // ── Connectivity test → decide: embed or custom ──
+    var TIMELINE_SOURCE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8NisScEU5rIHFIJ4azgMojyOZlP4urINxaEmEx0PW716sPALhYqx0AaxIZxYJZohMM5wz8oc7mNqT/pubhtml';
+    var TEST_TIMEOUT = 5000; // 5 seconds
+    var testDone = false;
+
+    function showIframe() {
+        if (testDone) return;
+        testDone = true;
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('timeline-frame').style.display = 'block';
+        console.log('[Timeline] 使用在线 TimelineJS');
+    }
+
+    function showCustom() {
+        if (testDone) return;
+        testDone = true;
+        document.getElementById('loading-screen').style.display = 'none';
+        initCustomTimeline();
+        console.log('[Timeline] 回退到自建时间轴');
+    }
+
+    // ── Try connecting to Google Sheets ──
+    var loadingSub = document.getElementById('loading-sub');
+
+    // Method 1: fetch with timeout
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function() {
+        controller.abort();
+        loadingSub.textContent = '连接超时，切换到本地时间轴…';
+        showCustom();
+    }, TEST_TIMEOUT);
+
+    fetch(TIMELINE_SOURCE, {
+        method: 'HEAD',
+        mode: 'no-cors',
+        signal: controller.signal
+    }).then(function() {
+        clearTimeout(timeoutId);
+        if (!testDone) {
+            loadingSub.textContent = 'TimelineJS 连接成功，加载中…';
+            showIframe();
+        }
+    }).catch(function(err) {
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') return; // handled by timeout
+        loadingSub.textContent = '无法连接 Google，使用本地时间轴';
+        showCustom();
+    });
+
+    // Also listen for iframe load event as fallback
+    var iframeEl = document.getElementById('timeline-frame');
+    var iframeLoadTimeout = setTimeout(function() {
+        if (!testDone) {
+            // iframe didn't trigger load in 8s, fall back
+            showCustom();
+        }
+    }, 8000);
+    iframeEl.addEventListener('load', function() {
+        clearTimeout(iframeLoadTimeout);
+        if (!testDone) {
+            showIframe();
+        }
+    });
+
+    // ────────────────────────────────────────────────
+    //  CUSTOM TIMELINE (fallback)
+    // ────────────────────────────────────────────────
+    var bgImage = '时间轴背景图.webp';
+    var eventsData = [], currentIdx = -1;
+    var scrollX = 0, isDragging = false, dragStartX = 0, dragStartScroll = 0;
+    var timenavEl, navScrollEl, slideArea, bgLayer;
+    var slideEls = [];
+
+    function fmtDate(ev) {
+        var d = ev.start_date;
+        var s = d.year || '';
+        var md = '';
+        if (d.month) md += d.month;
+        if (d.day) md += '.' + d.day;
+        else if (d.month) md += '月';
+        return { year: s, md: md };
+    }
+
+    function getDecade(year) {
+        var y = parseInt(year) || 1950;
+        return String(Math.floor(y / 10) * 10);
+    }
+
+    function setBackground() {
+        bgLayer.style.backgroundImage = 'url(' + bgImage + ')';
+    }
+
+    function goTo(idx, direction) {
+        if (idx < 0 || idx >= eventsData.length || idx === currentIdx) return;
+        var prev = currentIdx;
+        currentIdx = idx;
+        slideEls.forEach(function(el) { el.className = 'slide'; });
+        if (prev >= 0 && prev < slideEls.length) {
+            slideEls[prev].classList.add(direction === 'left' ? 'exit-right' : 'exit-left');
+        }
+        slideEls[idx].classList.add('active');
+        setBackground();
+        var groups = navScrollEl.querySelectorAll('.timenav-group');
+        groups.forEach(function(g, i) { g.classList.toggle('active', i === idx); });
+        centerActive();
+    }
+
+    function centerActive() {
+        var active = navScrollEl.querySelector('.timenav-group.active');
+        if (!active) return;
+        var navW = timenavEl.clientWidth;
+        var targetX = active.offsetLeft + active.offsetWidth / 2 - navW / 2;
+        scrollX = Math.max(0, Math.min(targetX, navScrollEl.scrollWidth - navW));
+        navScrollEl.style.transform = 'translateX(' + (-scrollX) + 'px)';
+    }
+
+    function prevSlide() { if (currentIdx > 0) goTo(currentIdx - 1, 'left'); }
+    function nextSlide() { if (currentIdx < eventsData.length - 1) goTo(currentIdx + 1, 'right'); }
+
+    function buildCustom(data) {
+        eventsData = data.events || [];
+        if (!eventsData.length) return;
+
+        document.getElementById('slide-area').style.display = 'block';
+        document.getElementById('prev-btn').style.display = 'flex';
+        document.getElementById('next-btn').style.display = 'flex';
+        document.getElementById('timenav').style.display = 'block';
+        slideArea = document.getElementById('slide-area');
+        bgLayer = document.getElementById('bg-layer');
+        timenavEl = document.getElementById('timenav');
+        navScrollEl = document.getElementById('timenav-scroll');
+        setBackground();
+
+        var eraMap = {
+            '1950': '五〇年代 · 构想萌芽', '1960': '六〇年代 · 丹江口建设',
+            '1970': '七〇年代 · 工程发展', '1980': '八〇年代 · 规划论证',
+            '1990': '九〇年代 · 深化论证', '2000': '〇〇年代 · 正式开工',
+            '2010': '一〇年代 · 通水圆梦'
+        };
+
+        eventsData.forEach(function(ev, i) {
+            var d = fmtDate(ev);
+            var era = eraMap[getDecade(ev.start_date.year)] || '';
+            var div = document.createElement('div');
+            div.className = 'slide';
+            div.innerHTML =
+                '<div class="slide-era">' + era + '</div>' +
+                '<div class="slide-date">' + d.year + (d.md ? '<span class="month-day">' + d.md + '</span>' : '') + '</div>' +
+                '<h2>' + (ev.text.headline || '') + '</h2>' +
+                '<p>' + (ev.text.text || '') + '</p>' +
+                '<div class="slide-counter"><span class="line"></span><span>' + (i + 1) + ' / ' + eventsData.length + '</span><span class="line"></span></div>';
+            slideArea.appendChild(div);
+            slideEls.push(div);
+        });
+
+        var lastDecade = '';
+        eventsData.forEach(function(ev, i) {
+            var decade = getDecade(ev.start_date.year);
+            if (decade !== lastDecade && lastDecade !== '') {
+                var sep = document.createElement('div');
+                sep.className = 'timenav-decade';
+                sep.innerHTML = '<div class="line"></div><div class="decade-label">' + decade + 's</div>';
+                navScrollEl.appendChild(sep);
+            }
+            lastDecade = decade;
+            var d = fmtDate(ev);
+            var grp = document.createElement('div');
+            grp.className = 'timenav-group';
+            grp.innerHTML =
+                '<div class="dot"></div><div class="tick"></div>' +
+                '<div class="year-label">' + d.year + '</div>' +
+                '<div class="mini-title">' + (ev.text.headline || '').substring(0, 8) + '</div>';
+            grp.addEventListener('click', (function(idx) {
+                return function() { var dir = idx > currentIdx ? 'right' : 'left'; goTo(idx, dir); };
+            })(i));
+            navScrollEl.appendChild(grp);
+        });
+
+        goTo(0, 'right');
+        initCustomDrag();
+    }
+
+    function initCustomDrag() {
+        timenavEl = document.getElementById('timenav');
+        navScrollEl = document.getElementById('timenav-scroll');
+        function onStart(e) {
+            isDragging = true;
+            var pt = e.touches ? e.touches[0] : e;
+            dragStartX = pt.clientX;
+            dragStartScroll = scrollX;
+            timenavEl.style.cursor = 'grabbing';
+            navScrollEl.style.transition = 'none';
+        }
+        function onMove(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            var pt = e.touches ? e.touches[0] : e;
+            var dx = dragStartX - pt.clientX;
+            var navW = timenavEl.clientWidth;
+            var maxS = Math.max(0, navScrollEl.scrollWidth - navW);
+            scrollX = Math.max(0, Math.min(dragStartScroll + dx, maxS));
+            navScrollEl.style.transform = 'translateX(' + (-scrollX) + 'px)';
+        }
+        function onEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            timenavEl.style.cursor = 'grab';
+            navScrollEl.style.transition = 'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)';
+            var navW = timenavEl.clientWidth;
+            var cx = scrollX + navW / 2;
+            var best = -1, bestDist = Infinity;
+            var groups = navScrollEl.querySelectorAll('.timenav-group');
+            groups.forEach(function(g, i) {
+                var d = Math.abs((g.offsetLeft + g.offsetWidth / 2) - cx);
+                if (d < bestDist) { bestDist = d; best = i; }
+            });
+            if (best >= 0 && best !== currentIdx) {
+                var dir = best > currentIdx ? 'right' : 'left';
+                goTo(best, dir);
+            } else { centerActive(); }
+        }
+        timenavEl.addEventListener('mousedown', onStart);
+        timenavEl.addEventListener('touchstart', onStart, { passive: false });
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchend', onEnd);
+    }
+
+    function initCustomTimeline() {
+        try {
+            buildCustom(data);
+        } catch(err) {
+            document.getElementById('loading-screen').style.display = 'flex';
+            document.getElementById('loading-screen').innerHTML =
+                '<div style="color:#f87171;text-align:center;line-height:1.8">初始化失败<br><small>' + err.message + '</small></div>';
+            console.error(err);
+        }
+    }
+
+    // ── Arrow buttons ──
+    document.getElementById('prev-btn').addEventListener('click', prevSlide);
+    document.getElementById('next-btn').addEventListener('click', nextSlide);
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); }
+    });
+
+    // Swipe on slide area
+    (function() {
+        var startX = 0, startY = 0;
+        document.getElementById('slide-area').addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+        }, { passive: true });
+        document.getElementById('slide-area').addEventListener('touchend', function(e) {
+            var dx = (e.changedTouches[0] ? e.changedTouches[0].clientX : startX) - startX;
+            var dy = (e.changedTouches[0] ? e.changedTouches[0].clientY : startY) - startY;
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+                if (dx < 0) nextSlide(); else prevSlide();
+            }
+        });
+    })();
+
+    window.addEventListener('resize', function() { if (currentIdx >= 0) centerActive(); });
+
+    // ── Inline event data ──
+    var data = {
+        "title": { "text": { "headline": "南水北调 · 世纪工程", "text": "从1952年毛泽东提出南水北调宏伟设想到2014年中线通水，跨越半个多世纪的水利史诗" } },
+        "events": [
+            {"start_date":{"year":"1952","month":"10","day":"30"},"text":{"headline":"南水北调宏伟设想诞生","text":"毛泽东视察黄河时首次提出：\u201c南方水多，北方水少，如有可能，借点水来也是可以的。\u201d这是南水北调构想的起点。"}},
+            {"start_date":{"year":"1953","month":"2","day":"19"},"text":{"headline":"毛泽东乘'长江舰'视察","text":"听取林一山汇报后指示：\u201c三峡问题暂时还不考虑开工，但南水北调工作要抓紧。\u201d首次提出从丹江口水库引水济黄济淮的设想。"}},
+            {"start_date":{"year":"1954","month":"12"},"text":{"headline":"三峡与丹江口规划推进","text":"毛泽东、刘少奇、周恩来在武汉至广州专列上听取林一山关于三峡工程汇报，并指示长委抓紧规划科研工作。官厅水库竣工，成为新中国第一座大型水库。"}},
+            {"start_date":{"year":"1955"},"text":{"headline":"丹江口列入'一五'计划","text":"兴建丹江口水库被列入国家第一个五年计划重点建设工程之一，汉江流域规划编制工作启动。"}},
+            {"start_date":{"year":"1958","month":"1"},"text":{"headline":"南宁会议：周恩来挂帅三峡","text":"毛泽东派飞机将林一山与李锐接到南宁会议辩论三峡问题。周恩来表态\u201c好，我来管\u201d，毛泽东说\u201c你来管，一年抓四次\u201d。"}},
+            {"start_date":{"year":"1958","month":"3"},"text":{"headline":"成都会议：决定兴建丹江口","text":"中共中央在成都会议上作出兴建丹江口水利枢纽工程的决定。毛泽东再次提出引江、引汉济黄问题。"}},
+            {"start_date":{"year":"1958","month":"8"},"text":{"headline":"'南水北调'首见中央文献","text":"北戴河会议通过《关于水利工作的指示》，指出\u201c全国范围较长远的水利规划，首先是以南水北调为主要目的\u201d，这是\u201c南水北调\u201d一词首次见于中央正式文献。"}},
+            {"start_date":{"year":"1958","month":"9","day":"1"},"text":{"headline":"丹江口水利枢纽正式开工","text":"张体学剪彩并持锄破土，五千多人参加典礼。淅川县组织民兵2.8万人奔赴工地。"}},
+            {"start_date":{"year":"1959","month":"12","day":"26"},"text":{"headline":"丹江口工程胜利截流","text":"以190分钟斩断汉江，完成汉江截流任务。李先念副总理参加庆祝大会并代表中共中央、国务院讲话。"}},
+            {"start_date":{"year":"1962","month":"2","day":"8"},"text":{"headline":"周总理主持质量处理会议","text":"因大坝出现严重质量事故（架空冷缝427处、裂缝2463条），周恩来决定主体工程停工处理。工程进入长达三年的\u201c六二停工\u201d期。"}},
+            {"start_date":{"year":"1964","month":"12","day":"16"},"text":{"headline":"丹江口工程复工","text":"国务院批复按防洪结合发电方案续建。河南管迁、湖北管安的移民原则确立。"}},
+            {"start_date":{"year":"1966","month":"1","day":"1"},"text":{"headline":"汉丹铁路全线通车","text":"解决丹江口工程大施工期间材料、大型机械设备进场问题。国务院批准大坝按162米施工。"}},
+            {"start_date":{"year":"1967","month":"11","day":"18"},"text":{"headline":"丹江口水库落闸蓄水","text":"11月5日举行下闸蓄水典礼，月底淅川马镫镇以下被水淹没。"}},
+            {"start_date":{"year":"1968","month":"10","day":"1"},"text":{"headline":"丹江口水电站首台机组发电","text":"151个单位627名代表参加发电典礼，丹江口工程开始发挥效益。"}},
+            {"start_date":{"year":"1970","month":"7","day":"29"},"text":{"headline":"丹江口一期工程基本完成","text":"大坝浇筑至162米高程。同年12月，毛泽东批示\u201c赞成兴建\u201d葛洲坝水利枢纽。"}},
+            {"start_date":{"year":"1973"},"text":{"headline":"丹江口大坝建设完工","text":"162米高程、全长2494米，总造价8.2亿元，移民补助1.8亿元，合计10.2亿元。"}},
+            {"start_date":{"year":"1974","month":"2","day":"24"},"text":{"headline":"《人民日报》：丹江口初期工程建成","text":"丹江渠道主体工程建成通水。朱德询问：\u201c能不能把水引到华北呢？\u201d回答：丹江口是实现南水北调的一条好通道。"}},
+            {"start_date":{"year":"1978"},"text":{"headline":"南水北调列入政府工作报告","text":"五届全国人大一次会议《政府工作报告》正式提出：\u201c兴建把长江水引到黄河以北的南水北调工程。\u201d南水北调由构想落实到政策执行层面。"}},
+            {"start_date":{"year":"1979","month":"12"},"text":{"headline":"南水北调规划办公室成立","text":"水利部成立南水北调规划办公室，统筹协调全国南水北调工作。黄委会负责西线、长江委负责中线、淮委负责东线。"}},
+            {"start_date":{"year":"1980","month":"7","day":"22"},"text":{"headline":"邓小平视察丹江口","text":"详细询问初期工程防洪、发电、灌溉效益与大坝二期加高情况。同年联合国专家考察中线和东线，认为工程技术上可行。"}},
+            {"start_date":{"year":"1991","month":"4"},"text":{"headline":"南水北调列入'八五'计划","text":"七届全国人大四次会议将南水北调列入十年规划。水利部审查通过中线修订规划：丹江口大坝一次性加高、调水150亿m\u00b3、全线自流。"}},
+            {"start_date":{"year":"1995","month":"6"},"text":{"headline":"国务院部署南水北调论证","text":"第71次总理办公会议明确南水北调是跨世纪重大工程，需慎重研究、充分论证、科学决策。成立南水北调工程论证委员会。"}},
+            {"start_date":{"year":"1998","month":"3"},"text":{"headline":"审查委员会确认实施顺序","text":"确认\u201c中、东、西\u201d实施顺序，同意中线加高丹江口大坝、东线治污后开工、西线加快前期，\u201c四横三纵\u201d水资源格局雏形确立。"}},
+            {"start_date":{"year":"2000","month":"9","day":"27"},"text":{"headline":"朱镕基提出'三先三后'原则","text":"\u201c先节水后调水、先治污后通水、先环保后用水\u201d，成为南水北调总体规划的核心指导思想。"}},
+            {"start_date":{"year":"2002","month":"12","day":"27"},"text":{"headline":"南水北调工程正式开工","text":"南水北调工程开工典礼举行，标志着从构想到现实的跨越。国务院正式批复《南水北调工程总体规划》，\u201c四横三纵\u201d总体布局确立。"}},
+            {"start_date":{"year":"2005"},"text":{"headline":"丹江口大坝加高工程启动","text":"解决中线调水水源保障，完成6种方案比选论证。确立\u201c建委会领导、省级负责、县为基础\u201d移民管理体制。"}},
+            {"start_date":{"year":"2011"},"text":{"headline":"丹江口库区移民搬迁完成","text":"河南、湖北两省累计搬迁33万人，实现\u201c四年任务、两年基本完成\u201d，破解工程建设核心难题。"}},
+            {"start_date":{"year":"2013","month":"11","day":"15"},"text":{"headline":"东线一期工程全线通水","text":"截至2020年9月累计抽江水420亿m\u00b3，直接受益人口近1亿人，水质达标率从3%提升至100%，南四湖从\u201c酱油湖\u201d变为优良湖泊。"}},
+            {"start_date":{"year":"2014","month":"12","day":"12"},"text":{"headline":"中线一期工程正式通水","text":"向京津冀豫调水，北京自来水硬度下降2/3。习近平总书记批示：\u201c加强运行管理，深化水质保护。\u201d南水北调世纪梦想终成现实。"}}
+        ]
+    };
+
+})();
+</script>
+    <script src="https://tianq4691-maker.github.io/NSBD-redesign/archive-shell.js"></script>
+</body>
+</html>
