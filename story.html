@@ -312,6 +312,25 @@
 
         @media (max-width: 768px) { .wc-grid { grid-template-columns: repeat(2, 1fr); gap: 0.9rem 0.6rem; } }
         @media (max-width: 480px) { .wc-grid { gap: 0.7rem 0.4rem; } .wc-label { margin-top: 0.25rem; } .wc-label span { font-size: 0.68rem; letter-spacing: 1px; } }
+
+        /* ========== 丹江口建设历史照片 ========== */
+        .history-gallery { margin: 1.2rem 0 2rem; padding: 1.4rem; border: 1px solid var(--card-border); background: rgba(8,24,21,.48); }
+        .history-gallery-head { display:flex; align-items:end; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
+        .history-gallery-head h2 { margin:0; font-size:1.2rem; color:var(--water-light); letter-spacing:3px; }
+        .history-gallery-head p { margin:0; color:var(--text-muted); font-size:.75rem; letter-spacing:1px; }
+        .history-gallery-grid { display:grid; grid-template-columns:repeat(12,1fr); gap:.8rem; }
+        .history-photo { margin:0; grid-column:span 4; position:relative; overflow:hidden; border:1px solid var(--card-border); background:#111; }
+        .history-photo:nth-child(1),.history-photo:nth-child(2) { grid-column:span 6; }
+        .history-photo img { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; filter:grayscale(1) sepia(.08); transition:.35s ease; }
+        .history-photo:hover img { transform:scale(1.025); filter:grayscale(.75) sepia(.08); }
+        .history-photo figcaption { min-height:58px; padding:.7rem .8rem; color:var(--text-secondary); font-size:.72rem; line-height:1.65; letter-spacing:.04em; }
+        .history-photo figcaption b { display:block; color:var(--water-light); font-weight:500; margin-bottom:.15rem; }
+        .history-photo .archive-evidence-tag { position:absolute; top:.6rem; left:.6rem; }
+        @media (max-width:768px) {
+            .history-gallery-grid { grid-template-columns:1fr; }
+            .history-photo,.history-photo:nth-child(1),.history-photo:nth-child(2) { grid-column:auto; }
+            .history-gallery-head { align-items:start; flex-direction:column; }
+        }
     </style>
     <link rel="stylesheet" href="https://tianq4691-maker.github.io/NSBD-redesign/archive-theme.css">
 </head>
@@ -422,6 +441,40 @@
         <p><span class="highlight">1959年</span>，中科院、水电部确定南水北调指导方针：<strong>"蓄调兼施，综合利用，统筹兼顾，南北两利，以有济无，以多补少，使水尽其用，地尽其利。"</strong></p>
         <p><span class="highlight">1979年</span>，五届全国人大一次会议《政府工作报告》正式提出："兴建把长江水引到黄河以北的南水北调工程"。</p>
     </div>
+
+    <section class="history-gallery" aria-labelledby="history-gallery-title">
+        <div class="history-gallery-head">
+            <h2 id="history-gallery-title">丹江口建设现场 · 历史照片</h2>
+            <p>1958—1959 · 图像档案</p>
+        </div>
+        <div class="history-gallery-grid">
+            <figure class="history-photo">
+                <img src="https://tianq4691-maker.github.io/NSBD-redesign/assets/1958-start.svg" alt="1958年8月1日丹江口水利枢纽开工历史照片" loading="lazy">
+                <span class="archive-evidence-tag">历史照片</span>
+                <figcaption><b>1958年8月1日</b>丹江口水利枢纽开工。</figcaption>
+            </figure>
+            <figure class="history-photo">
+                <img src="https://tianq4691-maker.github.io/NSBD-redesign/assets/1958-labor.svg" alt="1958年11月15日挑土比赛历史照片" loading="lazy">
+                <span class="archive-evidence-tag">历史照片</span>
+                <figcaption><b>1958年11月15日</b>“穆桂英排”和“武松排”进行挑土比赛。</figcaption>
+            </figure>
+            <figure class="history-photo">
+                <img src="https://tianq4691-maker.github.io/NSBD-redesign/assets/1959-dam.svg" alt="1959年丹江口大坝建设历史照片" loading="lazy">
+                <span class="archive-evidence-tag">历史照片</span>
+                <figcaption><b>1959年</b>丹江口大坝建设现场。</figcaption>
+            </figure>
+            <figure class="history-photo">
+                <img src="https://tianq4691-maker.github.io/NSBD-redesign/assets/1959-closure.svg" alt="1959年汉江截流历史照片" loading="lazy">
+                <span class="archive-evidence-tag">历史照片</span>
+                <figcaption><b>1959年</b>丹江口大坝建设开始进行汉江截流。</figcaption>
+            </figure>
+            <figure class="history-photo">
+                <img src="https://tianq4691-maker.github.io/NSBD-redesign/assets/1959-first-stone.svg" alt="1959年12月26日截流抛下第一块石头历史照片" loading="lazy">
+                <span class="archive-evidence-tag">历史照片</span>
+                <figcaption><b>1959年12月26日</b>工程局领导任士舜（右一）、夏克（右二）为截流抛下第一块石头。</figcaption>
+            </figure>
+        </div>
+    </section>
 
     <!-- ======== 二、研究论证 ======== -->
     <div class="section" id="sec2">
