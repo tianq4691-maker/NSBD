@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <base href="https://tianq4691-maker.github.io/NSBD/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>问水工器 · 旧制复刻 — 早期南水北调</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --iron-dark: #1c1917;
+            --iron-mid: #292524;
+            --iron-light: #44403c;
+            --copper: #d97706;
+            --copper-glow: #f59e0b;
+            --text-main: #e7e5e4;
+            --text-sub: #a8a29e;
+            --card-bg: rgba(41,37,36,0.75);
+            --card-border: rgba(217,119,6,0.25);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #1c1917;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            animation: fadeInBody 0.6s ease forwards;
+        }
+        @keyframes fadeInBody { from { opacity: 0; } to { opacity: 1; } }
+
+        /* 背景图层 */
+        .bg-layer {
+            position: fixed;
+            inset: 0; z-index: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            will-change: opacity;
+            pointer-events: none;
+        }
+        .bg-layer-1 {
+            background-image: url('工具背景图.jpeg');
+            opacity: 1;
+            transition: opacity 0.7s ease;
+        }
+        .bg-layer-2 {
+            background-image: url('工具建模背景图2.webp');
+            opacity: 0;
+            transition: opacity 0.7s ease;
+        }
+        .bg-overlay {
+            position: fixed;
+            inset: 0; z-index: 1;
+            background: rgba(28,25,23,0.60);
+            pointer-events: none;
+        }
+
+        /* 顶部导航 */
+        .top-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: rgba(28,25,23,0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(217,119,6,0.15);
+        }
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-sub);
+            cursor: pointer;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            text-decoration: none;
+        }
+        .back-btn:hover { color: var(--copper-glow); }
+        .back-btn svg { width: 18px; height: 18px; }
+        .top-bar-title {
+            font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+            font-size: 1rem;
+            color: var(--text-sub);
+            letter-spacing: 3px;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            position: relative;
+            z-index: 2;
+            padding: 72px 20px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 页头 */
+        .page-header {
+            text-align: center;
+            padding: 28px 0 44px;
+        }
+        .page-header .badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border: 1px solid rgba(217,119,6,0.4);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            color: var(--copper);
+            margin-bottom: 16px;
+        }
+        .page-header h1 {
+            font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+            font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #fff;
+            text-shadow: 0 0 32px rgba(217,119,6,0.3);
+            margin-bottom: 10px;
+        }
+        .page-header .subtitle {
+            font-size: clamp(0.72rem, 1.4vw, 0.9rem);
+            color: var(--text-sub);
+            letter-spacing: 6px;
+        }
+        .page-header .decree {
+            margin-top: 20px;
+            padding: 14px 24px;
+            background: rgba(217,119,6,0.06);
+            border-left: 3px solid var(--copper);
+            border-right: 3px solid var(--copper);
+            display: inline-block;
+            text-align: left;
+            max-width: 600px;
+        }
+        .page-header .decree p {
+            font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+            font-size: 0.85rem;
+            line-height: 1.9;
+            color: var(--text-sub);
+            letter-spacing: 2px;
+        }
+        .page-header .decree .stamp {
+            text-align: right;
+            color: var(--copper);
+            font-size: 0.75rem;
+            margin-top: 8px;
+            letter-spacing: 3px;
+        }
+
+        /* 加载提示 */
+        .loading-tips {
+            text-align: center;
+            margin-bottom: 36px;
+            padding: 16px 20px;
+            background: rgba(41,37,36,0.55);
+            border: 1px solid rgba(217,119,6,0.15);
+            border-radius: 8px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .loading-tips .tip-icon {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--copper);
+        }
+        .loading-tips .tip-line {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            letter-spacing: 2px;
+            line-height: 2;
+        }
+
+        /* 标语横幅 */
+        .slogan-strip {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 44px;
+        }
+        .slogan-item {
+            padding: 6px 16px;
+            background: rgba(217,119,6,0.08);
+            border: 1px solid rgba(217,119,6,0.2);
+            border-radius: 4px;
+            font-size: 0.72rem;
+            letter-spacing: 3px;
+            color: var(--text-sub);
+            font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+        }
+
+        /* 汇总场景 */
+        .overview-section {
+            margin-bottom: 44px;
+            text-align: center;
+        }
+        .overview-section .section-label {
+            display: inline-block;
+            font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            color: var(--copper);
+            border-bottom: 1px solid rgba(217,119,6,0.35);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        .overview-viewer {
+            width: 100%;
+            max-width: 800px;
+            height: 420px;
+            margin: 0 auto;
+            background: rgba(28,25,23,0.90);
+            border-radius: 12px;
+            border: 1px solid rgba(217,119,6,0.18);
+            overflow: hidden;
+        }
+        .overview-viewer canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .overview-caption {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            letter-spacing: 3px;
+        }
+
+        /* 工具卡片网格 */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.35s, border-color 0.35s, box-shadow 0.35s;
+        }
+        .tool-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(217,119,6,0.5);
+            box-shadow: 0 12px 40px rgba(217,119,6,0.1);
+        }
+
+        /* 3D 查看器加载占位 */
+        .tool-model {
+            width: 100%;
+            height: 280px;
+            position: relative;
+            overflow: hidden;
+        }
+        .tool-model::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(28,25,23,0.95);
+            z-index: 1;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+        .tool-model.loaded::after {
+            opacity: 0;
+        }
+        .tool-model canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* 三视图缩略图 */
+        .tool-triview {
+            background: #1c1917;
+            border-top: 1px solid rgba(217,119,6,0.1);
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .tool-triview img {
+            width: 100%;
+            height: auto;
+            display: block;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+        .tool-triview img:hover { opacity: 1; }
+
+        /* 工具信息 */
+        .tool-info {
+            padding: 18px 20px;
+        }
+        .tool-info .tool-number {
+            font-size: 0.6rem;
+            letter-spacing: 4px;
+            color: var(--copper);
+            margin-bottom: 6px;
+        }
+        .tool-info h3 {
+            font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .tool-info .tool-desc {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            line-height: 1.8;
+            letter-spacing: 1px;
+        }
+        .tool-info .tool-tag {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 3px 10px;
+            background: rgba(217,119,6,0.12);
+            border-radius: 3px;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: var(--copper-glow);
+            font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+        }
+
+        /* 底部语录 */
+        .footer-quote {
+            text-align: center;
+            padding: 44px 20px 20px;
+        }
+        .footer-quote .line {
+            font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+            font-size: 1rem;
+            letter-spacing: 4px;
+            color: var(--copper);
+            margin-bottom: 8px;
+        }
+        .footer-quote .line-sub {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            letter-spacing: 3px;
+        }
+
+        /* 灯箱 */
+        .lightbox { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.94); align-items: center; justify-content: center; }
+        .lightbox.active { display: flex; }
+        .lightbox img { max-width: 94vw; max-height: 90vh; border-radius: 4px; }
+        .lightbox-close { position: absolute; top: 20px; right: 28px; font-size: 2rem; color: #fff; cursor: pointer; z-index: 2; }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .main-content { padding: 62px 12px 30px; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .tool-model { height: 240px; }
+            .overview-viewer { height: 280px; }
+            .page-header h1 { letter-spacing: 4px; }
+            .slogan-strip { gap: 8px; }
+            .slogan-item { font-size: 0.62rem; letter-spacing: 1px; padding: 4px 10px; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://tianq4691-maker.github.io/NSBD-redesign/archive-theme.css">
+</head>
+<body>
+
+    <!-- 背景图层 -->
+    <div class="bg-layer bg-layer-1" id="bgLayer1"></div>
+    <div class="bg-layer bg-layer-2" id="bgLayer2"></div>
+    <div class="bg-overlay"></div>
+
+    <!-- 顶部导航 -->
+    <div class="top-bar">
+        <a class="back-btn" href="index.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            返回总图
+        </a>
+        <span class="top-bar-title">早期南水北调 · 工器展馆</span>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+
+        <!-- 页头 -->
+        <div class="page-header">
+            <div class="badge">工 具 复 刻</div>
+            <h1>问水工器 · 旧制复刻</h1>
+            <p class="subtitle">自力更生 &nbsp;土洋结合 &nbsp;多快好省</p>
+            <div class="decree">
+                <p>
+                    为胜利完成南水北调这一伟大历史任务，全体参战同志发扬一不怕苦、二不怕死的革命精神，土法上马、因陋就简，自制与改进了大批施工机具。现将部分代表性工器复原陈列，以志当年群策群力、战天斗地之壮举。
+                </p>
+                <p class="stamp">—— 南水北调工程指挥部 宣</p>
+            </div>
+        </div>
+
+        <!-- 标语 -->
+        <div class="slogan-strip">
+            <span class="slogan-item">抓革命·促生产</span>
+            <span class="slogan-item">自力更生·艰苦奋斗</span>
+            <span class="slogan-item">鼓足干劲·力争上游</span>
+            <span class="slogan-item">群众是真正的英雄</span>
+        </div>
+
+        <!-- 加载提示 -->
+        <div class="loading-tips">
+            <div class="tip-icon"><i class="fa-solid fa-circle-info"></i></div>
+            <div class="tip-line">3D 模型文件较大，若加载不出请耐心等待片刻</div>
+            <div class="tip-line">如有多余字样或元素干扰，请刷新页面重试</div>
+        </div>
+
+        <!-- 汇总场景 -->
+        <div class="overview-section">
+            <div class="section-label">全会战工具汇总场景</div>
+            <div class="overview-viewer">
+                <canvas data-model-glb="工具建模/工具建模/00_汇总场景/all_tools_combined.glb"></canvas>
+            </div>
+            <p class="overview-caption">〔 以上六件工器均为当年施工一线所用实物复原  〕</p>
+        </div>
+
+        <!-- 工具卡片 -->
+        <div class="tools-grid">
+
+            <!-- 1. 踏板飞车 -->
+            <div class="tool-card" id="tool01">
+                <div class="tool-model">
+                    <canvas data-model-glb="工具建模/工具建模/01_踏板飞车/01_踏板飞车.glb"
+                            data-model-obj="工具建模/工具建模/01_踏板飞车/01_踏板飞车.obj"></canvas>
+                </div>
+                <div class="tool-triview">
+                    <img src="工具建模/工具建模/01_踏板飞车/踏板飞车_三视图参考.png" alt="踏板飞车三视图" onclick="openLightbox(this.src)" loading="lazy">
+                </div>
+                <div class="tool-info">
+                    <div class="tool-number">工 器 之 一</div>
+                    <h3>踏板飞车</h3>
+                    <p class="tool-desc">
+                        土法自制的运土器具，以人力脚踏驱动，沿轻便轨道往返于取土场与填方段之间。虽形制简陋、不及洋设备之精巧，然结构简易、便于修造，一人一车每日可运土数十方，诚为大战中不可或缺之利器。
+                    </p>
+                    <span class="tool-tag">土法上马 · 群众创造</span>
+                </div>
+            </div>
+
+            <!-- 2. 锅驼机 -->
+            <div class="tool-card" id="tool02">
+                <div class="tool-model">
+                    <canvas data-model-glb="工具建模/工具建模/02_锅驼机/02_锅驼机.glb"
+                            data-model-obj="工具建模/工具建模/02_锅驼机/02_锅驼机.obj"></canvas>
+                </div>
+                <div class="tool-triview">
+                    <img src="工具建模/工具建模/02_锅驼机/02_锅驼机_三视图.png" alt="锅驼机三视图" onclick="openLightbox(this.src)" loading="lazy">
+                </div>
+                <div class="tool-info">
+                    <div class="tool-number">工 器 之 二</div>
+                    <h3>锅驼机</h3>
+                    <p class="tool-desc">
+                        蒸汽动力装置也，以煤炭或薪柴为燃料，产生蒸汽驱动活塞做往复运动，经由曲柄连杆转化为旋转做功。工地多用于带动水泵抽水、驱动碎石机、牵引卷扬机等。当年柴油机稀缺，此物乃各工段争相调配之"宝贝疙瘩"。
+                    </p>
+                    <span class="tool-tag">蒸汽动力 · 以土代洋</span>
+                </div>
+            </div>
+
+            <!-- 3. 小型水轮发电机 -->
+            <div class="tool-card" id="tool03">
+                <div class="tool-model">
+                    <canvas data-model-glb="工具建模/工具建模/03_小型水轮发电机/03_小型水轮发电机.glb"
+                            data-model-obj="工具建模/工具建模/03_小型水轮发电机/03_小型水轮发电机.obj"></canvas>
+                </div>
+                <div class="tool-triview">
+                    <img src="工具建模/工具建模/03_小型水轮发电机/03_小型水轮发电机_三视图.png" alt="小型水轮发电机三视图" onclick="openLightbox(this.src)" loading="lazy">
+                </div>
+                <div class="tool-info">
+                    <div class="tool-number">工 器 之 三</div>
+                    <h3>小型水轮发电机</h3>
+                    <p class="tool-desc">
+                        利用山涧溪流落差驱动水轮，带动发电机转子旋转发电。功率虽不过数瓩，然足以解决工地照明与小型机具之用电。同志们开动脑筋、因水制宜，于渠首及各支沟架设，使入夜之工地灯火通明、干劲愈足。
+                    </p>
+                    <span class="tool-tag">水力发电 · 因陋就简</span>
+                </div>
+            </div>
+
+            <!-- 4. 皮带运输机 -->
+            <div class="tool-card" id="tool04">
+                <div class="tool-model">
+                    <canvas data-model-glb="工具建模/工具建模/04_皮带运输机/04_皮带运输机.glb"
+                            data-model-obj="工具建模/工具建模/04_皮带运输机/04_皮带运输机.obj"></canvas>
+                </div>
+                <div class="tool-triview">
+                    <img src="工具建模/工具建模/04_皮带运输机/04_皮带运输机_三视图.png" alt="皮带运输机三视图" onclick="openLightbox(this.src)" loading="lazy">
+                </div>
+                <div class="tool-info">
+                    <div class="tool-number">工 器 之 四</div>
+                    <h3>皮带运输机</h3>
+                    <p class="tool-desc">
+                        以大轮带动橡胶帆布带连续运转，将土石方自低处输送至高处或远处。本机系修理厂同志参照画报所载外国样式自行仿制，虽转速不及原品，然胜在材料可就地筹措、机架可拆解搬运，实为土洋结合之典范。
+                    </p>
+                    <span class="tool-tag">连续输送 · 仿制改进</span>
+                </div>
+            </div>
+
+            <!-- 5. 斧头 -->
+            <div class="tool-card" id="tool05">
+                <div class="tool-model">
+                    <canvas data-model-glb="工具建模/工具建模/05_斧头/05_斧头.glb"
+                            data-model-obj="工具建模/工具建模/05_斧头/05_斧头.obj"></canvas>
+                </div>
+                <div class="tool-triview">
+                    <img src="工具建模/工具建模/05_斧头/参考_837544d6-6daa-5425-88ae-fc1b1122ea70.jpg" alt="斧头三视图" onclick="openLightbox(this.src)" loading="lazy">
+                </div>
+                <div class="tool-info">
+                    <div class="tool-number">工 器 之 五</div>
+                    <h3>斧头</h3>
+                    <p class="tool-desc">
+                        工地上最寻常亦最紧要之工具。伐木开辟施工通道、劈削木桩加固边坡、修整模板预制构件，无不用之。铁匠炉昼夜叮当，专为各民工营打制与修磨各式斧刃。一斧在手，披荆斩棘，逢山开路之志弥坚。
+                    </p>
+                    <span class="tool-tag">基本工具 · 开路先锋</span>
+                </div>
+            </div>
+
+            <!-- 6. 驳船 -->
+            <div class="tool-card" id="tool06">
+                <div class="tool-model">
+                    <canvas data-model-glb="工具建模/工具建模/06_驳船/06_驳船.glb"
+                            data-model-obj="工具建模/工具建模/06_驳船/06_驳船.obj"></canvas>
+                </div>
+                <div class="tool-triview">
+                    <img src="工具建模/工具建模/06_驳船/06_驳船_三视图.png" alt="驳船三视图" onclick="openLightbox(this.src)" loading="lazy">
+                </div>
+                <div class="tool-info">
+                    <div class="tool-number">工 器 之 六</div>
+                    <h3>驳船</h3>
+                    <p class="tool-desc">
+                        内河航运之主力也。于中线工程丹江口库区及引汉干渠施工期间，大批驳船日夜穿梭，运水泥钢筋至前沿，载砂石土料赴坝址。船工同志们顶风冒雨，喊出"船到码头就是战场"之豪言，水上运量曾占全线物资之四成以上。
+                    </p>
+                    <span class="tool-tag">水运主力 · 物资命脉</span>
+                </div>
+            </div>
+
+        </div><!-- /tools-grid -->
+
+        <!-- 底部语录 -->
+        <div class="footer-quote">
+            <div class="line">「 人民，只有人民，才是创造世界历史的动力 」</div>
+            <div class="line-sub">—— 谨以此展向当年参加南水北调工程的全体同志们致敬</div>
+        </div>
+
+    </div><!-- /main-content -->
+
+    <!-- 图片灯箱 -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightboxImg" src="" alt="三视图放大">
+    </div>
+
+    <!-- Three.js Import Map -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+        console.log('[3D] Three.js loaded, r' + THREE.REVISION);
+        console.log('[3D] Protocol:', window.location.protocol);
+
+        // file:// 协议下所有资源加载都会被 CORS 拦截，必须用本地服务器
+        const isFileProtocol = window.location.protocol === 'file:';
+        if (isFileProtocol) {
+            document.body.innerHTML = '' + 
+                '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#1c1917;color:#e7e5e4;font-family:sans-serif;z-index:99999;text-align:center;padding:40px;">' +
+                '<div>' +
+                '<h2 style="color:#d97706;margin-bottom:16px;">⚠ 需要本地 HTTP 服务器</h2>' +
+                '<p style="opacity:0.7;margin-bottom:24px;line-height:1.8;">浏览器安全策略阻止了 file:// 协议下加载 3D 模型文件。</p>' +
+                '<div style="background:#292524;padding:16px 24px;border-radius:8px;text-align:left;">' +
+                '<p style="color:#f59e0b;margin-bottom:8px;">请在项目目录下启动服务器：</p>' +
+                '<code style="color:#a8a29e;font-size:0.9rem;word-break:break-all;">cd e:\\小创\\网站<br>python -m http.server 8080</code>' +
+                '<p style="color:#a8a29e;margin-top:12px;font-size:0.85rem;">然后访问 <a href="http://localhost:8080/tools.html" style="color:#f59e0b;">http://localhost:8080/tools.html</a></p>' +
+                '</div></div></div>';
+            throw new Error('file:// protocol blocked — use http://localhost:8080/tools.html');
+        }
+
+        // ===== 创建单个 3D 查看器 =====
+        class ModelViewer {
+            constructor(canvas, glbPath, objPath) {
+                this.canvas = canvas;
+                this.glbPath = glbPath;
+                this.objPath = objPath;
+                this.clock = new THREE.Clock();
+                this._init();
+            }
+
+            _init() {
+                const parent = this.canvas.parentElement;
+                const rect = parent.getBoundingClientRect();
+                const w = Math.max(rect.width, 200);
+                const h = Math.max(rect.height, 200);
+
+                console.log('[3D] Init viewer', w + 'x' + h, this.glbPath);
+
+                // Renderer
+                this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: false });
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.setSize(w, h, false);
+                this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+                this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                this.renderer.toneMappingExposure = 1.1;
+                this.renderer.setClearColor(0x2a2522, 1);
+
+                // Scene
+                this.scene = new THREE.Scene();
+
+                // Camera
+                this.camera = new THREE.PerspectiveCamera(45, w / Math.max(h, 1), 0.1, 100);
+                this.camera.position.set(3, 2.5, 5);
+                this.camera.lookAt(0, 0, 0);
+
+                // Lighting — 物理正确的光照参数
+                const ambient = new THREE.AmbientLight(0xffffff, 3.5);
+                this.scene.add(ambient);
+                const key = new THREE.DirectionalLight(0xffffff, 2.0);
+                key.position.set(4, 6, 4);
+                this.scene.add(key);
+                const fill = new THREE.DirectionalLight(0xeeddcc, 1.0);
+                fill.position.set(-3, 1, -2);
+                this.scene.add(fill);
+                const rim = new THREE.DirectionalLight(0xffffff, 0.6);
+                rim.position.set(0, -0.5, 3);
+                this.scene.add(rim);
+
+                // Controls
+                this.controls = new OrbitControls(this.camera, this.canvas);
+                this.controls.enableDamping = true;
+                this.controls.dampingFactor = 0.08;
+                this.controls.autoRotate = true;
+                this.controls.autoRotateSpeed = 1.2;
+                this.controls.minDistance = 1.5;
+                this.controls.maxDistance = 12;
+                this.controls.target.set(0, 0.4, 0);
+
+                // Load model
+                this._loadModel();
+
+                // Resize observer
+                this._resizeObserver = new ResizeObserver(() => this._onResize());
+                this._resizeObserver.observe(this.canvas.parentElement);
+
+                // Start loop
+                this._animate();
+            }
+
+            _loadModel() {
+                const parentEl = this.canvas.parentElement;
+                this._loadTimeout = setTimeout(() => {
+                    if (parentEl) {
+                        parentEl.classList.add('loaded');
+                        if (!this.model) this._showError('加载超时，请检查文件是否存在');
+                    }
+                }, 10000);
+
+                if (this.glbPath) {
+                    this._loadGLB(this.glbPath);
+                } else if (this.objPath) {
+                    this._loadOBJ(this.objPath);
+                }
+            }
+
+            _loadGLB(path) {
+                console.log('[3D] Loading GLB:', path);
+                const loader = new GLTFLoader();
+                loader.load(path,
+                    (gltf) => {
+                        console.log('[3D] GLB loaded:', path);
+                        this.model = gltf.scene;
+                        this._setupModel();
+                    },
+                    (p) => {
+                        if (p.total > 0 && Math.round(p.loaded/p.total*100) % 25 === 0)
+                            console.log('[3D] Loading:', Math.round(p.loaded/p.total*100) + '%');
+                    },
+                    (err) => {
+                        console.error('[3D] GLB FAILED:', path, err);
+                        if (this.objPath) this._loadOBJ(this.objPath);
+                        else this._showError('模型加载失败');
+                    }
+                );
+            }
+
+            _loadOBJ(path) {
+                console.log('[3D] Loading OBJ:', path);
+                const loader = new OBJLoader();
+                loader.load(path,
+                    (obj) => {
+                        console.log('[3D] OBJ loaded:', path);
+                        obj.traverse((child) => {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshStandardMaterial({
+                                    color: 0xd4c5b2, roughness: 0.55,
+                                    metalness: 0.15, side: THREE.DoubleSide
+                                });
+                            }
+                        });
+                        this.model = obj;
+                        this._setupModel();
+                    },
+                    undefined,
+                    (err) => {
+                        console.error('[3D] OBJ FAILED:', path, err);
+                        this._showError('模型加载失败');
+                    }
+                );
+            }
+
+            _showError(msg) {
+                console.warn('[3D] Error:', msg);
+                const parent = this.canvas.parentElement;
+                if (parent) {
+                    parent.classList.add('loaded');
+                    const errDiv = document.createElement('div');
+                    errDiv.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#d97706;font-size:0.8rem;letter-spacing:2px;z-index:2;pointer-events:none;text-align:center;padding:20px;';
+                    errDiv.textContent = '⚠ ' + msg;
+                    parent.appendChild(errDiv);
+                }
+            }
+
+            _setupModel() {
+                if (!this.model) return;
+                if (this._loadTimeout) { clearTimeout(this._loadTimeout); this._loadTimeout = null; }
+                console.log('[3D] Setting up model, computing bounds...');
+
+                // 遍历所有子节点，确保材质正确渲染
+                let matCount = 0;
+                this.model.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        matCount++;
+                        const materials = Array.isArray(child.material) ? child.material : [child.material];
+                        materials.forEach((mat) => {
+                            mat.side = THREE.DoubleSide;
+                            if (mat.map) mat.map.colorSpace = THREE.SRGBColorSpace;
+                            mat.needsUpdate = true;
+                        });
+                    }
+                });
+                console.log('[3D] Fixed materials for ' + matCount + ' meshes (DoubleSide applied)');
+
+                const box = new THREE.Box3().setFromObject(this.model);
+                const center = new THREE.Vector3();
+                box.getCenter(center);
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = maxDim > 0 ? 2.5 / maxDim : 1;
+                this.model.scale.setScalar(scale);
+                this.model.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+                this.scene.add(this.model);
+
+                // 隐藏加载占位白色背景
+                this.canvas.parentElement.classList.add('loaded');
+
+                console.log('[3D] Model added to scene, scale=' + scale.toFixed(3) + ', pos=' + this.model.position.toArray().map(v=>v.toFixed(2)).join(','));
+            }
+
+            _onResize() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                const w = rect.width || 400;
+                const h = rect.height || 280;
+                if (w <= 0 || h <= 0) return;
+                this.renderer.setSize(w, h, false);
+                this.camera.aspect = w / Math.max(h, 1);
+                this.camera.updateProjectionMatrix();
+            }
+
+            _animate() {
+                requestAnimationFrame(() => this._animate());
+                const dt = Math.min(this.clock.getDelta(), 0.1);
+                this.controls.update();
+                this.renderer.render(this.scene, this.camera);
+            }
+
+            dispose() {
+                this._resizeObserver && this._resizeObserver.disconnect();
+                this.renderer.dispose();
+            }
+        }
+
+        // ===== 页面初始化 =====
+        const viewers = [];
+
+        // 首屏：汇总场景立即加载
+        const overviewCanvas = document.querySelector('.overview-viewer canvas');
+        if (overviewCanvas) {
+            const glb = overviewCanvas.getAttribute('data-model-glb') || null;
+            const obj = overviewCanvas.getAttribute('data-model-obj') || null;
+            viewers.push(new ModelViewer(overviewCanvas, glb, obj));
+            // 汇总场景也用 loaded 状态
+            overviewCanvas.parentElement.classList.add('loaded');
+        }
+
+        // 工具卡片 3D 模型懒加载：滚动到卡片附近 200px 时才加载
+        const toolCanvases = document.querySelectorAll('.tool-card canvas[data-model-glb], .tool-card canvas[data-model-obj]');
+        if ('IntersectionObserver' in window && toolCanvases.length > 0) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const canvas = entry.target;
+                        const glb = canvas.getAttribute('data-model-glb') || null;
+                        const obj = canvas.getAttribute('data-model-obj') || null;
+                        viewers.push(new ModelViewer(canvas, glb, obj));
+                        observer.unobserve(canvas);
+                    }
+                });
+            }, { rootMargin: '200px 0px' });
+
+            toolCanvases.forEach((canvas) => observer.observe(canvas));
+        } else {
+            // 降级：不支持 IntersectionObserver 的旧浏览器，延迟 200ms 后全部加载
+            setTimeout(() => {
+                toolCanvases.forEach((canvas) => {
+                    const glb = canvas.getAttribute('data-model-glb') || null;
+                    const obj = canvas.getAttribute('data-model-obj') || null;
+                    viewers.push(new ModelViewer(canvas, glb, obj));
+                });
+            }, 200);
+        }
+
+        // ===== 背景图滚动渐换 =====
+        const bg1 = document.getElementById('bgLayer1');
+        const bg2 = document.getElementById('bgLayer2');
+        let ticking = false;
+
+        function updateBackground() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight;
+            const winHeight = window.innerHeight;
+            const maxScroll = docHeight - winHeight;
+            if (maxScroll <= 0) return;
+
+            const progress = scrollTop / maxScroll;
+            const fadeStart = 0.35;
+            const fadeEnd = 0.55;
+
+            let opacity2;
+            if (progress <= fadeStart) {
+                opacity2 = 0;
+            } else if (progress >= fadeEnd) {
+                opacity2 = 1;
+            } else {
+                opacity2 = (progress - fadeStart) / (fadeEnd - fadeStart);
+            }
+            bg1.style.opacity = (1 - opacity2);
+            bg2.style.opacity = opacity2;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(() => { updateBackground(); ticking = false; });
+                ticking = true;
+            }
+        }, { passive: true });
+        updateBackground();
+
+        // ===== 灯箱 =====
+        window.openLightbox = function(src) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightbox').classList.add('active');
+        };
+        window.closeLightbox = function() {
+            document.getElementById('lightbox').classList.remove('active');
+        };
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+
+    <!-- 页面加载进度条 -->
+    <script>
+    (function(){
+        var css='.pl-wrap{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;pointer-events:none;}'+
+            '.pl-box{text-align:center;padding:28px 32px;border-radius:10px;background:rgba(20,14,8,0.78);backdrop-filter:blur(6px);}'+
+            '.pl-bar{width:220px;height:5px;background:rgba(255,255,255,0.12);border-radius:5px;overflow:hidden;margin:0 auto;}'+
+            '.pl-bar-fill{height:100%;width:0;border-radius:5px;background:linear-gradient(90deg,#d97706,#f59e0b,#fbbf24,#d97706);background-size:300% 100%;animation:plShim 1.5s linear infinite;transition:width 0.25s ease-out;}'+
+            '@keyframes plShim{0%{background-position:300% 0}100%{background-position:-300% 0}}'+
+            '.pl-text{color:rgba(255,255,255,0.72);font-size:13px;margin-top:12px;letter-spacing:2px;font-family:system-ui,sans-serif;}'+
+            '.pl-done{opacity:0;transition:opacity 0.35s ease 0.15s;}';
+        var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+        var w=document.createElement('div'),fill,txt,done=false;
+        w.className='pl-wrap';
+        w.innerHTML='<div class="pl-box"><div class="pl-bar"><div class="pl-bar-fill"></div></div><div class="pl-text">正 在 加 载 ...</div></div>';
+        function ins(){if(!document.body)return setTimeout(ins,10);document.body.appendChild(w);fill=w.querySelector('.pl-bar-fill');txt=w.querySelector('.pl-text');_();}
+        var p=0,iv;
+        function _(){iv=setInterval(function(){var r=85-p;if(r<=0)return;p=Math.min(85,p+Math.max(1,r*0.12+Math.random()*3));if(fill)fill.style.width=p+'%';},200);}
+        function fin(){if(done)return;done=true;clearInterval(iv);if(fill)fill.style.width='100%';if(txt)txt.textContent='加 载 完 成';setTimeout(function(){w.classList.add('pl-done');setTimeout(function(){if(w.parentNode)w.parentNode.removeChild(w);},400);},350);}
+        window.addEventListener('load',fin);
+        setTimeout(function(){if(p<95)fin();},7000);
+        if(document.readyState==='complete')fin();else ins();
+    })();
+    </script>
+
+    <script src="https://tianq4691-maker.github.io/NSBD-redesign/archive-shell.js"></script>
+</body>
+</html>
