@@ -47,6 +47,10 @@ body.archive-unified :is(button,.btn,.action-btn,.back-btn,.home-btn){
 }
 body.archive-unified :is(h1,h2,h3,.page-title,.section-title){font-family:"Noto Serif SC","Songti SC","SimSun",serif!important}
 body.archive-unified img{image-rendering:auto}
+body.archive-unified > :is(.header,.top-bar,.back-btn),
+body.archive-unified > .page-wrapper > .header{
+  display:none!important;
+}
 body.archive-dark{background:#11110f!important;color:#ece4d6!important}
 body.archive-dark .archive-site-header{background:rgba(15,15,13,.93);color:#eee5d6;border-color:#3a3024}
 body.archive-dark .archive-site-header .archive-brand small{color:#998c7b}
