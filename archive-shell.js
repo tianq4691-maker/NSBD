@@ -6,8 +6,8 @@
   if(path==='story.html'||path==='guxiang.html') document.body.classList.add('archive-dark');
 
   const nav=[
-    ['世纪问水',root+'qa.html'],['勘绘蓝图',root+'map3d.html'],['调水纪事',root+'time.html'],
-    ['工程载录',root+'story.html'],['旧制复刻',root+'tools.html'],['故土迁流',root+'guxiang.html']
+    ['世纪问水','qa.html'],['勘绘蓝图','map3d.html'],['调水纪事','time.html'],
+    ['工程载录','story.html'],['旧制复刻','tools.html'],['故土迁流','guxiang.html']
   ];
   const header=document.createElement('header');
   header.className='archive-site-header';
@@ -15,7 +15,7 @@
     '<a class="archive-brand" href="'+root+'index.html" aria-label="返回首页">'+
       '<span class="archive-seal">南水<br>往事</span><span><b>南水往事记忆空间</b>'+
       '<small>MEMORY OF THE SOUTH–NORTH WATER DIVERSION</small></span></a>'+
-    '<nav aria-label="全站导航">'+nav.map(x=>'<a href="'+x[1]+'">'+x[0]+'</a>').join('')+'</nav>'+
+    '<nav aria-label="全站导航">'+nav.map(x=>'<a class="'+(path===x[1]?'is-active':'')+'" href="'+root+x[1]+'"'+(path===x[1]?' aria-current="page"':'')+'>'+x[0]+'</a>').join('')+'</nav>'+
     '<a class="archive-home-link" href="'+root+'index.html">返回首页</a>';
   document.body.prepend(header);
 
@@ -32,9 +32,4 @@
     }
   });
 
-  const footer=document.createElement('footer');
-  footer.className='archive-site-footer';
-  footer.innerHTML='<div class="archive-seal">南水<br>往事</div><b>南水往事记忆空间</b>'+
-    '<p>让档案可见，让记忆相连，让普通人走向历史前台。</p>';
-  document.body.appendChild(footer);
 })();
