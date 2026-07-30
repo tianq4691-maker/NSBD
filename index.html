@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>南水往事记忆空间</title>
   <meta name="description" content="沿水脉，重返一代人的工程与故乡">
-  <link rel="stylesheet" href="archive-theme.css?v=20260730-3">
+  <link rel="stylesheet" href="archive-theme.css?v=20260730-5">
   <style>
     *{box-sizing:border-box}body{margin:0;color:var(--archive-ink);background:var(--archive-paper);font-family:"Noto Serif SC","Songti SC","SimSun",serif}
     a{color:inherit;text-decoration:none}.home-header{height:84px;padding:0 4.5vw;display:flex;align-items:center;border-bottom:1px solid var(--archive-line);position:sticky;top:0;z-index:50;background:rgba(242,238,227,.92);backdrop-filter:blur(16px)}
@@ -17,11 +17,11 @@
     .stats{margin-top:65px;color:var(--archive-muted);font-size:13px}.stats b{font-size:23px;color:var(--archive-river);font-weight:500}
     .river-stage{position:relative;min-height:560px}.river-stage svg{position:absolute;inset:-7% -2% 0 -5%;width:110%;height:110%}.river-shadow{fill:none;stroke:#b7d0cc;stroke-width:38;opacity:.28}.river{fill:none;stroke:var(--archive-river);stroke-width:11;stroke-linecap:round}.river-stage circle{fill:var(--archive-paper);stroke:var(--archive-red);stroke-width:4}.river-stage text{fill:var(--archive-ink);font:700 18px Arial,sans-serif;letter-spacing:.04em;paint-order:stroke fill;stroke:var(--archive-paper);stroke-width:9px;stroke-linejoin:round}
     .photo{position:absolute;margin:0;background:#f8f3e9;padding:10px 10px 30px;box-shadow:0 16px 36px #27261f33}.photo img{width:100%;height:100%;display:block;object-fit:cover;filter:grayscale(.46) sepia(.18)}.photo figcaption{font-size:11px;color:#6c675d;margin-top:8px;letter-spacing:.06em}.photo-a{width:49%;height:310px;top:85px;left:12%;transform:rotate(-1deg)}.photo-b{width:33%;height:220px;right:2%;bottom:38px;transform:rotate(2deg)}
-    .guide{padding:96px 4vw 70px}.guide-head{margin:0 2vw 38px}.guide-head h2{font-size:40px;font-weight:500;letter-spacing:.07em;margin:16px 0 0}.chapters{display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid var(--archive-line);border-bottom:1px solid var(--archive-line)}.chapters a{padding:32px 24px;min-height:238px;border-left:1px solid var(--archive-line);transition:.25s}.chapters a:last-child{border-right:1px solid var(--archive-line)}.chapters a:hover{background:#fff5;transform:translateY(-5px)}.chapters i{font-style:normal;color:var(--archive-red);font-size:12px}.chapters h2{font-size:24px;font-weight:500;margin:18px 0}.chapters p{font-size:13px;line-height:1.8;color:var(--archive-muted);min-height:48px}.chapters span{font-size:12px;color:var(--archive-river)}
+    .intro{padding:105px 7vw 115px;background:var(--archive-paper);border-top:1px solid var(--archive-line)}.intro-inner{max-width:920px;margin:0 auto}.intro h2{font-size:40px;font-weight:500;letter-spacing:.14em;margin:17px 0 46px}.intro-copy{font-size:17px;line-height:2.15;color:#4e544f}.intro-copy p{margin:0 0 22px;text-indent:2em}.intro-copy strong{color:var(--archive-river);font-weight:500}.intro-sign{text-align:right;color:var(--archive-red);letter-spacing:.18em;margin-top:40px}
     .atlas{padding:105px 6vw;background:var(--archive-paper-deep)}.section-kicker{font:11px Arial;letter-spacing:.25em;color:var(--archive-river)}.atlas h2{font-size:40px;font-weight:500;letter-spacing:.07em;margin:17px 0 48px}.atlas-grid{display:grid;grid-template-columns:68% 32%;border:1px solid var(--archive-line);background:#f8f4eaaa;min-height:520px}.atlas-map{position:relative;overflow:hidden;background:#f7f3e8}.atlas-map img{width:100%;height:100%;object-fit:contain;display:block;opacity:.92;filter:grayscale(.08) sepia(.08)}.atlas-caption{position:absolute;left:16px;bottom:14px;padding:7px 10px;background:rgba(242,238,227,.92);border-left:3px solid var(--archive-red);font-size:11px;color:var(--archive-muted);letter-spacing:.05em}.atlas-copy{padding:65px 40px;z-index:3}.atlas-copy h3{font-size:30px;font-weight:500;margin:30px 0 22px}.atlas-copy p{color:var(--archive-muted);line-height:2}.tags{display:flex;flex-wrap:wrap;gap:8px;margin:30px 0}.tags span{padding:6px 10px;border:1px solid var(--archive-river-soft);color:var(--archive-river);font-size:12px}
     footer{padding:58px 20px;text-align:center;background:#1d2522;color:#ddd5c8}footer .archive-seal{margin:0 auto 18px}footer h2{font-weight:400;letter-spacing:.16em}footer p{color:#9ea59f}
-    @media(max-width:900px){.home-header{height:65px}.home-header nav,.archive-brand small{display:none}.hero{display:block;padding:60px 7vw}.hero h1{font-size:58px}.river-stage{height:470px}.chapters{grid-template-columns:repeat(2,1fr)}.atlas-grid{grid-template-columns:1fr}.atlas-map{min-height:420px}.atlas-copy{padding:40px}}
-    @media(max-width:560px){.hero h1{font-size:45px}.lead{font-size:18px}.river-stage{height:380px}.photo-a{width:63%;height:230px}.photo-b{width:44%;height:170px}.chapters{grid-template-columns:1fr}.atlas{padding:75px 6vw}.atlas h2{font-size:30px}.anchor{display:none}}
+    @media(max-width:900px){.home-header{height:65px}.home-header nav,.archive-brand small{display:none}.hero{display:block;padding:60px 7vw}.hero h1{font-size:58px}.river-stage{height:470px}.atlas-grid{grid-template-columns:1fr}.atlas-map{min-height:420px}.atlas-copy{padding:40px}}
+    @media(max-width:560px){.hero h1{font-size:45px}.lead{font-size:18px}.river-stage{height:380px}.photo-a{width:63%;height:230px}.photo-b{width:44%;height:170px}.atlas{padding:75px 6vw}.atlas h2,.intro h2{font-size:30px}.intro{padding:75px 7vw}.intro-copy{font-size:15px}}
   </style>
 </head>
 <body>
@@ -31,7 +31,7 @@
   </header>
   <main>
     <section class="hero">
-      <div><p class="eyebrow"><span>溯源</span>1952 — 1979</p><h1>南水往事<br>记忆空间</h1><p class="lead">沿水脉，重返一代人的工程与故乡</p><a class="primary" href="#chapters">进入记忆空间　→</a><p class="stats"><b>149</b> 份口述史　 <b>443</b> 个记忆片段　 <b>2,000+</b> 件档案</p></div>
+      <div><p class="eyebrow"><span>溯源</span>1952 — 1979</p><h1>南水往事<br>记忆空间</h1><p class="lead">沿水脉，重返一代人的工程与故乡</p><a class="primary" href="#intro">阅读导语　→</a><p class="stats"><b>149</b> 份口述史　 <b>443</b> 个记忆片段　 <b>2,000+</b> 件档案</p></div>
       <div class="river-stage">
         <svg viewBox="0 0 900 580" aria-label="1952年至1979年南水北调记忆水脉"><path class="river-shadow" d="M-30 510C110 350 210 505 330 350S520 320 575 225S700 250 760 115S850 90 930-40"/><path class="river" d="M-30 510C110 350 210 505 330 350S520 320 575 225S700 250 760 115S850 90 930-40"/><g><circle cx="160" cy="425" r="9"/><text x="178" y="456">1952</text></g><g><circle cx="365" cy="325" r="9"/><text x="383" y="356">1958</text></g><g><circle cx="590" cy="210" r="9"/><text x="608" y="191">1969</text></g><g><circle cx="755" cy="115" r="9"/><text x="773" y="96">1979</text></g></svg>
         <figure class="photo photo-a"><img src="https://tianq4691-maker.github.io/NSBD/3.jpg" alt="南水北调工程历史照片"><figcaption>历史照片 · 南水北调工程早期考察</figcaption></figure>
@@ -42,15 +42,16 @@
       <p class="section-kicker">RIVER RELATION ATLAS · 河流关系图谱</p><h2>一条水脉，连接时间、地点与人的记忆</h2>
       <div class="atlas-grid"><div class="atlas-map"><img src="assets/overall-layout.svg" alt="南水北调工程总体布局图"><span class="atlas-caption">文献资料 · 南水北调工程总体布局图</span></div><div class="atlas-copy"><span class="section-kicker">02 / 勘绘蓝图</span><h3>从总体布局进入历史</h3><p>底图呈现东线、中线与西线的总体空间关系。页面不再叠加未经坐标校准的地点浮标，具体地点与史料请进入关系图谱核对。</p><div class="tags"><span>东线</span><span>中线</span><span>西线</span><span>水源区与受水区</span></div><a class="primary" href="map3d.html">浏览关系图谱　→</a></div></div>
     </section>
-    <section class="guide" id="chapters">
-      <div class="guide-head"><p class="section-kicker">SITE GUIDE · 全站导览</p><h2>沿六条路径，进入南水往事</h2></div>
-      <div class="chapters">
-        <a href="qa.html"><i>01</i><h2>世纪问水</h2><p>从历史长河中，寻找治水兴邦的追问与答案。</p><span>进入专题 →</span></a>
-        <a href="map3d.html"><i>02</i><h2>勘绘蓝图</h2><p>从勘测到规划，理解蓝图如何落笔成河。</p><span>进入专题 →</span></a>
-        <a href="time.html"><i>03</i><h2>调水纪事</h2><p>跟随时间线，见证工程的重要节点与抉择。</p><span>进入专题 →</span></a>
-        <a href="story.html"><i>04</i><h2>工程载录</h2><p>以档案、影像与记忆片段保存工程全貌。</p><span>进入专题 →</span></a>
-        <a href="tools.html"><i>05</i><h2>旧制复刻</h2><p>复刻工器，触摸建设者的智慧与匠心。</p><span>进入专题 →</span></a>
-        <a href="guxiang.html"><i>06</i><h2>故土迁流</h2><p>在流动的记忆里，听见故乡、迁徙与新生。</p><span>进入专题 →</span></a>
+    <section class="intro" id="intro">
+      <div class="intro-inner">
+        <p class="section-kicker">PROLOGUE · 专题导语</p>
+        <h2>南水往事导语</h2>
+        <div class="intro-copy">
+          <p>南水北调，是新中国成立以来规模最大的跨流域调水工程，其<strong>早期规划与探索</strong>可追溯至二十世纪五十年代。彼时百废待兴，水旱灾害频仍。正是在这一历史背景下，一九五二年，“南方水多，北方水少，如有可能，借一点来也是可以的”这一宏伟构想被首次提出，由此开启了跨越半个多世纪的调水征程。</p>
+          <p>工程所涉，非仅图纸与机械。数十万建设者奔赴荒山野岭，以铁锹、扁担、炸药与钢钎，在艰苦条件下推进工程；库区移民舍故土、迁他乡，为工程腾出蓄水空间。建设者的劳动、移民的离别以及沿线普通人的生活，共同构成了宏大工程背后不可忽略的人文记忆。</p>
+          <p>本平台以<strong>守护工程人文</strong>为使命，聚焦一九五二至一九七九年的早期探索，梳理建设脉络、复原工器具、呈现筹备年表、记录一线人物，并连接地点、事件与口述资料。我们希望让每一滴北上的江水，都能够被看见其背后承载的劳动、奉献与牺牲。</p>
+        </div>
+        <p class="intro-sign">—— 水润中华 · 不忘来路 ——</p>
       </div>
     </section>
   </main>
