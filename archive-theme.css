@@ -1,0 +1,66 @@
+:root{
+  --archive-paper:#f2eee3;--archive-paper-deep:#e6dece;--archive-ink:#18211f;
+  --archive-muted:#6c716b;--archive-river:#0f7581;--archive-river-soft:#8bb8b3;
+  --archive-red:#a44332;--archive-line:rgba(36,54,49,.18);
+  --archive-night:#11110f;--archive-amber:#c79454;
+}
+html{scroll-behavior:smooth}
+body.archive-unified{
+  --water-cyan:var(--archive-river);--water-light:#59a6ad;--water-glow:#8bb8b3;
+  --river-green:#476f66;--accent-color:var(--archive-red);
+  color:var(--archive-ink);
+  background-color:var(--archive-paper);
+  background-image:
+    linear-gradient(rgba(255,255,255,.22),rgba(255,255,255,.22)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.055'/%3E%3C/svg%3E");
+  font-family:"Noto Serif SC","Songti SC","SimSun",serif;
+  padding-top:72px;
+}
+.archive-site-header{
+  position:fixed;inset:0 0 auto 0;height:72px;z-index:9998;
+  display:flex;align-items:center;gap:34px;padding:0 4.5vw;
+  background:rgba(242,238,227,.93);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--archive-line);color:var(--archive-ink);
+}
+.archive-brand{display:flex;align-items:center;gap:13px;margin-right:auto;color:inherit;text-decoration:none}
+.archive-seal{width:40px;height:40px;display:grid;place-items:center;text-align:center;
+  border:2px solid var(--archive-red);color:var(--archive-red);font-size:11px;line-height:1.05;transform:rotate(-2deg)}
+.archive-brand b{font-size:19px;font-weight:500;letter-spacing:.12em}
+.archive-brand small{display:block;font:8px Arial,sans-serif;color:var(--archive-muted);letter-spacing:.13em;margin-top:4px}
+.archive-site-header nav{display:flex;align-items:center;gap:2.1vw}
+.archive-site-header nav a{color:inherit;text-decoration:none;font-size:14px;letter-spacing:.07em;white-space:nowrap}
+.archive-site-header nav a:hover{color:var(--archive-river)}
+.archive-home-link{border-left:1px solid var(--archive-line);padding-left:25px!important;color:var(--archive-river)!important}
+.archive-site-footer{position:relative;z-index:20;padding:55px 20px;text-align:center;
+  background:#1d2522;color:#ddd5c8;border-top:1px solid #39423e}
+.archive-site-footer .archive-seal{margin:0 auto 18px}
+.archive-site-footer b{font-weight:400;letter-spacing:.16em;font-size:20px}
+.archive-site-footer p{color:#9ea59f;font-size:13px;letter-spacing:.08em;margin:12px 0 0}
+body.archive-unified :is(.card,.qa-card,.tool-card,.timeline-card,.content-card,.panel,.info-panel){
+  border-color:var(--archive-line)!important;border-radius:2px!important;
+  box-shadow:0 12px 32px rgba(35,43,39,.08)!important;
+}
+body.archive-unified :is(button,.btn,.action-btn,.back-btn,.home-btn){
+  border-radius:2px!important;letter-spacing:.08em!important;
+}
+body.archive-unified :is(h1,h2,h3,.page-title,.section-title){font-family:"Noto Serif SC","Songti SC","SimSun",serif!important}
+body.archive-unified img{image-rendering:auto}
+body.archive-dark{background:#11110f!important;color:#ece4d6!important}
+body.archive-dark .archive-site-header{background:rgba(15,15,13,.93);color:#eee5d6;border-color:#3a3024}
+body.archive-dark .archive-site-header .archive-brand small{color:#998c7b}
+body.archive-dark .archive-site-header nav a:hover{color:var(--archive-amber)}
+body.archive-dark .archive-home-link{color:var(--archive-amber)!important;border-color:#3a3024}
+body.archive-dark :is(.card,.story-card,.content-card,.panel,.info-panel){
+  background:rgba(24,22,18,.88)!important;border-color:#5a4932!important;
+  color:#ede3d4!important;box-shadow:0 20px 50px rgba(0,0,0,.28)!important;
+}
+body.archive-dark :is(p,.meta,.description,.subtitle){color:#aaa092!important}
+body.archive-dark :is(button,.btn,.action-btn){border-color:var(--archive-amber)!important;color:#ead5b9!important}
+.archive-evidence-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;
+  border:1px solid currentColor;color:var(--archive-red);background:rgba(242,238,227,.82);
+  font-size:11px;letter-spacing:.08em}
+@media(max-width:900px){
+  body.archive-unified{padding-top:62px}
+  .archive-site-header{height:62px;padding:0 18px}.archive-brand b{font-size:16px}
+  .archive-brand small,.archive-site-header nav{display:none}.archive-home-link{margin-left:auto;border:0;padding-left:0!important}
+}
