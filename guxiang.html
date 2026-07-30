@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <base href="https://tianq4691-maker.github.io/NSBD/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>故土迁流 · 岁月亲历 - 南水北调</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 基础重置（简化选择器） */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family:'Noto Sans SC',sans-serif;
+            background:#000;
+            color:#fff;
+            overflow:hidden;
+            height:100vh;
+            width:100vw;
+            user-select:none;
+            -webkit-user-select:none;
+        }
+
+        /* 背景层（直接类选择器，去掉不必要的嵌套） */
+        .bg-layer { position:absolute; inset:0; z-index:0; }
+        .bg-layer-img { width:100%; height:100%; object-fit:cover; opacity:1; transition:opacity 0.8s ease; }
+        .bg-layer-img.fading { opacity:0; }
+        .bg-vignette { position:absolute; inset:0; background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,0.5) 100%); z-index:1; pointer-events:none; }
+
+        /* 顶部导航（简化选择器） */
+        .top-bar { position:absolute; top:0; left:0; right:0; z-index:100; padding:12px 16px; display:flex; align-items:center; gap:12px; transition:opacity 0.3s; }
+        .back-btn { display:flex; align-items:center; gap:6px; background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.75); padding:6px 14px; border-radius:20px; text-decoration:none; font-size:0.82rem; transition:all 0.3s; backdrop-filter:blur(8px); }
+        .back-btn:hover { background:rgba(255,255,255,0.15); color:#fff; }
+        .title-badge { font-size:0.8rem; color:rgba(255,255,255,0.45); letter-spacing:2px; }
+
+        /* 进度指示器（简化选择器） */
+        .chapter-indicator { position:absolute; top:14px; right:20px; z-index:100; display:flex; gap:6px; align-items:center; }
+        .ch-dot { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.2); transition:all 0.4s; }
+        .ch-dot.active { background:rgba(34,211,238,0.9); box-shadow:0 0 6px rgba(34,211,238,0.5); }
+        .ch-dot.done { background:rgba(16,185,129,0.7); }
+
+        /* 文本区（简化选择器，减少渐变层开销） */
+        .text-box { position:absolute; bottom:0; left:0; right:0; z-index:10; padding:0 24px 30px; }
+        .text-inner { max-width:860px; margin:0 auto; background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.78) 8%,rgba(6,20,18,0.88) 100%); border-radius:16px; padding:22px 28px 20px; min-height:130px; border:1px solid rgba(255,255,255,0.06); backdrop-filter:blur(10px); cursor:pointer; transition:border-color 0.3s; }
+        .text-inner:hover { border-color:rgba(255,255,255,0.12); }
+        .speaker-name { display:inline-block; font-size:0.85rem; font-weight:600; padding:3px 12px; border-radius:4px; margin-bottom:10px; letter-spacing:1px; }
+        .speaker-mc { background:rgba(40,56,143,0.5); color:#a8b8ff; }
+        .speaker-xiulan { background:rgba(139,69,19,0.5); color:#e8c4a0; }
+        .speaker-cadre { background:rgba(47,79,79,0.5); color:#b0c8c0; }
+        .speaker-broadcast { background:rgba(102,102,102,0.5); color:#ccc; }
+        .speaker-narrator { background:rgba(200,200,200,0.15); color:rgba(255,255,255,0.6); }
+        .dialogue-text { font-size:1.05rem; line-height:1.9; color:rgba(255,255,255,0.92); letter-spacing:0.5px; }
+        .click-hint { text-align:center; margin-top:10px; font-size:0.72rem; color:rgba(255,255,255,0.25); letter-spacing:2px; animation:hintPulse 2s ease-in-out infinite; }
+        @keyframes hintPulse { 0%,100% { opacity:0.25; } 50% { opacity:0.55; } }
+
+        /* 选择区（简化选择器） */
+        .choices-box { position:absolute; bottom:180px; left:50%; transform:translateX(-50%); z-index:50; display:flex; flex-direction:column; gap:10px; max-width:520px; width:90%; }
+        .choice-btn { display:block; width:100%; padding:13px 20px; background:rgba(6,30,28,0.78); border:1.5px solid rgba(13,148,136,0.35); border-radius:10px; color:rgba(255,255,255,0.88); font-size:0.95rem; cursor:pointer; transition:all 0.3s ease; text-align:center; letter-spacing:1px; backdrop-filter:blur(6px); font-family:'Noto Sans SC',sans-serif; }
+        .choice-btn:hover { background:rgba(13,148,136,0.25); border-color:rgba(34,211,238,0.6); color:#fff; transform:translateY(-1px); box-shadow:0 4px 20px rgba(0,0,0,0.3); }
+        .choice-label { font-size:0.72rem; color:rgba(34,211,238,0.7); margin-bottom:2px; letter-spacing:2px; }
+
+        /* 结局画面（简化选择器） */
+        .ending-screen { position:absolute; inset:0; z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(0,0,0,0.85); opacity:0; pointer-events:none; transition:opacity 0.8s ease; }
+        .ending-screen.show { opacity:1; pointer-events:auto; }
+        .ending-screen h2 { font-size:2.2rem; letter-spacing:6px; color:#fff; margin-bottom:12px; }
+        .ending-type { font-size:1.1rem; color:rgba(34,211,238,0.8); margin-bottom:24px; letter-spacing:3px; }
+        .ending-quote { font-size:1.05rem; color:rgba(255,255,255,0.7); max-width:500px; text-align:center; line-height:2; margin-bottom:16px; }
+        .ending-dedication { font-size:0.9rem; color:rgba(255,255,255,0.4); margin-top:20px; letter-spacing:2px; line-height:1.8; text-align:center; }
+        .ending-btn { margin-top:20px; padding:10px 28px; background:rgba(34,211,238,0.15); border:1px solid rgba(34,211,238,0.4); border-radius:25px; color:rgba(34,211,238,0.9); font-size:0.9rem; cursor:pointer; letter-spacing:2px; transition:all 0.3s; font-family:'Noto Sans SC',sans-serif; }
+        .ending-btn:hover { background:rgba(34,211,238,0.25); color:#fff; }
+
+        /* 加载画面（简化选择器） */
+        .loading-screen { position:absolute; inset:0; z-index:999; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#0a1416; transition:opacity 0.5s ease; }
+        .loading-screen.hide { opacity:0; pointer-events:none; }
+        .loading-screen h3 { font-size:1.4rem; letter-spacing:4px; color:rgba(255,255,255,0.5); margin-bottom:20px; }
+        .loading-dots { display:flex; gap:8px; }
+        .loading-dots span { width:8px; height:8px; border-radius:50%; background:rgba(34,211,238,0.6); animation:ld 1.4s ease-in-out infinite; }
+        .loading-dots span:nth-child(2) { animation-delay:0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay:0.4s; }
+        @keyframes ld { 0%,100% { opacity:0.3; transform:scale(1); } 50% { opacity:1; transform:scale(1.3); } }
+
+        @media (max-width:768px) {
+            .text-box { padding:0 12px 20px; }
+            .text-inner { padding:16px 18px 14px; min-height:110px; }
+            .dialogue-text { font-size:0.95rem; line-height:1.7; }
+            .choices-box { bottom:140px; width:88%; }
+            .choice-btn { padding:11px 16px; font-size:0.88rem; }
+            .ending-screen h2 { font-size:1.6rem; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://tianq4691-maker.github.io/NSBD-redesign/archive-theme.css">
+</head>
+<body>
+
+<!-- 背景（给图片加独立类，方便操作） -->
+<div class="bg-layer">
+    <img id="bgImage" class="bg-layer-img" src="P0_01.png" alt="">
+    <div class="bg-vignette"></div>
+</div>
+
+<!-- 进度点 -->
+<div class="chapter-indicator" id="chapterDots">
+    <div class="ch-dot active"></div>
+    <div class="ch-dot"></div>
+    <div class="ch-dot"></div>
+    <div class="ch-dot"></div>
+    <div class="ch-dot"></div>
+</div>
+
+<!-- 顶部 -->
+<div class="top-bar">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>
+    <span class="title-badge">故土迁流 · 岁月亲历</span>
+</div>
+
+<!-- 文本区 -->
+<div class="text-box" id="textBox" onclick="advance()">
+    <div class="text-inner">
+        <div class="speaker-name speaker-narrator" id="speakerName">旁白</div>
+        <div class="dialogue-text" id="dialogueText">点击屏幕开始…</div>
+        <div class="click-hint" id="clickHint">点击或按空格键继续</div>
+    </div>
+</div>
+
+<!-- 选择区 -->
+<div class="choices-box" id="choicesBox" style="display:none;"></div>
+
+<!-- 结局画面 -->
+<div class="ending-screen" id="endingScreen">
+    <h2>全 剧 终</h2>
+    <div class="ending-type" id="endingType"></div>
+    <div class="ending-quote" id="endingQuote"></div>
+    <div class="ending-dedication">谨以此互动故事<br>致敬南水北调早期工程的移民先辈们</div>
+    <button class="ending-btn" onclick="restart()"><i class="fas fa-redo"></i> 重新体验</button>
+</div>
+
+<!-- 加载 -->
+<div class="loading-screen" id="loadingScreen">
+    <h3>故 土 迁 流</h3>
+    <div class="loading-dots"><span></span><span></span><span></span></div>
+</div>
+
+<script>
+// ========== 游戏状态 ==========
+const state = {
+    player_name: '李建国',
+    memory_fragments: 0,
+    has_silver: false,
+    fix_house: false,
+    is_resilient: false,
+    land_quality: 'poor',
+    currentChapter: 0,
+    dialogueIndex: 0,
+    waitingForChoice: false,
+    currentChoices: null,
+    ended: false
+};
+
+// ========== 剧本数据 ==========
+const script = {
+    // 序章
+    prologue: [
+        {bg:'P0_01.png', speaker:'旁白', text:'1939年生。淅川县仓房镇沿江村人。'},
+        {bg:'P0_01.png', speaker:'旁白', text:'他的一生，都在"搬家"。'},
+        {bg:'P0_01.png', speaker:'旁白', text:'这不是一个关于冒险的故事，这是一个关于"落地"的故事。'},
+        {bg:'P0_02.png', speaker:'旁白', text:'地图上的淅川，是起点，也是终点。'},
+        {bg:'P0_02.png', speaker:'旁白', text:'1959年冬，第一次迁徙开始。'},
+    ],
+    // 第一章：1959·支边青海
+    chapter1: [
+        {bg:'C1_01.png', speaker:'旁白', text:'1959年冬。我叫李建国，刚娶了秀兰两个月。'},
+        {bg:'C1_01.png', speaker:'旁白', text:'丹江口大坝开工了。县里要选人支援青海边疆建设，说那里地广人稀，能吃饱饭。'},
+        {bg:'C1_01.png', speaker:'李建国', text:'娘，我要去青海。家里弟妹多，我出去闯闯，也能给家里省张嘴。'},
+        {bg:'C1_02.png', speaker:'广播声', text:'淅川县的移民同志们！请抓紧时间登船！'},
+        {bg:'C1_03.png', speaker:'', choice:[
+            {label:'【积极报名】', text:'"我是小伙子，国家哪里需要，我就去哪里。"', effect(){state.memory_fragments+=1;}},
+            {label:'【犹豫不舍】', text:'"秀兰哭了，但我知道，留在家里也是挨饿，不如出去碰碰运气。"', effect(){}}
+        ]},
+        {bg:'C1_04.png', speaker:'李建国', text:'国家需要，我去！'},
+        {bg:'C1_05.png', speaker:'旁白', text:'到了青海，才知道什么叫苦。海拔三千多米，满眼荒山，住的是冰冷的土坯房。'},
+        {bg:'C1_05.png', speaker:'旁白', text:'每天要垦荒七分地，或者捡八十斤柴火。种的青稞和洋芋，根本不够吃。'},
+    ],
+    // 第二章：1962·返迁淅川
+    chapter2: [
+        {bg:'C2_01.png', speaker:'旁白', text:'1962年初。坏消息传来，丹江口工程因质量问题停工了。'},
+        {bg:'C2_01.png', speaker:'李建国', text:'大坝不修了，我们在青海也没了活路。听说政府要组织我们回淅川。'},
+        {bg:'C2_03.png', speaker:'旁白', text:'等了三个月，遣返的命令终于下来了。我们又挤进了闷罐车。'},
+        {bg:'C2_02.png', speaker:'旁白', text:'回到淅川，老家已被水淹了一半。好在露出了些肥田，还能种点红薯。'},
+        {bg:'C2_02.png', speaker:'', choice:[
+            {label:'【修缮老宅】', text:'"把漏风的墙补一补，总算有个窝了。"', effect(){state.fix_house=true;}},
+            {label:'【开荒种地】', text:'"顾不上修房，先把地犁了，误了农时就得饿死。"', effect(){state.fix_house=false;}}
+        ]},
+        {bg:'C2_05.png', speaker:'村干部', text:'建国！大坝又要修了！这次是真的！'},
+        {bg:'C2_05.png', speaker:'李建国', text:'啥？又要走？我这刚把地种上啊！'},
+        {bg:'C2_05.png', speaker:'村干部', text:'这是国家大计！这次是往湖北荆门迁，那边条件好，有瓦房住！'},
+        {bg:'C2_05.png', speaker:'', choice:[
+            {label:'【含泪服从】', text:'"国家让咋办就咋办吧。收拾包袱，还得走。"', effect(){state.memory_fragments+=1;}},
+            {label:'【试图拖延】', text:'"我磨蹭着不想走，想把这一季的庄稼收了再走。"', effect(){}}
+        ]},
+    ],
+    // 第三章：1964·迁居荆门
+    chapter3: [
+        {bg:'C3_01.png', speaker:'旁白', text:'1964年，我们到了湖北荆门十里铺。'},
+        {bg:'C3_01_1.png', speaker:'李建国', text:'这就是给我们住的？荆条编的墙，四面漏风。一家七口，就半间房。'},
+        {bg:'C3_02.png', speaker:'旁白', text:'四户人家挤在一起，人畜同屋，几代同室。日子过得压抑。'},
+        {bg:'C3_02.png', speaker:'', choice:[
+            {label:'【忍辱负重】', text:'"忍吧，只要能给个户口，啥都能忍。"', effect(){state.is_resilient=true;}},
+            {label:'【据理力争】', text:'"我去找队里评理，想要间像样的房。结果被骂\'刁民\'。"', effect(){state.is_resilient=false;}}
+        ]},
+        {bg:'C3_03.png', speaker:'旁白', text:'日子久了，移民和本地人的矛盾越来越大。地少人多，抢粮抢水。'},
+        {bg:'C3_03.png', speaker:'村干部', text:'上面有令，为了缓和矛盾，你们淅川人得分散插队！'},
+        {bg:'C3_03.png', speaker:'李建国', text:'分散？那我们去哪儿？'},
+        {bg:'C3_03.png', speaker:'村干部', text:'去建阳公社白羽大队。那里的荒山多，你们自己开荒去吧。'},
+        {bg:'C3_03.png', speaker:'', choice:[
+            {label:'【咬牙接受】', text:'"还能咋办？国家指哪儿，咱就打哪儿。"', effect(){}},
+            {label:'【心灰意冷】', text:'"心凉了。这哪里是安置，分明是发配。"', effect(){}}
+        ]},
+    ],
+    // 第四章：1971·栖身荒山
+    chapter4: [
+        {bg:'C4_01.png', speaker:'旁白', text:'在建阳公社，日子更难了。没有户籍，没有粮票，连公分都难挣。'},
+        {bg:'C4_01.png', speaker:'李建国', text:'老伴病了，娃也要上学。可咱是"黑人"，啥福利都没有。'},
+        {bg:'C4_03.png', speaker:'旁白', text:'实在过不下去了。我想回家，回淅川。'},
+        {bg:'C4_02.png', speaker:'旁白', text:'1971年，我带着全家偷跑回了淅川。可老家早淹了，房子没了，地也没了。'},
+        {bg:'C4_02.png', speaker:'旁白', text:'我们在丹江岸边的乔家沟荒山上，搭了个茅草棚。'},
+        {bg:'C4_04.png', speaker:'旁白', text:'这一住，就是十几年。没户口，没口粮，像个野人一样活着。'},
+        {bg:'C4_04.png', speaker:'李建国', text:'娃儿要上学，咱得想办法……'},
+        {bg:'C4_04.png', speaker:'', choice:[
+            {label:'【偷偷开荒】', text:'"我拿出了那半块银圆，买通了护林员，开了几亩薄田。"', effect(){state.land_quality='good';}, condition(){return state.has_silver;}},
+            {label:'【打零工维生】', text:'"我去林场砍柴，日子紧巴巴，但心里踏实。"', effect(){state.land_quality='poor';}}
+        ]},
+        {bg:'C4_gov.png', speaker:'旁白', text:'1985年春天，转机来了。'},
+        {bg:'C4_gov.png', speaker:'村干部', text:'老李！别在山上当野人了！政府要把你们这些返迁移民统一管起来！'},
+        {bg:'C4_gov.png', speaker:'李建国', text:'真的？能上户口了？'},
+        {bg:'C4_gov.png', speaker:'村干部', text:'真的！搬到沿江村去，给你们划宅基地，分自留地！'},
+    ],
+    // 第五章：1985·归宿
+    chapter5: [
+        {bg:'C5_01.png', speaker:'旁白', text:'搬到了沿江村，我终于不再是"黑人"了。'},
+        {bg:'C5_01.png', speaker:'李建国', text:'老伴，听见没？咱有户口了。'},
+        {bg:'C5_02.png', speaker:'旁白', text:'新任村长把红彤彤的户口本递到我手里。'},
+        {bg:'C5_02.png', speaker:'村干部', text:'老李，这是你的地，你的房。受苦了。'},
+        {bg:'C5_02.png', speaker:'', choice:[
+            {label:'【仔细抚摸每一个字】', text:'"这红章，比千斤顶还重。我摸了又摸，生怕是梦。"', effect(){state.memory_fragments+=1;}},
+            {label:'【紧紧抱在怀里】', text:'"我把它揣进怀里，贴着心口。这下，谁也抢不走了。"', effect(){}}
+        ]},
+        {bg:'C5_04.png', speaker:'旁白', text:'回到新房前，我反复抚摸着门牌号上的红漆。'},
+    ],
+};
+
+const chapterNames = ['序章 · 定格', '支边青海', '返迁淅川', '迁居荆门', '栖身荒山', '归宿'];
+const chapterKeys = ['prologue','chapter1','chapter2','chapter3','chapter4','chapter5'];
+let currentChapterKey = 'prologue';
+
+// ========== UI 元素 ==========
+const bgImage = document.getElementById('bgImage');
+const speakerName = document.getElementById('speakerName');
+const dialogueText = document.getElementById('dialogueText');
+const clickHint = document.getElementById('clickHint');
+const choicesBox = document.getElementById('choicesBox');
+const textBox = document.getElementById('textBox');
+const dots = document.querySelectorAll('.ch-dot');
+
+// ========== 预加载图片（优化：加超时兜底，避免卡加载） ==========
+function preloadImages() {
+    const allImages = new Set();
+    Object.values(script).forEach(chapter => {
+        chapter.forEach(line => {
+            if (line.bg) allImages.add(line.bg);
+        });
+    });
+    allImages.add('C5_end_hard.png');
+    allImages.add('C5_end_normal.png');
+    allImages.add('bg_ending_black.png');
+    let loaded=0;
+    const total = allImages.size;
+    if (total === 0) {
+        hideLoading();
+        return;
+    }
+    allImages.forEach(src=>{
+        const img=new Image();
+        img.onload=img.onerror=()=>{
+            loaded++;
+            if(loaded >= total) hideLoading();
+        };
+        img.src=src;
+    });
+    // 超时兜底（防止某张图加载失败卡界面）
+    setTimeout(()=>hideLoading(), 4000);
+}
+function hideLoading(){
+    document.getElementById('loadingScreen').classList.add('hide');
+    updateDialogue(0);
+}
+preloadImages();
+
+// ========== 核心逻辑（优化：合并DOM操作，减少重绘） ==========
+function setBg(src) {
+    if (bgImage.src.includes(src.split('/').pop())) return;
+    bgImage.classList.add('fading');
+    setTimeout(() => {
+        bgImage.src = src;
+        bgImage.classList.remove('fading');
+    }, 250);
+}
+
+function getSpeakerClass(speaker) {
+    if (!speaker) return 'speaker-narrator';
+    if (speaker.includes('李建国') || speaker === state.player_name) return 'speaker-mc';
+    if (speaker.includes('秀兰')) return 'speaker-xiulan';
+    if (speaker.includes('干部')) return 'speaker-cadre';
+    if (speaker.includes('广播')) return 'speaker-broadcast';
+    return 'speaker-narrator';
+}
+
+function updateDialogue(idx) {
+    const chapter = script[currentChapterKey];
+    if (!chapter || idx >= chapter.length) {
+        nextChapter();
+        return;
+    }
+    state.dialogueIndex = idx;
+    const line = chapter[idx];
+
+    // 先处理背景（合并操作）
+    if (line.bg) setBg(line.bg);
+
+    // 处理选择项
+    if (line.choice) {
+        showChoices(line.choice, idx);
+        return;
+    }
+
+    // 隐藏选择框，显示文本框（合并DOM修改）
+    choicesBox.style.display = 'none';
+    textBox.style.display = '';
+
+    // 更新文本（一次修改多个DOM属性，减少重绘）
+    const sp = line.speaker || '旁白';
+    speakerName.textContent = sp;
+    speakerName.className = `speaker-name ${getSpeakerClass(sp)}`;
+    dialogueText.textContent = line.text;
+    clickHint.style.display = '';
+    state.waitingForChoice = false;
+}
+
+function showChoices(choices, idx) {
+    state.waitingForChoice = true;
+    state.currentChoices = {choices, idx};
+    // 清空文本（合并操作）
+    speakerName.textContent = '';
+    dialogueText.textContent = '';
+    clickHint.style.display = 'none';
+
+    // 生成选择按钮（减少DOM插入次数）
+    choicesBox.innerHTML = '';
+    choicesBox.style.display = 'flex';
+    const availChoices = choices.filter(c => !c.condition || c.condition());
+    availChoices.forEach((c, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerHTML = `<div class="choice-label">抉择 ${i+1}</div>${c.label}`;
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            selectChoice(c, idx);
+        };
+        choicesBox.appendChild(btn);
+    });
+}
+
+function selectChoice(choice, idx) {
+    if (choice.effect) choice.effect();
+    state.waitingForChoice = false;
+
+    // 处理背景和文本（合并操作）
+    const chapter = script[currentChapterKey];
+    const line = chapter[idx];
+    setBg(line.bg);
+
+    const sp = choice.label.includes('积极') || choice.label.includes('服从') || choice.label.includes('接受')
+        ? '李建国' : '旁白';
+    speakerName.textContent = sp;
+    speakerName.className = `speaker-name ${getSpeakerClass(sp)}`;
+    dialogueText.textContent = choice.text;
+    clickHint.style.display = '';
+    state.dialogueIndex = idx + 1;
+
+    // 隐藏选择框
+    choicesBox.style.display = 'none';
+}
+
+function advance() {
+    if (state.ended || state.waitingForChoice) return;
+
+    const chapter = script[currentChapterKey];
+    const nextIdx = state.dialogueIndex + 1;
+
+    if (!chapter || nextIdx >= chapter.length) {
+        nextChapter();
+        return;
+    }
+
+    updateDialogue(nextIdx);
+}
+
+function nextChapter() {
+    const idx = chapterKeys.indexOf(currentChapterKey);
+    if (idx < 0 || idx >= chapterKeys.length - 1) {
+        showEnding();
+        return;
+    }
+    currentChapterKey = chapterKeys[idx + 1];
+    state.dialogueIndex = 0;
+    state.currentChapter = idx + 1;
+    updateDots(state.currentChapter);
+    updateDialogue(0);
+}
+
+function updateDots(ch) {
+    dots.forEach((d, i) => {
+        d.classList.remove('active', 'done');
+        if (i < ch) d.classList.add('done');
+        if (i === ch) d.classList.add('active');
+    });
+}
+
+function showEnding() {
+    state.ended = true;
+    // 隐藏不必要元素（合并操作）
+    textBox.style.display = 'none';
+    choicesBox.style.display = 'none';
+
+    const endingEl = document.getElementById('endingScreen');
+    const endingType = document.getElementById('endingType');
+    const endingQuote = document.getElementById('endingQuote');
+
+    // 结局逻辑（保持原功能）
+    if (state.memory_fragments >= 3) {
+        setBg('C5_end_hard.png');
+        endingType.textContent = '【结局：坚韧的李建国】';
+        endingQuote.textContent = '"我盖起了瓦房，也守住了家。这辈子，值了。"';
+    } else {
+        setBg('C5_end_normal.png');
+        endingType.textContent = '【结局：平凡的李建国】';
+        endingQuote.textContent = '"日子安稳了，孩子们也长大了。这就够了。"';
+    }
+
+    endingEl.classList.add('show');
+}
+
+function restart() {
+    // 重置状态（合并操作）
+    Object.assign(state, {
+        memory_fragments: 0,
+        has_silver: false,
+        fix_house: false,
+        is_resilient: false,
+        land_quality: 'poor',
+        currentChapter: 0,
+        dialogueIndex: 0,
+        waitingForChoice: false,
+        ended: false
+    });
+    currentChapterKey = 'prologue';
+    document.getElementById('endingScreen').classList.remove('show');
+    textBox.style.display = '';
+    updateDots(0);
+    updateDialogue(0);
+}
+
+// ========== 键盘操作（简化逻辑） ==========
+document.addEventListener('keydown', function(e) {
+    if ((e.key === ' ' || e.key === 'Enter') && !state.waitingForChoice) {
+        e.preventDefault();
+        advance();
+    }
+    if (e.key === 'ArrowUp' && state.waitingForChoice) {
+        e.preventDefault();
+        const btns = choicesBox.querySelectorAll('.choice-btn');
+        btns.length && btns[0].focus();
+    }
+});
+</script>
+
+    <script src="https://tianq4691-maker.github.io/NSBD-redesign/archive-shell.js"></script>
+</body>
+</html>
