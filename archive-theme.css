@@ -67,6 +67,224 @@ body.archive-dark :is(button,.btn,.action-btn){border-color:var(--archive-amber)
 .archive-evidence-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;
   border:1px solid currentColor;color:var(--archive-red);background:rgba(242,238,227,.82);
   font-size:11px;letter-spacing:.08em}
+
+/* =========================================================
+   Shared exhibition language
+   Keep each page's information and interaction, but remove the
+   unrelated "technology dashboard" and "industrial UI" skins.
+   ========================================================= */
+body.archive-unified:not(.archive-dark) :is(
+  .search-section,.entity-info,.results-section,.suggestions-section,
+  .qa-card,.gallery-card,.entity-item,.suggestion-item,
+  .loading-tips,.overview-viewer,.tool-card,.decree
+){
+  background:rgba(247,243,233,.92)!important;
+  color:var(--archive-ink)!important;
+  border:1px solid var(--archive-line)!important;
+  border-radius:2px!important;
+  box-shadow:0 14px 36px rgba(35,43,39,.1)!important;
+  backdrop-filter:blur(12px);
+}
+body.archive-unified:not(.archive-dark) :is(
+  .subtitle,.gallery-sub,.entity-text p,.tool-desc,.tip-line,
+  .overview-caption,.card-desc,.answer,.qa-answer
+){color:var(--archive-muted)!important}
+body.archive-unified:not(.archive-dark) :is(
+  .search-hero h2,.entity-title,.gallery-header h2,.suggestions-title,
+  .results-title,.page-header h1,.tool-info h2,.section-label
+){
+  color:var(--archive-ink)!important;
+  background:none!important;
+  -webkit-text-fill-color:currentColor!important;
+  text-shadow:none!important;
+}
+body.archive-unified:not(.archive-dark) :is(.search-input,input[type="text"]){
+  color:var(--archive-ink)!important;
+  background:rgba(255,252,244,.94)!important;
+  border:1px solid var(--archive-line)!important;
+  border-radius:2px!important;
+  box-shadow:none!important;
+}
+body.archive-unified:not(.archive-dark) :is(.search-input,input[type="text"])::placeholder{
+  color:#8a8c84!important;
+}
+body.archive-unified:not(.archive-dark) :is(.search-btn,.tag,.tool-tag,.card-badge){
+  background:rgba(15,117,129,.08)!important;
+  color:var(--archive-river)!important;
+  border:1px solid rgba(15,117,129,.32)!important;
+  border-radius:2px!important;
+  box-shadow:none!important;
+}
+body.archive-unified:not(.archive-dark) .search-btn{
+  background:var(--archive-river)!important;color:#fff!important;
+}
+body.archive-unified:not(.archive-dark) :is(.search-btn,.tag,.suggestion-item,.entity-item):hover{
+  transform:translateY(-2px)!important;
+  border-color:var(--archive-amber)!important;
+  box-shadow:0 10px 24px rgba(35,43,39,.1)!important;
+}
+
+/* 世纪问水：让背景照片成为低对比度的档案衬底，而非青色大屏。 */
+body.archive-unified:not(.archive-dark) .bg-img{
+  filter:grayscale(.45) sepia(.18) contrast(.88) brightness(1.08)!important;
+}
+body.archive-unified:not(.archive-dark) .bg-overlay{
+  background:rgba(232,225,210,.8)!important;
+}
+body.archive-unified:not(.archive-dark) .main-content{color:var(--archive-ink)}
+
+/* 勘绘蓝图：纸质图册面板。路线颜色只用于识别线路。 */
+body.archive-unified .draggable-panel{
+  background:rgba(242,238,227,.96)!important;
+  color:var(--archive-ink)!important;
+  border:1px solid rgba(36,54,49,.28)!important;
+  border-radius:2px!important;
+  box-shadow:0 20px 48px rgba(18,29,26,.2)!important;
+  backdrop-filter:blur(16px)!important;
+}
+body.archive-unified .drag-handle{
+  border-radius:0!important;
+  background:rgba(15,117,129,.055)!important;
+  border-bottom:1px solid var(--archive-line);
+}
+body.archive-unified .drag-handle::before{background:var(--archive-river-soft)!important}
+body.archive-unified .resize-handle::before,
+body.archive-unified .resize-handle::after{background:var(--archive-river)!important}
+body.archive-unified .reset-btn,
+body.archive-unified .detail-close{
+  background:var(--archive-paper-deep)!important;
+  color:var(--archive-muted)!important;
+  border:1px solid var(--archive-line)!important;
+  border-radius:2px!important;
+}
+body.archive-unified .draggable-panel .section-title{
+  color:var(--archive-red)!important;
+  font-size:.72rem!important;
+  font-weight:700!important;
+  letter-spacing:.18em!important;
+}
+body.archive-unified .route-card{
+  background:rgba(255,252,244,.72)!important;
+  color:var(--archive-ink)!important;
+  border:1px solid var(--archive-line)!important;
+  border-left-width:4px!important;
+  border-radius:2px!important;
+  box-shadow:none!important;
+}
+body.archive-unified .route-card.east{border-left-color:#b24838!important}
+body.archive-unified .route-card.middle{border-left-color:var(--archive-river)!important}
+body.archive-unified .route-card.west{border-left-color:var(--archive-amber)!important}
+body.archive-unified .route-card.active,
+body.archive-unified .route-card:hover{
+  background:#fffaf0!important;
+  border-top-color:rgba(36,54,49,.28)!important;
+  border-right-color:rgba(36,54,49,.28)!important;
+  border-bottom-color:rgba(36,54,49,.28)!important;
+  box-shadow:0 7px 18px rgba(35,43,39,.09)!important;
+}
+body.archive-unified .route-info h4{color:var(--archive-ink)!important;font-family:"Noto Serif SC","Songti SC",serif}
+body.archive-unified .route-info p{color:var(--archive-muted)!important}
+body.archive-unified .left-panel .panel-section > div[style],
+body.archive-unified .left-panel .panel-section > div[style] p{
+  color:var(--archive-muted)!important;
+}
+body.archive-unified .detail-header{border-color:var(--archive-line)!important}
+body.archive-unified .detail-title{color:var(--archive-river)!important}
+body.archive-unified :is(.info-item,.stat-item,.route-overview,.detail-desc){
+  background:rgba(230,222,206,.48)!important;
+  color:var(--archive-ink)!important;
+  border:1px solid rgba(36,54,49,.1)!important;
+  border-radius:2px!important;
+}
+body.archive-unified .info-label,
+body.archive-unified .stat-label{color:var(--archive-muted)!important}
+body.archive-unified .info-value,
+body.archive-unified .stat-value{color:var(--archive-ink)!important}
+body.archive-unified .stat-value.water{color:var(--archive-river)!important}
+body.archive-unified .stat-value.migrate{color:var(--archive-red)!important}
+body.archive-unified .stat-value.eco{color:#476f66!important}
+body.archive-unified .stat-value.time{color:var(--archive-amber)!important}
+body.archive-unified .detail-photo-item,
+body.archive-unified .detail-photo-item img{border-radius:1px!important}
+body.archive-unified .detail-photo-item img{
+  border:5px solid #fffaf0!important;
+  box-shadow:0 4px 12px rgba(35,43,39,.14);
+  filter:sepia(.1) saturate(.85);
+}
+body.archive-unified .legend-bar{
+  background:rgba(242,238,227,.95)!important;
+  border:1px solid rgba(36,54,49,.28)!important;
+  border-radius:2px!important;
+  box-shadow:0 12px 30px rgba(18,29,26,.18)!important;
+}
+body.archive-unified .legend-item{color:var(--archive-ink)!important}
+body.archive-unified .map-switch{gap:4px!important}
+body.archive-unified .map-btn{
+  background:rgba(242,238,227,.95)!important;
+  border:1px solid rgba(36,54,49,.28)!important;
+  color:var(--archive-ink)!important;
+  border-radius:2px!important;
+  box-shadow:none!important;
+}
+body.archive-unified .map-btn.active,
+body.archive-unified .map-btn:hover{
+  background:var(--archive-river)!important;color:#fff!important;
+  border-color:var(--archive-river)!important;
+}
+body.archive-unified .photo-tooltip{
+  background:rgba(242,238,227,.97)!important;
+  border:1px solid var(--archive-line)!important;
+  border-radius:2px!important;
+}
+body.archive-unified .photo-tooltip::before{border-top-color:rgba(242,238,227,.97)!important}
+
+/* 旧制复刻：保留工器展品，撤去独立的铜棕工业皮肤。 */
+body.archive-unified:not(.archive-dark) .bg-layer-1,
+body.archive-unified:not(.archive-dark) .bg-layer-2{
+  filter:grayscale(.35) sepia(.22) contrast(.82) brightness(1.12)!important;
+}
+body.archive-unified:not(.archive-dark) .page-header .badge{
+  color:var(--archive-red)!important;border-color:var(--archive-red)!important;
+  border-radius:1px!important;background:rgba(242,238,227,.76)!important;
+}
+body.archive-unified:not(.archive-dark) .page-header .decree{
+  border-left:3px solid var(--archive-red)!important;
+  border-right:0!important;
+}
+body.archive-unified:not(.archive-dark) .page-header .decree p{color:var(--archive-muted)!important}
+body.archive-unified:not(.archive-dark) .page-header .decree .stamp{color:var(--archive-red)!important}
+body.archive-unified:not(.archive-dark) .slogan-item{
+  background:rgba(199,148,84,.1)!important;
+  border:1px solid rgba(199,148,84,.42)!important;
+  color:#76552e!important;border-radius:2px!important;
+}
+body.archive-unified:not(.archive-dark) .tool-card{overflow:hidden}
+body.archive-unified:not(.archive-dark) .tool-info{
+  background:rgba(247,243,233,.96)!important;
+  color:var(--archive-ink)!important;
+  border-top:1px solid var(--archive-line)!important;
+}
+body.archive-unified:not(.archive-dark) .tool-number{color:var(--archive-red)!important}
+
+/* 暗场叙事也沿用同一套尺寸、边线与档案橘金，而非另一套组件。 */
+body.archive-dark :is(.toc,.stat-card,.section,.wc-card,.history-photo,.text-box,.choices-box,.ending-screen){
+  background:rgba(24,22,18,.9)!important;
+  border:1px solid #5a4932!important;
+  border-radius:2px!important;
+  color:#ede3d4!important;
+  box-shadow:0 18px 42px rgba(0,0,0,.26)!important;
+}
+body.archive-dark :is(.toc-link,.choice-btn,.ending-btn){
+  border-radius:2px!important;
+  border-color:#5a4932!important;
+}
+body.archive-dark :is(.toc-link:hover,.toc-link.active,.choice-btn:hover){
+  color:var(--archive-amber)!important;border-color:var(--archive-amber)!important;
+  background:rgba(199,148,84,.1)!important;
+}
+body.archive-dark :is(.section h2,.wc-header h2,.stat-card .num,.speaker-name){
+  color:var(--archive-amber)!important;
+}
 @media(max-width:900px){
   body.archive-unified{padding-top:62px}
   .archive-site-header{height:62px;padding:0 18px}.archive-brand b{font-size:16px}
