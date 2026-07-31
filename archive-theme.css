@@ -248,6 +248,24 @@ body.archive-page-tools .tool-tag{
 /* 两个暗场栏目共享结构，仅通过叙事强调色区分。 */
 body.archive-page-story :is(.section h2,.wc-header h2,.stat-card .num){color:#d4a564!important}
 body.archive-page-guxiang :is(.speaker-name,.ending-type){color:#d88a65!important}
+body.archive-page-guxiang .text-box{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+body.archive-page-guxiang .text-inner{
+  max-width:860px!important;
+  background:linear-gradient(135deg,rgba(22,17,13,.9),rgba(27,24,19,.82))!important;
+  border:1px solid rgba(189,113,79,.48)!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.28)!important;
+  backdrop-filter:blur(8px)!important;
+}
+body.archive-page-guxiang .choices-box{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
 
 /* 勘绘蓝图：纸质图册面板。路线颜色只用于识别线路。 */
 body.archive-unified .draggable-panel{
@@ -383,7 +401,7 @@ body.archive-unified:not(.archive-dark) .tool-info{
 body.archive-unified:not(.archive-dark) .tool-number{color:var(--archive-red)!important}
 
 /* 暗场叙事也沿用同一套尺寸、边线与档案橘金，而非另一套组件。 */
-body.archive-dark :is(.toc,.stat-card,.section,.wc-card,.history-photo,.text-box,.choices-box,.ending-screen){
+body.archive-dark :is(.toc,.stat-card,.section,.wc-card,.history-photo,.text-inner,.ending-screen){
   background:rgba(24,22,18,.9)!important;
   border:1px solid #5a4932!important;
   border-radius:2px!important;
