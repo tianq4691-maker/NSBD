@@ -90,6 +90,10 @@ body.archive-unified:not(.archive-dark) :is(
   .overview-caption,.card-desc,.answer,.qa-answer
 ){color:var(--archive-muted)!important}
 body.archive-unified:not(.archive-dark) :is(
+  .entity-text h4,.qa-card h3,.gallery-card h3,.suggestion-item,
+  .tool-card h2,.tool-card h3
+){color:var(--archive-ink)!important}
+body.archive-unified:not(.archive-dark) :is(
   .search-hero h2,.entity-title,.gallery-header h2,.suggestions-title,
   .results-title,.page-header h1,.tool-info h2,.section-label
 ){
@@ -132,6 +136,118 @@ body.archive-unified:not(.archive-dark) .bg-overlay{
   background:rgba(232,225,210,.8)!important;
 }
 body.archive-unified:not(.archive-dark) .main-content{color:var(--archive-ink)}
+
+/* 六个栏目使用同一套档案色谱，并以低饱和主题色区分内容气质。 */
+body.archive-page-qa{
+  --section-accent:#176d72;
+  --section-accent-soft:#a9cbc4;
+  --section-ground:#183b38;
+  background-color:var(--section-ground)!important;
+}
+body.archive-page-map3d{
+  --section-accent:#356f78;
+  --section-accent-soft:#b6cbc5;
+  --section-ground:#263e3d;
+}
+body.archive-page-time{
+  --section-accent:#506c7b;
+  --section-accent-soft:#b9c5c8;
+  --section-ground:#1e2b31;
+}
+body.archive-page-story{
+  --section-accent:#c79454;
+  --section-accent-soft:#6c5b45;
+  --section-ground:#11110f;
+}
+body.archive-page-tools{
+  --section-accent:#9a5c3f;
+  --section-accent-soft:#cdb29b;
+  --section-ground:#3a2d27;
+  background-color:var(--section-ground)!important;
+}
+body.archive-page-guxiang{
+  --section-accent:#bd714f;
+  --section-accent-soft:#74513f;
+  --section-ground:#19130f;
+}
+body.archive-unified[class*="archive-page-"]{
+  --water-cyan:var(--section-accent);
+  --water-light:var(--section-accent-soft);
+}
+
+/* 世纪问水：深水色环境承托暖纸检索台，避免整页泛白。 */
+body.archive-page-qa .bg-img{
+  filter:grayscale(.55) sepia(.16) saturate(.78) contrast(1.08) brightness(.7)!important;
+}
+body.archive-page-qa .bg-overlay{
+  background:
+    linear-gradient(180deg,rgba(17,49,46,.66),rgba(25,48,43,.78)),
+    linear-gradient(90deg,rgba(9,44,43,.3),rgba(164,67,50,.08))!important;
+}
+body.archive-page-qa :is(.search-section,.entity-info,.results-section,.suggestions-section){
+  background:rgba(238,232,217,.94)!important;
+  border-color:rgba(255,255,255,.24)!important;
+  box-shadow:0 20px 55px rgba(5,25,23,.28)!important;
+}
+body.archive-page-qa :is(.entity-item,.qa-card,.gallery-card,.suggestion-item){
+  background:#f7f1e4!important;
+  border-color:rgba(46,63,58,.24)!important;
+}
+body.archive-page-qa :is(.entity-text h4,.qa-card h3,.gallery-card h3){
+  color:#1c302c!important;
+  font-weight:700!important;
+}
+body.archive-page-qa :is(.entity-text p,.qa-card p,.gallery-card p){
+  color:#626861!important;
+}
+body.archive-page-qa :is(.entity-icon,.page-title-icon){
+  background:rgba(23,109,114,.13)!important;
+  color:#176d72!important;
+  box-shadow:none!important;
+}
+body.archive-page-qa .search-btn{
+  background:#176d72!important;color:#fff!important;
+}
+
+/* 勘绘蓝图的面板略带测绘灰绿，避免纯白浮在卫星影像上。 */
+body.archive-page-map3d .draggable-panel,
+body.archive-page-map3d .legend-bar,
+body.archive-page-map3d .map-btn{
+  background:rgba(226,224,211,.95)!important;
+}
+body.archive-page-map3d :is(.info-item,.stat-item,.route-overview,.detail-desc){
+  background:rgba(205,211,199,.62)!important;
+}
+body.archive-page-map3d .detail-title{color:#356f78!important}
+body.archive-page-map3d .map-btn.active,
+body.archive-page-map3d .map-btn:hover{background:#356f78!important}
+
+/* 调水纪事使用灰蓝压暗照片，文字仍维持暖白。 */
+body.archive-page-time .bg-overlay{
+  background:linear-gradient(90deg,rgba(20,31,36,.88),rgba(27,42,47,.52),rgba(20,31,36,.82))!important;
+}
+body.archive-page-time :is(.slide-era,.slide-date,.decade-label){color:#d8c39e!important}
+body.archive-page-time :is(.year-label,.mini-title){color:#e8e1d4!important}
+
+/* 旧制复刻使用铁锈棕环境，但展品说明仍落在暖纸上。 */
+body.archive-page-tools .bg-overlay{
+  background:linear-gradient(180deg,rgba(49,37,30,.64),rgba(43,36,31,.82))!important;
+}
+body.archive-page-tools :is(.page-header h1,.page-header .subtitle,.overview-caption){
+  color:#f1e8d8!important;
+}
+body.archive-page-tools .section-label{color:#e1b28f!important}
+body.archive-page-tools :is(.loading-tips,.tool-card,.decree){
+  background:rgba(239,231,214,.95)!important;
+}
+body.archive-page-tools .tool-tag{
+  color:#884c36!important;border-color:rgba(154,92,63,.4)!important;
+  background:rgba(154,92,63,.08)!important;
+}
+
+/* 两个暗场栏目共享结构，仅通过叙事强调色区分。 */
+body.archive-page-story :is(.section h2,.wc-header h2,.stat-card .num){color:#d4a564!important}
+body.archive-page-guxiang :is(.speaker-name,.ending-type){color:#d88a65!important}
 
 /* 勘绘蓝图：纸质图册面板。路线颜色只用于识别线路。 */
 body.archive-unified .draggable-panel{
