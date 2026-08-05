@@ -285,20 +285,40 @@
             .toc-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
         }
 
-        /* ========== 词云图谱 ========== */
-        .wc-section { margin-bottom: 2rem; }
-        .wc-header { text-align: center; margin-bottom: 0.9rem; }
-        .wc-header h2 { font-size: 1.2rem; font-weight: 600; letter-spacing: 3px; color: var(--water-light); margin-bottom: 0.25rem; }
-        .wc-header .wc-sub { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1.5px; }
-        .wc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem 0.8rem; }
-        .wc-item { cursor: pointer; transition: transform 0.3s ease; }
+        /* ========== 词云图谱：横向照片画廊 ========== */
+        .wc-section { margin-bottom: 2rem; padding: 1.25rem 1.25rem 1.1rem; border: 1px solid var(--card-border); background: rgba(8,24,21,.44); overflow: hidden; }
+        .wc-header { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+        .wc-header-copy h2 { font-size: 1.2rem; font-weight: 600; letter-spacing: 3px; color: var(--water-light); margin: 0 0 0.25rem; }
+        .wc-header .wc-sub { margin: 0; font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1.5px; }
+        .wc-controls { display: flex; gap: .55rem; flex: 0 0 auto; }
+        .wc-nav { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid var(--card-border); border-radius: 50%; background: rgba(242,238,227,.08); color: var(--water-light); cursor: pointer; transition: .25s ease; }
+        .wc-nav:hover { color: #fff; border-color: var(--water-mid); background: rgba(184,121,47,.2); }
+        .wc-nav:focus-visible { outline: 2px solid var(--water-mid); outline-offset: 2px; }
+        .wc-viewport { position: relative; }
+        .wc-grid { display: flex; gap: .9rem; overflow-x: auto; overscroll-behavior-inline: contain; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; padding: .15rem .05rem .6rem; }
+        .wc-grid::-webkit-scrollbar { display: none; }
+        .wc-item { flex: 0 0 calc((100% - 1.8rem) / 3); min-width: 0; cursor: pointer; scroll-snap-align: start; transition: transform 0.3s ease; }
         .wc-item:hover { transform: translateY(-3px); }
         .wc-card { position: relative; overflow: hidden; aspect-ratio: 2 / 3; border-radius: 8px; border: 1px solid var(--card-border); transition: border-color 0.3s ease, box-shadow 0.3s ease; background: rgba(10,50,45,0.15); }
         .wc-item:hover .wc-card { border-color: var(--water-mid); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
         .wc-card img { width: 105%; height: 105%; object-fit: contain; object-position: center; margin: -2.5%; transition: transform 0.35s ease; }
-        .wc-item:hover .wc-card img { transform: scale(1.06); }
-        .wc-label { text-align: center; margin-top: 0.35rem; }
+        .wc-item:hover .wc-card img { transform: scale(1.04); }
+        .wc-label { text-align: center; margin-top: 0.4rem; }
         .wc-label span { font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); letter-spacing: 1.5px; }
+        .wc-swipe-tip { display: none; margin: .35rem 0 0; text-align: center; color: var(--text-muted); font-size: .68rem; letter-spacing: 1px; }
+
+        @media (max-width: 768px) {
+            .wc-section { padding: 1rem; }
+            .wc-item { flex-basis: calc((100% - .9rem) / 2); }
+            .wc-swipe-tip { display: block; }
+        }
+        @media (max-width: 480px) {
+            .wc-header { align-items: center; }
+            .wc-header-copy h2 { font-size: 1rem; letter-spacing: 2px; }
+            .wc-item { flex-basis: 88%; }
+            .wc-label { margin-top: 0.3rem; }
+            .wc-label span { font-size: 0.72rem; letter-spacing: 1px; }
+        }
 
         /* ========== 图片灯箱 ========== */
         .lb-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; cursor: pointer; }
@@ -387,10 +407,17 @@
     <!-- 词云图谱 -->
     <section class="wc-section">
         <div class="wc-header">
-            <h2>群像记忆 · 词云图谱</h2>
-            <p class="wc-sub">六类建设者群体的口述关键词</p>
+            <div class="wc-header-copy">
+                <h2>群像记忆 · 词云图谱</h2>
+                <p class="wc-sub">六类建设者群体的口述关键词</p>
+            </div>
+            <div class="wc-controls" aria-label="词云图切换">
+                <button class="wc-nav" type="button" onclick="slideWordcloud(-1)" aria-label="查看上一张词云"><i class="fas fa-chevron-left"></i></button>
+                <button class="wc-nav" type="button" onclick="slideWordcloud(1)" aria-label="查看下一张词云"><i class="fas fa-chevron-right"></i></button>
+            </div>
         </div>
-        <div class="wc-grid">
+        <div class="wc-viewport">
+        <div class="wc-grid" id="wordcloudCarousel">
             <div class="wc-item" title="原住民" onclick="openLB('assets/wordcloud-residents.svg','原住民')">
                 <div class="wc-card">
                     <img src="assets/wordcloud-residents.svg" alt="原住民词云" loading="lazy">
@@ -428,6 +455,8 @@
                 <div class="wc-label"><span>移 民</span></div>
             </div>
         </div>
+        </div>
+        <p class="wc-swipe-tip">左右滑动查看更多词云</p>
     </section>
 
     <!-- ======== 一、缘起构想 ======== -->
@@ -730,6 +759,14 @@
     <div class="lb-label" id="lbLabel"></div>
 </div>
 <script>
+    function slideWordcloud(direction) {
+        var carousel = document.getElementById('wordcloudCarousel');
+        if (!carousel) return;
+        var card = carousel.querySelector('.wc-item');
+        var gap = parseFloat(getComputedStyle(carousel).gap) || 0;
+        var step = card ? card.getBoundingClientRect().width + gap : carousel.clientWidth;
+        carousel.scrollBy({ left: direction * step, behavior: 'smooth' });
+    }
     function openLB(src, label) {
         document.getElementById('lbImage').src = src;
         document.getElementById('lbLabel').textContent = label;
