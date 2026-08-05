@@ -285,6 +285,36 @@
             .toc-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
         }
 
+        /* ========== 十章横向卡片阅读器 ========== */
+        .chapter-carousel { margin: 1.4rem 0 2rem; }
+        .chapter-carousel-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .85rem; padding: 0 .15rem; }
+        .chapter-status { min-width: 0; }
+        .chapter-kicker { display: block; margin-bottom: .25rem; color: var(--text-muted); font-size: .68rem; letter-spacing: 1.8px; }
+        .chapter-current { display: flex; align-items: baseline; gap: .65rem; min-width: 0; }
+        .chapter-current strong { color: var(--water-light); font-size: 1.05rem; font-weight: 500; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chapter-count { color: var(--text-muted); font: .75rem Arial,sans-serif; white-space: nowrap; }
+        .chapter-controls { display: flex; gap: .55rem; flex: 0 0 auto; }
+        .chapter-nav { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid var(--card-border); border-radius: 50%; background: rgba(8,30,28,.78); color: var(--water-light); cursor: pointer; transition: .25s ease; }
+        .chapter-nav:hover:not(:disabled) { color: #fff; border-color: var(--water-mid); background: rgba(184,121,47,.2); }
+        .chapter-nav:disabled { opacity: .3; cursor: default; }
+        .chapter-nav:focus-visible { outline: 2px solid var(--water-mid); outline-offset: 2px; }
+        .chapter-viewport { overflow: hidden; border-radius: 20px; }
+        .chapter-track { display: flex; gap: 1rem; height: min(70vh,720px); min-height: 520px; overflow-x: auto; overscroll-behavior-inline: contain; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; }
+        .chapter-track::-webkit-scrollbar { display: none; }
+        .chapter-track > .section { flex: 0 0 100%; width: 100%; height: 100%; margin: 0; overflow-x: hidden; overflow-y: auto; scroll-snap-align: start; scroll-snap-stop: always; scrollbar-width: thin; scrollbar-color: var(--water-mid) rgba(255,255,255,.05); }
+        .chapter-track > .section::-webkit-scrollbar { width: 7px; }
+        .chapter-track > .section::-webkit-scrollbar-track { background: rgba(255,255,255,.04); }
+        .chapter-track > .section::-webkit-scrollbar-thumb { background: var(--water-mid); border-radius: 8px; }
+        .chapter-card::after { content: "卡片内上下滚动阅读"; position: sticky; display: block; width: max-content; left: 50%; bottom: -.8rem; transform: translateX(-50%); padding: .32rem .65rem; border: 1px solid var(--card-border); border-radius: 20px; background: rgba(4,26,24,.9); color: var(--text-muted); font-size: .64rem; letter-spacing: 1px; opacity: .78; }
+        .toc-link.active { color: #fff; border-color: #b8792f; background: rgba(184,121,47,.2); }
+
+        @media (max-width: 768px) {
+            .chapter-track { height: 72vh; min-height: 480px; }
+            .chapter-track > .section { padding: 1.5rem 1.2rem 2rem; }
+            .chapter-current strong { font-size: .92rem; }
+            .chapter-nav { width: 38px; height: 38px; }
+        }
+
         /* ========== 词云图谱：横向照片画廊 ========== */
         .wc-section { margin-bottom: 2rem; padding: 1.25rem 1.25rem 1.1rem; border: 1px solid var(--card-border); background: rgba(8,24,21,.44); overflow: hidden; }
         .wc-header { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
@@ -727,6 +757,109 @@
 
 </div>
 </div>
+
+<!-- 十章横向卡片阅读器 -->
+<script>
+(function setupChapterCarousel(){
+    var main = document.querySelector('.main-content');
+    if (!main) return;
+    var chapters = Array.prototype.filter.call(main.children, function(el){
+        return el.classList && el.classList.contains('section') && /^sec\d+$/.test(el.id);
+    });
+    if (chapters.length !== 10) return;
+
+    var carousel = document.createElement('section');
+    carousel.className = 'chapter-carousel';
+    carousel.setAttribute('aria-label', '工程载录十章');
+    carousel.innerHTML =
+        '<div class="chapter-carousel-head">' +
+            '<div class="chapter-status">' +
+                '<span class="chapter-kicker">CHAPTER READER · 横向章节</span>' +
+                '<div class="chapter-current"><strong id="chapterTitle"></strong><span class="chapter-count" id="chapterCount"></span></div>' +
+            '</div>' +
+            '<div class="chapter-controls">' +
+                '<button class="chapter-nav" id="chapterPrev" type="button" aria-label="上一章"><i class="fas fa-chevron-left"></i></button>' +
+                '<button class="chapter-nav" id="chapterNext" type="button" aria-label="下一章"><i class="fas fa-chevron-right"></i></button>' +
+            '</div>' +
+        '</div>' +
+        '<div class="chapter-viewport"><div class="chapter-track" id="chapterTrack" tabindex="0"></div></div>';
+
+    main.insertBefore(carousel, chapters[0]);
+    var track = carousel.querySelector('#chapterTrack');
+    chapters.forEach(function(chapter){
+        chapter.classList.add('chapter-card');
+        track.appendChild(chapter);
+    });
+
+    var title = carousel.querySelector('#chapterTitle');
+    var count = carousel.querySelector('#chapterCount');
+    var prev = carousel.querySelector('#chapterPrev');
+    var next = carousel.querySelector('#chapterNext');
+    var tocLinks = Array.prototype.slice.call(document.querySelectorAll('.toc-link'));
+    var active = 0;
+    var ticking = false;
+
+    function chapterName(index) {
+        var heading = chapters[index].querySelector('h2');
+        return heading ? heading.textContent.replace(/\s+/g, ' ').trim() : '章节 ' + (index + 1);
+    }
+    function update(index) {
+        active = Math.max(0, Math.min(chapters.length - 1, index));
+        title.textContent = chapterName(active);
+        count.textContent = String(active + 1).padStart(2, '0') + ' / ' + String(chapters.length).padStart(2, '0');
+        prev.disabled = active === 0;
+        next.disabled = active === chapters.length - 1;
+        tocLinks.forEach(function(link){
+            link.classList.toggle('active', link.getAttribute('href') === '#' + chapters[active].id);
+        });
+    }
+    function goTo(index, movePage) {
+        var target = Math.max(0, Math.min(chapters.length - 1, index));
+        track.scrollTo({ left: chapters[target].offsetLeft - track.offsetLeft, behavior: 'smooth' });
+        chapters[target].scrollTop = 0;
+        update(target);
+        if (movePage) carousel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    prev.addEventListener('click', function(){ goTo(active - 1, false); });
+    next.addEventListener('click', function(){ goTo(active + 1, false); });
+    track.addEventListener('keydown', function(event){
+        if (event.key === 'ArrowLeft') { event.preventDefault(); goTo(active - 1, false); }
+        if (event.key === 'ArrowRight') { event.preventDefault(); goTo(active + 1, false); }
+    });
+    track.addEventListener('scroll', function(){
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function(){
+            var nearest = 0;
+            var distance = Infinity;
+            chapters.forEach(function(chapter, index){
+                var d = Math.abs((chapter.offsetLeft - track.offsetLeft) - track.scrollLeft);
+                if (d < distance) { distance = d; nearest = index; }
+            });
+            update(nearest);
+            ticking = false;
+        });
+    }, { passive: true });
+
+    tocLinks.forEach(function(link){
+        link.addEventListener('click', function(event){
+            var id = link.getAttribute('href').slice(1);
+            var index = chapters.findIndex(function(chapter){ return chapter.id === id; });
+            if (index < 0) return;
+            event.preventDefault();
+            history.replaceState(null, '', '#' + id);
+            goTo(index, true);
+        });
+    });
+
+    update(0);
+    if (/^#sec\d+$/.test(location.hash)) {
+        var initial = chapters.findIndex(function(chapter){ return '#' + chapter.id === location.hash; });
+        if (initial >= 0) setTimeout(function(){ goTo(initial, false); }, 0);
+    }
+})();
+</script>
 
 <!-- 页面加载进度条 -->
 <script>
