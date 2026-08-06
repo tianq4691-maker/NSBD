@@ -1,0 +1,191 @@
+/*
+ * 南水往事记忆空间 · 六板块背景系统
+ * 真实地图与历史照片负责内容，纹理、网格和色层仅作视觉组织。
+ */
+
+body.theme-qa,
+body.theme-map,
+body.theme-time,
+body.theme-story,
+body.theme-tools,
+body.theme-migration {
+  --section-paper: #eee7d7;
+  --section-ink: #1f2825;
+  --section-gold: #b8792f;
+}
+
+/* 世纪问水：档案底图 / 深水青 */
+.theme-qa .bg-img {
+  filter: grayscale(.38) sepia(.16) brightness(.5) contrast(1.06) saturate(.7) !important;
+  transform: scale(1.035);
+}
+.theme-qa .bg-overlay {
+  background:
+    linear-gradient(90deg, rgba(9,38,37,.91) 0%, rgba(13,53,51,.76) 48%, rgba(13,45,43,.87) 100%),
+    linear-gradient(180deg, rgba(238,231,215,.08), transparent 24%, rgba(3,22,22,.5)) !important;
+}
+.theme-qa .water-ripple {
+  opacity: .13 !important;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 43px, rgba(227,219,199,.13) 44px, transparent 45px),
+    repeating-linear-gradient(90deg, transparent 0 78px, rgba(227,219,199,.08) 79px, transparent 80px),
+    radial-gradient(ellipse at 18% 28%, rgba(194,157,91,.25), transparent 42%) !important;
+}
+
+/* 勘绘蓝图：实时地图 / 纸本路线图 / 测绘灰绿 */
+.theme-map #map {
+  background: #2d4541;
+}
+.theme-map #map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(21,40,37,.18), transparent 22%, transparent 72%, rgba(21,40,37,.22)),
+    repeating-linear-gradient(0deg, transparent 0 79px, rgba(238,231,215,.05) 80px),
+    repeating-linear-gradient(90deg, transparent 0 79px, rgba(238,231,215,.05) 80px);
+  mix-blend-mode: multiply;
+}
+.theme-map .draggable-panel {
+  background: rgba(232,226,211,.94) !important;
+  border-color: rgba(64,91,83,.42) !important;
+  color: #26312d !important;
+  box-shadow: 0 14px 38px rgba(19,31,28,.28) !important;
+}
+.theme-map .draggable-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: url("assets/map-overall.jpg") center/cover no-repeat;
+  opacity: .055;
+  filter: grayscale(.65) sepia(.2);
+}
+.theme-map .route-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: rgba(244,239,226,.88) !important;
+}
+.theme-map .route-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-position: center;
+  background-size: cover;
+  opacity: .1;
+  filter: grayscale(.45) sepia(.16);
+}
+.theme-map .route-card.east::before { background-image: url("assets/map-east.jpg"); }
+.theme-map .route-card.middle::before { background-image: url("assets/map-middle.jpg"); }
+.theme-map .route-card.west::before { background-image: url("assets/map-west.jpg"); }
+
+/* 调水纪事：灰蓝时间影像 / 胶片刻度 */
+.theme-time #slide-area .bg-layer {
+  filter: grayscale(.58) sepia(.1) saturate(.65) brightness(.68) contrast(1.05);
+}
+.theme-time #slide-area .bg-overlay {
+  background:
+    linear-gradient(90deg, rgba(31,47,58,.9) 0%, rgba(41,57,66,.64) 45%, rgba(31,45,55,.86) 100%),
+    linear-gradient(180deg, rgba(232,226,211,.08), transparent 30%, rgba(13,22,28,.55)) !important;
+}
+.theme-time #slide-area::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 119px, rgba(239,231,213,.08) 120px),
+    linear-gradient(90deg, transparent 49.8%, rgba(184,121,47,.28) 50%, transparent 50.2%);
+}
+.theme-time .top-bar,
+.theme-time #timenav {
+  background-color: rgba(29,42,49,.9) !important;
+  border-color: rgba(184,121,47,.32) !important;
+}
+
+/* 工程载录：真实建设现场 / 炭黑橘金 */
+.theme-story .bg-layer {
+  background-image:
+    linear-gradient(180deg, rgba(11,18,17,.42), rgba(20,20,17,.62)),
+    url("assets/1958-start.svg") !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center top !important;
+  background-attachment: fixed;
+  filter: grayscale(.82) sepia(.22) brightness(.54) contrast(1.08) !important;
+}
+.theme-story .bg-overlay {
+  background:
+    radial-gradient(ellipse at 72% 22%, rgba(184,121,47,.18), transparent 32%),
+    linear-gradient(180deg, rgba(21,26,23,.38), rgba(17,22,20,.62) 55%, rgba(16,19,17,.82)) !important;
+}
+.theme-story .section,
+.theme-story .toc,
+.theme-story .stat-card,
+.theme-story .wc-section,
+.theme-story .history-gallery {
+  border-color: rgba(184,121,47,.32) !important;
+}
+
+/* 旧制复刻：工器实物 / 铁锈棕 / 机械制图线 */
+.theme-tools .bg-layer {
+  filter: grayscale(.4) sepia(.38) brightness(.52) contrast(1.08) !important;
+}
+.theme-tools .bg-overlay {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 59px, rgba(231,220,198,.06) 60px),
+    repeating-linear-gradient(90deg, transparent 0 59px, rgba(231,220,198,.05) 60px),
+    linear-gradient(180deg, rgba(39,27,20,.7), rgba(31,25,21,.82)) !important;
+}
+.theme-tools .tool-card,
+.theme-tools .overview-section,
+.theme-tools .decree {
+  border-color: rgba(169,104,53,.42) !important;
+}
+
+/* 故土迁流：剧情场景 / 土红深褐 / 旧照片 */
+.theme-migration .bg-layer-img {
+  filter: grayscale(.34) sepia(.28) saturate(.74) brightness(.68) contrast(1.06);
+}
+.theme-migration .bg-vignette {
+  background:
+    radial-gradient(ellipse at center, transparent 42%, rgba(48,27,22,.42) 76%, rgba(24,17,15,.72) 100%),
+    linear-gradient(180deg, rgba(128,68,52,.12), transparent 34%, rgba(48,29,23,.24)) !important;
+}
+.theme-migration .text-inner {
+  background: linear-gradient(180deg, rgba(42,28,23,.4), rgba(38,27,23,.88)) !important;
+  border-color: rgba(167,104,76,.44) !important;
+}
+.theme-migration .ch-dot.active {
+  background: #c17f54 !important;
+  box-shadow: 0 0 8px rgba(193,127,84,.5) !important;
+}
+
+/* 统一低密度纸张颗粒，避免六页成为六套视觉语言 */
+body.theme-qa::after,
+body.theme-time::after,
+body.theme-story::after,
+body.theme-tools::after,
+body.theme-migration::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .18;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.15) 0 1px, transparent 1.2px),
+    radial-gradient(circle at 75% 65%, rgba(0,0,0,.13) 0 1px, transparent 1.2px);
+  background-size: 31px 29px, 37px 41px;
+}
+
+@media (max-width: 768px) {
+  .theme-story .bg-layer { background-attachment: scroll; }
+  .theme-map .draggable-panel::before { opacity: .035; }
+}
