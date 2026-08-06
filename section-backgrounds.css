@@ -54,15 +54,23 @@ body.theme-migration {
   color: #26312d !important;
   box-shadow: 0 14px 38px rgba(19,31,28,.28) !important;
 }
+.theme-map .draggable-panel {
+  isolation: isolate;
+}
 .theme-map .draggable-panel::before {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   border-radius: inherit;
+  pointer-events: none;
   background: url("assets/map-overall.jpg") center/cover no-repeat;
-  opacity: .055;
+  opacity: .065;
   filter: grayscale(.65) sepia(.2);
+}
+.theme-map .draggable-panel > * {
+  position: relative;
+  z-index: 1;
 }
 .theme-map .route-card {
   position: relative;
