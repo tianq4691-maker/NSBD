@@ -16,13 +16,13 @@ body.theme-migration {
 
 /* 世纪问水：档案底图 / 深水青 */
 .theme-qa .bg-img {
-  filter: grayscale(.38) sepia(.16) brightness(.5) contrast(1.06) saturate(.7) !important;
+  filter: grayscale(.28) sepia(.12) brightness(.7) contrast(1.08) saturate(.82) !important;
   transform: scale(1.035);
 }
 .theme-qa .bg-overlay {
   background:
-    linear-gradient(90deg, rgba(9,38,37,.91) 0%, rgba(13,53,51,.76) 48%, rgba(13,45,43,.87) 100%),
-    linear-gradient(180deg, rgba(238,231,215,.08), transparent 24%, rgba(3,22,22,.5)) !important;
+    linear-gradient(90deg, rgba(9,38,37,.72) 0%, rgba(13,53,51,.5) 48%, rgba(13,45,43,.66) 100%),
+    linear-gradient(180deg, rgba(238,231,215,.06), transparent 30%, rgba(3,22,22,.34)) !important;
 }
 .theme-qa .water-ripple {
   opacity: .13 !important;
@@ -43,7 +43,7 @@ body.theme-migration {
   z-index: 500;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(21,40,37,.18), transparent 22%, transparent 72%, rgba(21,40,37,.22)),
+    linear-gradient(180deg, rgba(21,40,37,.1), transparent 22%, transparent 72%, rgba(21,40,37,.12)),
     repeating-linear-gradient(0deg, transparent 0 79px, rgba(238,231,215,.05) 80px),
     repeating-linear-gradient(90deg, transparent 0 79px, rgba(238,231,215,.05) 80px);
   mix-blend-mode: multiply;
@@ -65,7 +65,7 @@ body.theme-migration {
   border-radius: inherit;
   pointer-events: none;
   background: url("assets/map-overall.jpg") center/cover no-repeat;
-  opacity: .065;
+  opacity: .12;
   filter: grayscale(.65) sepia(.2);
 }
 .theme-map .draggable-panel > * {
@@ -85,8 +85,8 @@ body.theme-migration {
   z-index: -1;
   background-position: center;
   background-size: cover;
-  opacity: .1;
-  filter: grayscale(.45) sepia(.16);
+  opacity: .18;
+  filter: grayscale(.32) sepia(.12);
 }
 .theme-map .route-card.east::before { background-image: url("assets/map-east.jpg"); }
 .theme-map .route-card.middle::before { background-image: url("assets/map-middle.jpg"); }
@@ -94,12 +94,12 @@ body.theme-migration {
 
 /* 调水纪事：灰蓝时间影像 / 胶片刻度 */
 .theme-time #slide-area .bg-layer {
-  filter: grayscale(.58) sepia(.1) saturate(.65) brightness(.68) contrast(1.05);
+  filter: grayscale(.42) sepia(.08) saturate(.78) brightness(.82) contrast(1.06);
 }
 .theme-time #slide-area .bg-overlay {
   background:
-    linear-gradient(90deg, rgba(31,47,58,.9) 0%, rgba(41,57,66,.64) 45%, rgba(31,45,55,.86) 100%),
-    linear-gradient(180deg, rgba(232,226,211,.08), transparent 30%, rgba(13,22,28,.55)) !important;
+    linear-gradient(90deg, rgba(31,47,58,.72) 0%, rgba(41,57,66,.46) 45%, rgba(31,45,55,.66) 100%),
+    linear-gradient(180deg, rgba(232,226,211,.05), transparent 34%, rgba(13,22,28,.36)) !important;
 }
 .theme-time #slide-area::after {
   content: "";
@@ -126,12 +126,12 @@ body.theme-migration {
   background-size: cover !important;
   background-position: center top !important;
   background-attachment: fixed;
-  filter: grayscale(.82) sepia(.22) brightness(.54) contrast(1.08) !important;
+  filter: grayscale(.62) sepia(.18) brightness(.72) contrast(1.08) !important;
 }
 .theme-story .bg-overlay {
   background:
     radial-gradient(ellipse at 72% 22%, rgba(184,121,47,.18), transparent 32%),
-    linear-gradient(180deg, rgba(21,26,23,.38), rgba(17,22,20,.62) 55%, rgba(16,19,17,.82)) !important;
+    linear-gradient(180deg, rgba(21,26,23,.24), rgba(17,22,20,.44) 55%, rgba(16,19,17,.64)) !important;
 }
 .theme-story .section,
 .theme-story .toc,
@@ -143,13 +143,13 @@ body.theme-migration {
 
 /* 旧制复刻：工器实物 / 铁锈棕 / 机械制图线 */
 .theme-tools .bg-layer {
-  filter: grayscale(.4) sepia(.38) brightness(.52) contrast(1.08) !important;
+  filter: grayscale(.28) sepia(.3) brightness(.7) contrast(1.08) !important;
 }
 .theme-tools .bg-overlay {
   background:
     repeating-linear-gradient(0deg, transparent 0 59px, rgba(231,220,198,.06) 60px),
     repeating-linear-gradient(90deg, transparent 0 59px, rgba(231,220,198,.05) 60px),
-    linear-gradient(180deg, rgba(39,27,20,.7), rgba(31,25,21,.82)) !important;
+    linear-gradient(180deg, rgba(39,27,20,.5), rgba(31,25,21,.64)) !important;
 }
 .theme-tools .tool-card,
 .theme-tools .overview-section,
@@ -157,14 +157,31 @@ body.theme-migration {
   border-color: rgba(169,104,53,.42) !important;
 }
 
+
+/* 旧制复刻：浅色建模展台 */
+.theme-tools .overview-viewer,
+.theme-tools .tool-model {
+  background: #d7cdbb !important;
+  border-color: rgba(112,78,49,.38) !important;
+  box-shadow: inset 0 0 34px rgba(94,69,47,.12);
+}
+.theme-tools .tool-model::after {
+  background:
+    radial-gradient(circle at 50% 42%, #e9e1d2 0%, #d7cdbb 62%, #c4b59f 100%) !important;
+}
+.theme-tools .overview-viewer canvas,
+.theme-tools .tool-model canvas {
+  background: transparent !important;
+}
+
 /* 故土迁流：剧情场景 / 土红深褐 / 旧照片 */
 .theme-migration .bg-layer-img {
-  filter: grayscale(.34) sepia(.28) saturate(.74) brightness(.68) contrast(1.06);
+  filter: grayscale(.22) sepia(.22) saturate(.86) brightness(.82) contrast(1.06);
 }
 .theme-migration .bg-vignette {
   background:
-    radial-gradient(ellipse at center, transparent 42%, rgba(48,27,22,.42) 76%, rgba(24,17,15,.72) 100%),
-    linear-gradient(180deg, rgba(128,68,52,.12), transparent 34%, rgba(48,29,23,.24)) !important;
+    radial-gradient(ellipse at center, transparent 48%, rgba(48,27,22,.28) 78%, rgba(24,17,15,.52) 100%),
+    linear-gradient(180deg, rgba(128,68,52,.08), transparent 40%, rgba(48,29,23,.16)) !important;
 }
 .theme-migration .text-inner {
   background: linear-gradient(180deg, rgba(42,28,23,.4), rgba(38,27,23,.88)) !important;
@@ -195,5 +212,5 @@ body.theme-migration::after {
 
 @media (max-width: 768px) {
   .theme-story .bg-layer { background-attachment: scroll; }
-  .theme-map .draggable-panel::before { opacity: .035; }
+  .theme-map .draggable-panel::before { opacity: .08; }
 }
