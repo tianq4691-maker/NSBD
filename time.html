@@ -178,10 +178,11 @@
         .timeline-range b { color: var(--red); font: 1.12rem/1 Georgia, serif; letter-spacing: 0; }
         .timeline-range b:last-child { text-align: right; }
         .timeline-range span { text-align: center; }
-        .timeline-legend { display: flex; align-items: center; justify-content: flex-end; gap: .45rem; margin: .25rem .1rem 0; color: var(--ink-soft); font: .64rem/1.2 sans-serif; }
+        .timeline-legend { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: .45rem; margin: .25rem .1rem 0; color: var(--ink-soft); font: .64rem/1.2 sans-serif; }
         .timeline-legend i { display: inline-grid; min-width: 17px; height: 17px; padding: 0 4px; place-items: center; border-radius: 9px; color: #fff; background: var(--red); font: 600 .58rem/17px sans-serif; font-style: normal; }
-        .timeline-scroll { overflow-x: auto; overflow-y: hidden; padding: .15rem .55rem .2rem; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--water) transparent; }
-        .timeline-scale { position: relative; min-width: 1040px; height: 76px; margin: 0 14px; }
+        .timeline-scroll { overflow-x: auto; overflow-y: hidden; padding: .15rem .55rem .2rem; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--water) transparent; cursor: grab; user-select: none; touch-action: pan-y; }
+        .timeline-scroll.dragging { cursor: grabbing; scroll-behavior: auto; }
+        .timeline-scale { position: relative; min-width: 1960px; height: 76px; margin: 0 14px; }
         .scale-line { position: absolute; left: 0; right: 0; top: 31px; height: 3px; background: linear-gradient(90deg, var(--water-deep), var(--water), var(--amber)); box-shadow: 0 1px 0 rgba(255,255,255,.55); }
         .year-node { position: absolute; top: 7px; width: 38px; height: 66px; padding: 0; border: 0; color: #7d8985; background: transparent; transform: translateX(-50%); text-align: center; transition: .18s ease; }
         .year-node::before { content: ""; position: absolute; left: 50%; top: 20px; width: 7px; height: 7px; border: 2px solid var(--paper); border-radius: 50%; background: #9ba59f; box-shadow: 0 0 0 1px #78837e; transform: translateX(-50%); }
@@ -298,7 +299,7 @@
 
         <nav class="timeline-rail-wrap" aria-label="1952至1979连续时间轴">
             <div class="timeline-range"><b id="timeline-start">1952</b><span id="timeline-range-title">南水北调早期纪事 · 连续时间轴</span><b id="timeline-end">1979</b></div>
-            <div class="timeline-legend" aria-label="时间轴图例"><i aria-hidden="true">3</i><span>红色数字表示该年份收录的纪事数量</span></div>
+            <div class="timeline-legend" aria-label="时间轴图例"><span>按住时间轴左右拖动浏览</span><i aria-hidden="true">3</i><span>红色数字表示该年份收录的纪事数量</span></div>
             <div class="timeline-scroll" id="timeline-scroll"><div class="timeline-scale" id="timeline-rail"></div></div>
         </nav>
 
@@ -411,6 +412,11 @@
     var empty = document.getElementById('empty-state');
     var visual = document.getElementById('event-visual');
     var timelineScroll = document.getElementById('timeline-scroll');
+    var timelineDragging = false;
+    var timelineDragStartX = 0;
+    var timelineDragStartScroll = 0;
+    var timelineDragDistance = 0;
+    var suppressTimelineClick = false;
 
     categories.forEach(function (cat) {
         var button = document.createElement('button');
@@ -465,7 +471,11 @@
             node.disabled = !matching.length;
             node.setAttribute('aria-label', matching.length ? year + '年，共' + matching.length + '个事件' : year + '年，暂无节点');
             node.innerHTML = (matching.length > 1 ? '<span class="year-count">' + matching.length + '</span>' : '') + '<b>' + year + '</b>';
-            if (matching.length) node.addEventListener('click', function () { current = matching[0]; renderEvent(); });
+            if (matching.length) node.addEventListener('click', function () {
+                if (suppressTimelineClick) return;
+                current = matching[0];
+                renderEvent();
+            });
             rail.appendChild(node);
         });
     }
@@ -520,6 +530,39 @@
         var delta = event.changedTouches[0].clientX - touchStart;
         if (Math.abs(delta) > 55) step(delta < 0 ? 1 : -1);
     }, {passive:true});
+
+    timelineScroll.addEventListener('pointerdown', function (event) {
+        if (event.button !== undefined && event.button !== 0) return;
+        timelineDragging = true;
+        timelineDragStartX = event.clientX;
+        timelineDragStartScroll = timelineScroll.scrollLeft;
+        timelineDragDistance = 0;
+        timelineScroll.setPointerCapture(event.pointerId);
+        timelineScroll.classList.add('dragging');
+    });
+    timelineScroll.addEventListener('pointermove', function (event) {
+        if (!timelineDragging) return;
+        timelineDragDistance = event.clientX - timelineDragStartX;
+        timelineScroll.scrollLeft = timelineDragStartScroll - timelineDragDistance;
+        if (Math.abs(timelineDragDistance) > 4) event.preventDefault();
+    });
+    function endTimelineDrag(event) {
+        if (!timelineDragging) return;
+        timelineDragging = false;
+        timelineScroll.classList.remove('dragging');
+        if (event && timelineScroll.hasPointerCapture(event.pointerId)) timelineScroll.releasePointerCapture(event.pointerId);
+        if (Math.abs(timelineDragDistance) > 6) {
+            suppressTimelineClick = true;
+            window.setTimeout(function () { suppressTimelineClick = false; }, 160);
+        }
+    }
+    timelineScroll.addEventListener('pointerup', endTimelineDrag);
+    timelineScroll.addEventListener('pointercancel', endTimelineDrag);
+    timelineScroll.addEventListener('wheel', function (event) {
+        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+        timelineScroll.scrollLeft += event.deltaY;
+        event.preventDefault();
+    }, {passive:false});
 
     var lightbox = document.getElementById('lightbox');
     document.querySelectorAll('[data-lightbox]').forEach(function (button) {
