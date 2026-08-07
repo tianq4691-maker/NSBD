@@ -117,28 +117,149 @@ body.theme-migration {
   border-color: rgba(184,121,47,.32) !important;
 }
 
-/* 工程载录：真实建设现场 / 炭黑橘金 */
+/* 工程载录：建设现场 / 暖灰档案纸 / 橘金与水青 */
 .theme-story .bg-layer {
   background-image:
-    linear-gradient(180deg, rgba(11,18,17,.42), rgba(20,20,17,.62)),
+    linear-gradient(180deg, rgba(236,228,210,.12), rgba(28,33,29,.24)),
     url("assets/1958-start.svg") !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
   background-position: center top !important;
   background-attachment: fixed;
-  filter: grayscale(.62) sepia(.18) brightness(.72) contrast(1.08) !important;
+  filter: grayscale(.36) sepia(.12) brightness(.98) contrast(1.02) saturate(.86) !important;
 }
 .theme-story .bg-overlay {
   background:
-    radial-gradient(ellipse at 72% 22%, rgba(184,121,47,.18), transparent 32%),
-    linear-gradient(180deg, rgba(21,26,23,.24), rgba(17,22,20,.44) 55%, rgba(16,19,17,.64)) !important;
+    radial-gradient(ellipse at 72% 22%, rgba(184,121,47,.11), transparent 34%),
+    linear-gradient(180deg, rgba(232,224,207,.08), rgba(18,28,25,.20) 58%, rgba(14,20,18,.34)) !important;
+}
+.theme-story .main-content {
+  max-width: 1120px !important;
 }
 .theme-story .section,
 .theme-story .toc,
 .theme-story .stat-card,
 .theme-story .wc-section,
 .theme-story .history-gallery {
-  border-color: rgba(184,121,47,.32) !important;
+  border-color: rgba(155,103,48,.40) !important;
+}
+
+/* 十章阅读器改用浅暖档案卡，降低暗场压迫并控制阅读行宽。 */
+body.archive-dark.theme-story .chapter-carousel {
+  margin: 1.6rem 0 2.6rem;
+}
+body.archive-dark.theme-story .chapter-carousel-head {
+  max-width: 1040px;
+  margin: 0 auto 1rem;
+  padding: 0 .35rem;
+}
+body.archive-dark.theme-story .chapter-viewport {
+  max-width: 1040px;
+  margin: 0 auto;
+  border-radius: 12px;
+}
+body.archive-dark.theme-story .chapter-track {
+  height: clamp(500px, 62vh, 640px);
+  min-height: 0;
+}
+body.archive-dark.theme-story .chapter-track > .section {
+  padding: clamp(1.55rem, 3.4vw, 2.7rem) clamp(1.35rem, 4.2vw, 3.25rem) 3.2rem !important;
+  background:
+    linear-gradient(145deg, rgba(239,233,219,.97), rgba(218,210,191,.96)) !important;
+  border: 1px solid rgba(126,88,45,.55) !important;
+  border-radius: 12px !important;
+  color: #26312d !important;
+  box-shadow: 0 18px 46px rgba(14,22,19,.25) !important;
+  scrollbar-color: #9b6631 rgba(72,68,56,.10);
+}
+body.archive-dark.theme-story .chapter-track > .section::before {
+  height: 4px;
+  background: linear-gradient(90deg, #a8642d 0%, #c69554 42%, #2f756e 100%) !important;
+}
+body.archive-dark.theme-story .chapter-track > .section h2 {
+  max-width: 30ch;
+  margin: 0 0 1.35rem !important;
+  color: #8d5525 !important;
+  font-size: clamp(1.35rem, 2.35vw, 1.85rem) !important;
+  line-height: 1.35;
+  letter-spacing: .08em;
+}
+body.archive-dark.theme-story .chapter-track > .section h2 i {
+  color: #2f756e !important;
+}
+body.archive-dark.theme-story .chapter-track > .section h3,
+body.archive-dark.theme-story .chapter-track > .section h4 {
+  color: #356d65 !important;
+}
+body.archive-dark.theme-story .chapter-track > .section > p,
+body.archive-dark.theme-story .chapter-track > .section > blockquote {
+  max-width: 74ch;
+}
+body.archive-dark.theme-story .chapter-track > .section p,
+body.archive-dark.theme-story .chapter-track > .section .tl-text,
+body.archive-dark.theme-story .chapter-track > .section .route-card p {
+  color: #35423d !important;
+  font-size: clamp(.91rem, 1.35vw, 1rem) !important;
+  line-height: 1.95 !important;
+  letter-spacing: .015em;
+}
+body.archive-dark.theme-story .chapter-track > .section strong {
+  color: #302a22 !important;
+}
+body.archive-dark.theme-story .chapter-track > .section blockquote {
+  margin: 1.35rem 0;
+  padding: 1rem 1.25rem;
+  background: rgba(47,117,110,.10) !important;
+  border-left: 3px solid #2f756e !important;
+  color: #2e4741 !important;
+  font-size: clamp(.9rem, 1.3vw, .98rem);
+  line-height: 1.9;
+}
+body.archive-dark.theme-story .chapter-track > .section .tl-date {
+  color: #925821 !important;
+  font-size: .82rem;
+  letter-spacing: .04em;
+}
+body.archive-dark.theme-story .chapter-track > .section .timeline::before {
+  background: linear-gradient(180deg, #a8642d, #2f756e) !important;
+}
+body.archive-dark.theme-story .chapter-track > .section .tl-item::before {
+  background: #b57939 !important;
+  box-shadow: 0 0 0 4px rgba(181,121,57,.13) !important;
+}
+body.archive-dark.theme-story .chapter-track > .section .highlight {
+  background: rgba(158,96,39,.12) !important;
+  color: #824d1e !important;
+}
+body.archive-dark.theme-story .chapter-track > .section .route-card {
+  background: rgba(248,244,234,.55) !important;
+  border-color: rgba(73,100,91,.28) !important;
+}
+body.archive-dark.theme-story .chapter-card::after {
+  bottom: -.9rem;
+  background: rgba(245,239,226,.94) !important;
+  border-color: rgba(126,88,45,.32) !important;
+  color: #6f604c !important;
+}
+body.archive-dark.theme-story .chapter-track > .section::-webkit-scrollbar-track {
+  background: rgba(72,68,56,.08);
+}
+body.archive-dark.theme-story .chapter-track > .section::-webkit-scrollbar-thumb {
+  background: #9b6631;
+  border-radius: 8px;
+}
+@media (max-width: 768px) {
+  body.archive-dark.theme-story .chapter-track {
+    height: min(68vh, 600px);
+    min-height: 460px;
+  }
+  body.archive-dark.theme-story .chapter-track > .section {
+    padding: 1.35rem 1.15rem 2.8rem !important;
+  }
+  body.archive-dark.theme-story .chapter-track > .section > p,
+  body.archive-dark.theme-story .chapter-track > .section > blockquote {
+    max-width: none;
+  }
 }
 
 /* 旧制复刻：工器实物 / 铁锈棕 / 机械制图线 */
