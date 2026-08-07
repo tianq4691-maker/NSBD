@@ -178,6 +178,8 @@
         .timeline-range b { color: var(--red); font: 1.12rem/1 Georgia, serif; letter-spacing: 0; }
         .timeline-range b:last-child { text-align: right; }
         .timeline-range span { text-align: center; }
+        .timeline-legend { display: flex; align-items: center; justify-content: flex-end; gap: .45rem; margin: .25rem .1rem 0; color: var(--ink-soft); font: .64rem/1.2 sans-serif; }
+        .timeline-legend i { display: inline-grid; min-width: 17px; height: 17px; padding: 0 4px; place-items: center; border-radius: 9px; color: #fff; background: var(--red); font: 600 .58rem/17px sans-serif; font-style: normal; }
         .timeline-scroll { overflow-x: auto; overflow-y: hidden; padding: .15rem .55rem .2rem; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--water) transparent; }
         .timeline-scale { position: relative; min-width: 1040px; height: 76px; margin: 0 14px; }
         .scale-line { position: absolute; left: 0; right: 0; top: 31px; height: 3px; background: linear-gradient(90deg, var(--water-deep), var(--water), var(--amber)); box-shadow: 0 1px 0 rgba(255,255,255,.55); }
@@ -238,6 +240,7 @@
             .event-nav { flex: 1; min-width: 0; }
             .timeline-range { grid-template-columns: 52px 1fr 52px; }
             .timeline-range span { font-size: .62rem; }
+            .timeline-legend { justify-content: center; }
             .image-card, .image-card:nth-child(1), .image-card:nth-child(2) { grid-column: 1 / -1; }
             .source-panel { grid-template-columns: 1fr; }
         }
@@ -295,6 +298,7 @@
 
         <nav class="timeline-rail-wrap" aria-label="1952至1979连续时间轴">
             <div class="timeline-range"><b id="timeline-start">1952</b><span id="timeline-range-title">南水北调早期纪事 · 连续时间轴</span><b id="timeline-end">1979</b></div>
+            <div class="timeline-legend" aria-label="时间轴图例"><i aria-hidden="true">3</i><span>红色数字表示该年份收录的纪事数量</span></div>
             <div class="timeline-scroll" id="timeline-scroll"><div class="timeline-scale" id="timeline-rail"></div></div>
         </nav>
 
