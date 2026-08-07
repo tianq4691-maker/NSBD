@@ -9,7 +9,7 @@
 
   const nav=[
     ['世纪问水','qa.html'],['勘绘蓝图','map3d.html'],['调水纪事','time.html'],
-    ['工程载录','story.html'],['旧制复刻','tools.html'],['故土迁流','guxiang.html']
+    ['工程载录','story.html'],['旧制复刻','tools.html'],['故土迁流','guxiang.html'],['渠声成河','canal-echo-maze/index.html']
   ];
   const header=document.createElement('header');
   header.className='archive-site-header';
@@ -28,7 +28,7 @@
     if(!raw||raw.startsWith('#')||raw.startsWith('mailto:')||raw.startsWith('tel:')) return;
     let target;
     try{target=new URL(raw,document.baseURI)}catch(_){return}
-    const filename=(target.pathname.split('/').pop()||'').toLowerCase();
+    const filename=(target.pathname.split('/').pop()||'').toLowerCase();\n    if(target.pathname.toLowerCase().endsWith('/canal-echo-maze/index.html')){link.href=root+'canal-echo-maze/index.html'+target.hash;return;}
     if(filename.endsWith('.html')&&['index.html','home.html','qa.html','map3d.html','time.html','story.html','tools.html','guxiang.html'].includes(filename)){
       link.href=root+(filename==='index.html'?'home.html':filename)+target.hash;
     }
