@@ -28,7 +28,11 @@
     if(!raw||raw.startsWith('#')||raw.startsWith('mailto:')||raw.startsWith('tel:')) return;
     let target;
     try{target=new URL(raw,document.baseURI)}catch(_){return}
-    const filename=(target.pathname.split('/').pop()||'').toLowerCase();\n    if(target.pathname.toLowerCase().endsWith('/canal-echo-maze/index.html')){link.href=root+'canal-echo-maze/index.html'+target.hash;return;}
+    const filename=(target.pathname.split('/').pop()||'').toLowerCase();
+    if(target.pathname.toLowerCase().endsWith('/canal-echo-maze/index.html')){
+      link.href=root+'canal-echo-maze/index.html'+target.hash;
+      return;
+    }
     if(filename.endsWith('.html')&&['index.html','home.html','qa.html','map3d.html','time.html','story.html','tools.html','guxiang.html'].includes(filename)){
       link.href=root+(filename==='index.html'?'home.html':filename)+target.hash;
     }
