@@ -2,7 +2,7 @@
   const scriptUrl=document.currentScript&&document.currentScript.src;
   const root=new URL('./',scriptUrl||location.href).href;
   const path=(location.pathname.split('/').pop()||'index.html').toLowerCase();
-  if(path==='index.html'||path==='') return;
+  if(path==='index.html'||path==='home.html'||path==='') return;
   document.body.classList.add('archive-unified');
   document.body.classList.add('archive-page-'+path.replace(/\.html$/,''));
   if(path==='story.html'||path==='guxiang.html') document.body.classList.add('archive-dark');
@@ -29,8 +29,8 @@
     let target;
     try{target=new URL(raw,document.baseURI)}catch(_){return}
     const filename=(target.pathname.split('/').pop()||'').toLowerCase();
-    if(filename.endsWith('.html')&&['index.html','qa.html','map3d.html','time.html','story.html','tools.html','guxiang.html'].includes(filename)){
-      link.href=root+filename+target.hash;
+    if(filename.endsWith('.html')&&['index.html','home.html','qa.html','map3d.html','time.html','story.html','tools.html','guxiang.html'].includes(filename)){
+      link.href=root+(filename==='index.html'?'home.html':filename)+target.hash;
     }
   });
 
