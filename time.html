@@ -87,7 +87,7 @@
         .hero-meta b { color: #e5b06d; font: 400 1.55rem/1 Georgia, serif; }
         .hero-meta small { color: rgba(245,239,226,.62); font: .72rem/1.3 sans-serif; letter-spacing: .16em; }
 
-        .chronicle-main { width: min(1180px, calc(100% - 3rem)); margin: 0 auto; padding: 4.5rem 0 5rem; }
+        .chronicle-main { width: min(1180px, calc(100% - 3rem)); margin: 0 auto; padding: 3.2rem 0 5rem; }
         .section-eyebrow { margin: 0 0 .7rem; color: var(--water); font: 700 .69rem/1 sans-serif; letter-spacing: .28em; }
         .section-heading { margin: 0; font-size: clamp(1.8rem, 3.6vw, 3.1rem); font-weight: 400; letter-spacing: .06em; }
         .section-lead { max-width: 760px; margin: 1rem 0 0; color: var(--ink-soft); line-height: 1.9; font-size: .98rem; }
@@ -112,8 +112,8 @@
             display: grid;
             grid-template-columns: minmax(220px, 1fr) auto;
             gap: 1rem;
-            margin: 2.4rem 0 1.25rem;
-            padding: .8rem;
+            margin: 1.65rem 0 .7rem;
+            padding: .6rem;
             border: 1px solid var(--line);
             background: rgba(238,232,216,.93);
             backdrop-filter: blur(14px);
@@ -121,11 +121,11 @@
         }
         .search-wrap { position: relative; }
         .search-wrap::before { content: "⌕"; position: absolute; left: 1rem; top: 50%; transform: translateY(-53%); color: var(--water); font: 1.3rem sans-serif; }
-        .search-wrap input { width: 100%; height: 44px; padding: 0 1rem 0 2.8rem; border: 1px solid var(--line); color: var(--ink); background: rgba(255,252,244,.78); outline: none; }
+        .search-wrap input { width: 100%; height: 40px; padding: 0 1rem 0 2.8rem; border: 1px solid var(--line); color: var(--ink); background: rgba(255,252,244,.78); outline: none; }
         .search-wrap input:focus { border-color: var(--water); box-shadow: 0 0 0 3px rgba(23,111,115,.1); }
         .filter-row { display: flex; gap: .45rem; overflow-x: auto; scrollbar-width: none; }
         .filter-row::-webkit-scrollbar { display: none; }
-        .filter-btn { flex: 0 0 auto; height: 44px; padding: 0 .9rem; border: 1px solid var(--line); color: var(--ink-soft); background: transparent; transition: .2s ease; }
+        .filter-btn { flex: 0 0 auto; height: 40px; padding: 0 .78rem; border: 1px solid var(--line); color: var(--ink-soft); background: transparent; transition: .2s ease; }
         .filter-btn:hover, .filter-btn.active { color: #fff; border-color: var(--water-deep); background: var(--water-deep); }
 
         .result-summary { display: flex; justify-content: space-between; gap: 1rem; margin: 0 0 .75rem; color: var(--ink-soft); font: .76rem/1.5 sans-serif; letter-spacing: .08em; }
@@ -133,44 +133,63 @@
 
         .event-explorer {
             display: grid;
-            grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr);
-            min-height: 590px;
+            grid-template-columns: minmax(0, .88fr) minmax(390px, 1.12fr);
+            min-height: 405px;
             border: 1px solid rgba(54,74,68,.35);
             background: var(--paper);
             box-shadow: 0 25px 60px rgba(35,47,42,.14);
         }
-        .event-visual { min-height: 590px; position: relative; overflow: hidden; background: #243a36; }
-        .event-visual img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.9) sepia(.15) contrast(1.04); }
-        .event-visual::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(11,27,24,.88), transparent 45%), linear-gradient(90deg, transparent 65%, rgba(18,36,32,.24)); pointer-events: none; }
-        .image-caption { position: absolute; z-index: 2; left: 1.5rem; right: 1.5rem; bottom: 1.35rem; margin: 0; color: rgba(255,248,235,.82); font-size: .78rem; line-height: 1.7; }
+        .event-visual { min-height: 405px; position: relative; overflow: hidden; background: #8fa49d; }
+        .event-visual img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.72) sepia(.12) brightness(1.08) contrast(.96); }
+        .event-visual::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(16,35,31,.72), transparent 42%), linear-gradient(90deg, transparent 76%, rgba(28,52,46,.12)); pointer-events: none; }
+        .image-caption { position: absolute; z-index: 2; left: 1.25rem; right: 1.25rem; bottom: 1rem; margin: 0; color: rgba(255,248,235,.9); font-size: .74rem; line-height: 1.55; }
         .image-caption b { display: block; margin-bottom: .2rem; color: #e8b476; letter-spacing: .12em; }
-        .year-poster { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; background: radial-gradient(circle at 55% 44%, #38534e 0%, #1c3430 48%, #112621 100%); }
-        .year-poster::before, .year-poster::after { content: ""; position: absolute; width: 72%; height: 115%; border: 1px solid rgba(124,190,185,.2); border-radius: 48%; transform: rotate(32deg); }
-        .year-poster::after { width: 44%; transform: rotate(-27deg); }
-        .year-poster span { position: relative; z-index: 2; color: rgba(239,229,207,.9); font: 400 clamp(4rem, 9vw, 7.5rem)/1 Georgia, serif; letter-spacing: -.04em; text-shadow: 0 18px 32px rgba(0,0,0,.3); }
-        .year-poster small { position: absolute; left: 50%; top: calc(50% + 4.8rem); transform: translateX(-50%); color: #8bb9b4; font: .66rem/1 sans-serif; letter-spacing: .32em; white-space: nowrap; }
+        .event-illustration { position: absolute; inset: 0; overflow: hidden; color: #173f3d; background: linear-gradient(145deg, #d8d5c5 0%, #a9bbb3 55%, #839f98 100%); }
+        .event-illustration::before { content: ""; position: absolute; inset: 0; opacity: .36; background-image: radial-gradient(rgba(24,64,60,.34) .7px, transparent .7px); background-size: 14px 14px; }
+        .event-illustration svg { position: absolute; inset: 1.2rem 1.2rem 2.8rem; width: calc(100% - 2.4rem); height: calc(100% - 4rem); color: rgba(20,77,74,.8); }
+        .event-illustration .art-fill { fill: rgba(240,233,214,.48); stroke: currentColor; stroke-width: 3; }
+        .event-illustration .art-line { fill: none; stroke: currentColor; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+        .event-illustration .art-water { fill: none; stroke: rgba(235,245,237,.86); stroke-width: 6; stroke-linecap: round; }
+        .event-illustration .art-accent { fill: var(--amber); stroke: #f1d4a5; stroke-width: 2; }
+        .event-illustration.ill-build { background: linear-gradient(145deg, #d4cfbd, #aa9f87 58%, #7f897d); color: #3e514a; }
+        .event-illustration.ill-migrate { background: linear-gradient(145deg, #dfd1bd, #b99f82 58%, #957b66); color: #65483d; }
+        .event-illustration.ill-power { background: linear-gradient(145deg, #cfd8ce, #8daaa3 58%, #617f7a); }
+        .event-illustration.ill-plan { background: linear-gradient(145deg, #ddd8c9, #aeb9ae 58%, #7f9992); }
+        .illustration-year { position: absolute; left: 1.35rem; top: 1rem; color: rgba(245,238,218,.94); font: 400 clamp(2.2rem, 5vw, 4.3rem)/1 Georgia, serif; text-shadow: 0 2px 18px rgba(23,55,51,.28); }
+        .illustration-label { position: absolute; right: 1.25rem; top: 1.2rem; padding: .3rem .5rem; border: 1px solid rgba(245,238,218,.65); color: #fff8e9; font: .65rem/1 sans-serif; letter-spacing: .15em; }
+        .design-caption { position: absolute; z-index: 2; left: 1.25rem; right: 1.25rem; bottom: .8rem; margin: 0; padding-top: .55rem; border-top: 1px solid rgba(245,238,218,.46); color: rgba(255,248,235,.92); font: .68rem/1.35 sans-serif; letter-spacing: .04em; }
+        .design-caption b { margin-right: .55rem; color: #ffe0a7; }
 
-        .event-copy { position: relative; display: flex; flex-direction: column; padding: clamp(2rem, 4vw, 3.4rem); background: linear-gradient(145deg, rgba(255,252,243,.86), rgba(230,220,198,.82)); }
-        .event-number { position: absolute; right: 1.4rem; top: 1.15rem; color: rgba(33,58,52,.14); font: 3.8rem/1 Georgia, serif; }
+        .event-copy { position: relative; display: flex; flex-direction: column; padding: clamp(1.35rem, 2.4vw, 2.05rem); background: linear-gradient(145deg, rgba(255,252,243,.94), rgba(232,223,203,.9)); }
+        .event-number { position: absolute; right: 1.15rem; top: .85rem; color: rgba(33,58,52,.12); font: 2.8rem/1 Georgia, serif; }
         .event-tag { width: max-content; padding: .34rem .58rem; border: 1px solid currentColor; color: var(--water); font: .68rem/1 sans-serif; letter-spacing: .16em; }
-        .event-date { margin: 2.5rem 0 .65rem; color: var(--red); font: 400 clamp(2.3rem, 5vw, 4.3rem)/1 Georgia, "Songti SC", serif; letter-spacing: -.02em; }
-        .event-title { margin: 0; max-width: 520px; font-size: clamp(1.55rem, 3vw, 2.45rem); font-weight: 500; line-height: 1.35; }
-        .event-text { margin: 1.4rem 0 0; color: #46534f; font-size: .98rem; line-height: 2; text-align: justify; }
-        .event-source { margin-top: auto; padding-top: 1.4rem; border-top: 1px solid var(--line); color: #75807c; font: .69rem/1.65 sans-serif; }
+        .event-date { margin: 1.25rem 0 .42rem; color: var(--red); font: 400 clamp(1.75rem, 3.5vw, 2.75rem)/1.05 Georgia, "Songti SC", serif; letter-spacing: -.02em; }
+        .event-title { margin: 0; max-width: 560px; font-size: clamp(1.3rem, 2.2vw, 1.85rem); font-weight: 500; line-height: 1.3; }
+        .event-text { margin: .8rem 0 0; color: #46534f; font-size: .9rem; line-height: 1.75; text-align: justify; }
+        .event-source { margin-top: auto; padding-top: .75rem; border-top: 1px solid var(--line); color: #75807c; font: .66rem/1.5 sans-serif; }
         .event-source b { color: var(--water-deep); }
-        .event-actions { display: flex; gap: .7rem; margin-top: 1.35rem; }
-        .event-nav { min-width: 110px; height: 42px; border: 1px solid var(--line); color: var(--water-deep); background: transparent; transition: .2s; }
+        .event-actions { display: flex; gap: .6rem; margin-top: .7rem; }
+        .event-nav { min-width: 104px; height: 36px; border: 1px solid var(--line); color: var(--water-deep); background: transparent; transition: .2s; font-size: .82rem; }
         .event-nav:hover:not(:disabled) { color: #fff; border-color: var(--water-deep); background: var(--water-deep); }
         .event-nav:disabled { opacity: .32; cursor: default; }
 
-        .timeline-rail-wrap { position: relative; margin: 1.1rem 0 4.7rem; padding: 1.25rem .35rem 1.05rem; border-bottom: 1px solid var(--line); }
-        .timeline-rail { display: flex; gap: .35rem; overflow-x: auto; padding: .5rem 46%; scroll-behavior: smooth; scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: var(--water) transparent; }
-        .rail-node { flex: 0 0 100px; min-height: 88px; padding: .65rem .4rem; border: 0; border-top: 1px solid var(--line); color: var(--ink-soft); background: transparent; text-align: left; scroll-snap-align: center; transition: .2s; }
-        .rail-node::before { content: ""; display: block; width: 8px; height: 8px; margin: -11px 0 .55rem; border: 2px solid var(--paper); border-radius: 50%; background: #81908b; box-shadow: 0 0 0 1px #81908b; }
-        .rail-node b { display: block; color: inherit; font: 1rem/1.2 Georgia, serif; }
-        .rail-node small { display: -webkit-box; margin-top: .4rem; overflow: hidden; font-size: .64rem; line-height: 1.4; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-        .rail-node:hover, .rail-node.active { color: var(--red); border-top-color: var(--amber); }
-        .rail-node.active::before { width: 12px; height: 12px; margin-top: -13px; background: var(--amber); box-shadow: 0 0 0 1px var(--amber), 0 0 0 5px rgba(201,133,53,.16); }
+        .timeline-rail-wrap { position: relative; margin: .7rem 0 3.7rem; padding: .65rem .9rem .8rem; border: 1px solid var(--line); background: rgba(244,239,226,.68); }
+        .timeline-range { display: grid; grid-template-columns: 70px 1fr 70px; align-items: center; color: var(--water-deep); font: .72rem/1 sans-serif; letter-spacing: .12em; }
+        .timeline-range b { color: var(--red); font: 1.12rem/1 Georgia, serif; letter-spacing: 0; }
+        .timeline-range b:last-child { text-align: right; }
+        .timeline-range span { text-align: center; }
+        .timeline-scroll { overflow-x: auto; overflow-y: hidden; padding: .15rem .55rem .2rem; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--water) transparent; }
+        .timeline-scale { position: relative; min-width: 1040px; height: 76px; margin: 0 14px; }
+        .scale-line { position: absolute; left: 0; right: 0; top: 31px; height: 3px; background: linear-gradient(90deg, var(--water-deep), var(--water), var(--amber)); box-shadow: 0 1px 0 rgba(255,255,255,.55); }
+        .year-node { position: absolute; top: 7px; width: 38px; height: 66px; padding: 0; border: 0; color: #7d8985; background: transparent; transform: translateX(-50%); text-align: center; transition: .18s ease; }
+        .year-node::before { content: ""; position: absolute; left: 50%; top: 20px; width: 7px; height: 7px; border: 2px solid var(--paper); border-radius: 50%; background: #9ba59f; box-shadow: 0 0 0 1px #78837e; transform: translateX(-50%); }
+        .year-node::after { content: ""; position: absolute; left: 50%; top: 29px; width: 1px; height: 11px; background: rgba(67,89,82,.38); }
+        .year-node b { position: absolute; left: 50%; bottom: 0; color: inherit; font: .63rem/1 Georgia, serif; transform: translateX(-50%) rotate(-38deg); transform-origin: center; }
+        .year-node.has-event { color: var(--water-deep); }
+        .year-node.has-event::before { width: 10px; height: 10px; top: 18px; background: var(--water); box-shadow: 0 0 0 1px var(--water), 0 0 0 4px rgba(23,111,115,.1); }
+        .year-node:hover, .year-node.active { color: var(--red); }
+        .year-node.active::before { width: 15px; height: 15px; top: 15px; border-color: #f8f0dd; background: var(--amber); box-shadow: 0 0 0 2px var(--amber), 0 0 0 7px rgba(201,133,53,.2); }
+        .year-count { position: absolute; left: calc(50% + 8px); top: 4px; min-width: 15px; height: 15px; padding: 0 3px; border-radius: 8px; color: #fff; background: var(--red); font: 600 .55rem/15px sans-serif; }
 
         .empty-state { display: none; padding: 4rem 1rem; border: 1px solid var(--line); background: rgba(244,239,226,.7); text-align: center; color: var(--ink-soft); }
 
@@ -199,8 +218,8 @@
         @media (max-width: 900px) {
             .chronicle-tools { position: static; grid-template-columns: 1fr; }
             .event-explorer { grid-template-columns: 1fr; }
-            .event-visual { min-height: 52vw; max-height: 520px; }
-            .event-copy { min-height: 500px; }
+            .event-visual { min-height: 48vw; max-height: 460px; }
+            .event-copy { min-height: 390px; }
             .image-card, .image-card:nth-child(1), .image-card:nth-child(2) { grid-column: span 6; }
         }
         @media (max-width: 620px) {
@@ -212,12 +231,13 @@
             .chronicle-main { padding-top: 2.8rem; }
             .archive-note { grid-template-columns: 1fr; gap: .55rem; }
             .chronicle-tools { padding: .6rem; }
-            .event-visual { min-height: 74vw; }
-            .event-copy { min-height: 520px; padding: 1.6rem 1.25rem; }
+            .event-visual { min-height: 70vw; }
+            .event-copy { min-height: 430px; padding: 1.35rem 1.1rem; }
             .event-date { margin-top: 2rem; }
             .event-actions { margin-top: 1rem; }
             .event-nav { flex: 1; min-width: 0; }
-            .timeline-rail { padding-left: 39%; padding-right: 39%; }
+            .timeline-range { grid-template-columns: 52px 1fr 52px; }
+            .timeline-range span { font-size: .62rem; }
             .image-card, .image-card:nth-child(1), .image-card:nth-child(2) { grid-column: 1 / -1; }
             .source-panel { grid-template-columns: 1fr; }
         }
@@ -243,7 +263,7 @@
     <main class="chronicle-main">
         <aside class="archive-note">
             <strong>编纂说明</strong>
-            <p>本页以项目组提供的《南水北调大事记》为事实底稿，优先呈现1952—1979年的构想、勘测、建设、移民、蓄水发电与规划接续。1980年以后仅列为“后续历程”。历史照片只与能够明确对应的事件关联；无对应图像时使用年份档案牌。</p>
+            <p>本页以项目组提供的《南水北调大事记》为事实底稿，优先呈现1952—1979年的构想、勘测、建设、移民、蓄水发电与规划接续。1980年以后仅列为“后续历程”。历史照片只与能够明确对应的事件关联；无对应图像时使用明确标注的主题设计图。</p>
         </aside>
 
         <p class="section-eyebrow">INTERACTIVE CHRONICLE</p>
@@ -273,7 +293,10 @@
         </section>
         <div class="empty-state" id="empty-state">没有找到对应纪事。可尝试输入年份、人物、地点或较短的关键词。</div>
 
-        <nav class="timeline-rail-wrap" aria-label="年代轨道"><div class="timeline-rail" id="timeline-rail"></div></nav>
+        <nav class="timeline-rail-wrap" aria-label="1952至1979连续时间轴">
+            <div class="timeline-range"><b id="timeline-start">1952</b><span id="timeline-range-title">南水北调早期纪事 · 连续时间轴</span><b id="timeline-end">1979</b></div>
+            <div class="timeline-scroll" id="timeline-scroll"><div class="timeline-scale" id="timeline-rail"></div></div>
+        </nav>
 
         <section class="image-archive" aria-labelledby="image-title">
             <p class="section-eyebrow">IMAGE EVIDENCE</p>
@@ -354,6 +377,7 @@
     var explorer = document.getElementById('event-explorer');
     var empty = document.getElementById('empty-state');
     var visual = document.getElementById('event-visual');
+    var timelineScroll = document.getElementById('timeline-scroll');
 
     categories.forEach(function (cat) {
         var button = document.createElement('button');
@@ -388,14 +412,40 @@
     }
     function renderRail() {
         rail.innerHTML = '';
-        filtered.forEach(function (event, index) {
+        var later = activeCategory === '后续历程';
+        var years = later ? Array.from(new Set(filtered.map(function (event) { return event.year; }))) : Array.from({length: 28}, function (_, index) { return 1952 + index; });
+        if (!years.length) return;
+        document.getElementById('timeline-start').textContent = years[0];
+        document.getElementById('timeline-end').textContent = years[years.length - 1];
+        document.getElementById('timeline-range-title').textContent = later ? '后续工程简史 · 节点时间轴' : '南水北调早期纪事 · 1952—1979连续时间轴';
+        var line = document.createElement('span');
+        line.className = 'scale-line';
+        rail.appendChild(line);
+        years.forEach(function (year, position) {
+            var matching = [];
+            filtered.forEach(function (event, index) { if (event.year === year) matching.push(index); });
             var node = document.createElement('button');
             node.type = 'button';
-            node.className = 'rail-node' + (index === current ? ' active' : '');
-            node.innerHTML = '<b>' + event.year + '</b><small>' + event.title + '</small>';
-            node.addEventListener('click', function () { current = index; renderEvent(); });
+            node.className = 'year-node' + (matching.length ? ' has-event' : '') + (filtered[current] && filtered[current].year === year ? ' active' : '');
+            node.dataset.year = year;
+            node.style.left = (years.length === 1 ? 50 : position / (years.length - 1) * 100) + '%';
+            node.disabled = !matching.length;
+            node.setAttribute('aria-label', matching.length ? year + '年，共' + matching.length + '个事件' : year + '年，暂无节点');
+            node.innerHTML = (matching.length > 1 ? '<span class="year-count">' + matching.length + '</span>' : '') + '<b>' + year + '</b>';
+            if (matching.length) node.addEventListener('click', function () { current = matching[0]; renderEvent(); });
             rail.appendChild(node);
         });
+    }
+    function illustrationSVG(event) {
+        var kind = event.cat === '工程建设' ? 'build' : event.cat === '移民安置' ? 'migrate' : event.cat === '蓄水发电' ? 'power' : event.cat === '规划接续' || event.cat === '后续历程' ? 'plan' : 'survey';
+        var art = {
+            survey: '<path class="art-line" d="M70 320 C150 235 190 270 260 180 S390 100 555 120"/><path class="art-water" d="M55 355 C155 300 220 340 300 265 S455 205 585 230"/><circle class="art-accent" cx="260" cy="180" r="10"/><circle class="art-fill" cx="470" cy="175" r="54"/><path class="art-line" d="M470 128v94M423 175h94M440 145l60 60M500 145l-60 60"/>',
+            build: '<path class="art-fill" d="M105 315h430L465 180H180z"/><path class="art-line" d="M180 180h285M215 180l-25 135M275 180l-12 135M350 180v135M420 180l18 135"/><path class="art-water" d="M70 348q45-28 90 0t90 0t90 0t90 0t90 0"/><path class="art-line" d="M115 115h265M210 115v65M210 115l120 45"/><circle class="art-accent" cx="535" cy="315" r="12"/>',
+            migrate: '<path class="art-fill" d="M82 280l95-78 95 78v78H82zM405 225l70-58 70 58v92H405z"/><path class="art-line" d="M172 358c65-42 125-35 180-5s116 4 162-18"/><path class="art-line" d="M245 320l31 12-24 22M360 336l30 12-25 23"/><circle class="art-accent" cx="176" cy="202" r="10"/>',
+            power: '<path class="art-water" d="M55 310q45-28 90 0t90 0t90 0t90 0t90 0t90 0M55 350q45-28 90 0t90 0t90 0t90 0t90 0t90 0"/><circle class="art-fill" cx="300" cy="215" r="92"/><circle class="art-line" cx="300" cy="215" r="30"/><path class="art-line" d="M300 123v62M208 215h62M300 245v62M330 215h62M235 150l43 43M365 150l-43 43M235 280l43-43M365 280l-43-43"/><path class="art-accent" d="M500 95l-46 88h38l-20 80 67-108h-39z"/>',
+            plan: '<path class="art-fill" d="M125 95h260v220H125zM185 145h260v220H185z"/><path class="art-line" d="M225 190h165M225 230h125M225 270h150"/><path class="art-water" d="M70 350 C170 300 215 340 290 285 S430 220 560 235"/><circle class="art-accent" cx="290" cy="285" r="10"/><circle class="art-accent" cx="455" cy="232" r="10"/>'
+        };
+        return '<div class="event-illustration ill-' + kind + '"><div class="illustration-year">' + event.year + '</div><div class="illustration-label">' + event.cat + '</div><svg viewBox="0 0 640 440" aria-hidden="true">' + art[kind] + '</svg><p class="design-caption"><b>主题设计图</b>非历史照片 · 用于无对应影像节点</p></div>';
     }
     function renderEvent() {
         if (!filtered.length) return;
@@ -411,11 +461,13 @@
         if (event.image) {
             visual.innerHTML = '<img src="' + event.image + '" alt="' + event.title + '"><p class="image-caption"><b>图像说明</b>' + event.caption + '</p>';
         } else {
-            visual.innerHTML = '<div class="year-poster"><span>' + event.year + '</span><small>CHRONICLE ARCHIVE</small></div>';
+            visual.innerHTML = illustrationSVG(event);
         }
-        rail.querySelectorAll('.rail-node').forEach(function (node, index) { node.classList.toggle('active', index === current); });
-        var active = rail.querySelector('.rail-node.active');
-        if (active) active.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+        rail.querySelectorAll('.year-node').forEach(function (node) { node.classList.toggle('active', Number(node.dataset.year) === event.year); });
+        var active = rail.querySelector('.year-node.active');
+        if (active && timelineScroll.scrollWidth > timelineScroll.clientWidth) {
+            timelineScroll.scrollTo({left: Math.max(0, active.offsetLeft - timelineScroll.clientWidth / 2), behavior:'smooth'});
+        }
     }
     function step(amount) {
         var next = Math.max(0, Math.min(filtered.length - 1, current + amount));
