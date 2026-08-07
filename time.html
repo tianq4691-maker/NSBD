@@ -430,6 +430,7 @@
     var timelineDragStartScroll = 0;
     var timelineDragDistance = 0;
     var suppressTimelineClick = false;
+    var timelinePointerStartedOnYear = false;
 
     categories.forEach(function (cat) {
         var button = document.createElement('button');
@@ -605,12 +606,16 @@
         timelineDragStartX = event.clientX;
         timelineDragStartScroll = timelineScroll.scrollLeft;
         timelineDragDistance = 0;
-        timelineScroll.setPointerCapture(event.pointerId);
+        timelinePointerStartedOnYear = Boolean(event.target.closest && event.target.closest('.year-node'));
+        if (!timelinePointerStartedOnYear) timelineScroll.setPointerCapture(event.pointerId);
         timelineScroll.classList.add('dragging');
     });
     timelineScroll.addEventListener('pointermove', function (event) {
         if (!timelineDragging) return;
         timelineDragDistance = event.clientX - timelineDragStartX;
+        if (timelinePointerStartedOnYear && Math.abs(timelineDragDistance) > 6 && !timelineScroll.hasPointerCapture(event.pointerId)) {
+            timelineScroll.setPointerCapture(event.pointerId);
+        }
         timelineScroll.scrollLeft = timelineDragStartScroll - timelineDragDistance;
         syncEventToTimelinePosition();
         if (Math.abs(timelineDragDistance) > 4) event.preventDefault();
