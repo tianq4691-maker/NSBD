@@ -299,7 +299,7 @@
 
         <nav class="timeline-rail-wrap" aria-label="1952至1979连续时间轴">
             <div class="timeline-range"><b id="timeline-start">1952</b><span id="timeline-range-title">南水北调早期纪事 · 连续时间轴</span><b id="timeline-end">1979</b></div>
-            <div class="timeline-legend" aria-label="时间轴图例"><span>按住时间轴左右拖动浏览</span><i aria-hidden="true">3</i><span>红色数字表示该年份收录的纪事数量</span></div>
+            <div class="timeline-legend" aria-label="时间轴图例"><span>按住时间轴左右拖动，图文事件同步切换</span><i aria-hidden="true">3</i><span>红色数字表示该年份收录的纪事数量</span></div>
             <div class="timeline-scroll" id="timeline-scroll"><div class="timeline-scale" id="timeline-rail"></div></div>
         </nav>
 
@@ -490,7 +490,7 @@
         };
         return '<div class="event-illustration ill-' + kind + '"><div class="illustration-year">' + event.year + '</div><div class="illustration-label">' + event.cat + '</div><svg viewBox="0 0 640 440" aria-hidden="true">' + art[kind] + '</svg><p class="design-caption"><b>主题设计图</b>非历史照片 · 用于无对应影像节点</p></div>';
     }
-    function renderEvent() {
+    function renderEvent(preserveTimelinePosition) {
         if (!filtered.length) return;
         var event = filtered[current];
         document.getElementById('event-number').textContent = String(current + 1).padStart(2, '0');
@@ -508,8 +508,40 @@
         }
         rail.querySelectorAll('.year-node').forEach(function (node) { node.classList.toggle('active', Number(node.dataset.year) === event.year); });
         var active = rail.querySelector('.year-node.active');
-        if (active && timelineScroll.scrollWidth > timelineScroll.clientWidth) {
+        if (!preserveTimelinePosition && active && timelineScroll.scrollWidth > timelineScroll.clientWidth) {
             timelineScroll.scrollTo({left: Math.max(0, active.offsetLeft - timelineScroll.clientWidth / 2), behavior:'smooth'});
+        }
+    }
+    function syncEventToTimelinePosition() {
+        if (!filtered.length) return;
+        var maxScroll = timelineScroll.scrollWidth - timelineScroll.clientWidth;
+        if (maxScroll <= 0) return;
+        var ratio = Math.max(0, Math.min(1, timelineScroll.scrollLeft / maxScroll));
+        var targetIndex = 0;
+        if (activeCategory === '后续历程') {
+            targetIndex = Math.round(ratio * (filtered.length - 1));
+        } else {
+            var yearPosition = ratio === 1 ? 27.999999 : ratio * 28;
+            var targetYear = 1952 + Math.min(27, Math.floor(yearPosition));
+            var indices = [];
+            filtered.forEach(function (event, index) { if (event.year === targetYear) indices.push(index); });
+            if (!indices.length) {
+                var nearestDistance = Infinity;
+                filtered.forEach(function (event, index) {
+                    var distance = Math.abs(event.year - (1952 + ratio * 27));
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        targetIndex = index;
+                    }
+                });
+            } else {
+                var withinYear = yearPosition - Math.floor(yearPosition);
+                targetIndex = indices[Math.min(indices.length - 1, Math.floor(withinYear * indices.length))];
+            }
+        }
+        if (targetIndex !== current) {
+            current = targetIndex;
+            renderEvent(true);
         }
     }
     function step(amount) {
@@ -544,6 +576,7 @@
         if (!timelineDragging) return;
         timelineDragDistance = event.clientX - timelineDragStartX;
         timelineScroll.scrollLeft = timelineDragStartScroll - timelineDragDistance;
+        syncEventToTimelinePosition();
         if (Math.abs(timelineDragDistance) > 4) event.preventDefault();
     });
     function endTimelineDrag(event) {
@@ -560,7 +593,8 @@
     timelineScroll.addEventListener('pointercancel', endTimelineDrag);
     timelineScroll.addEventListener('wheel', function (event) {
         if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-        timelineScroll.scrollLeft += event.deltaY;
+        timelineScroll.scrollTo({left: timelineScroll.scrollLeft + event.deltaY, behavior:'auto'});
+        window.requestAnimationFrame(syncEventToTimelinePosition);
         event.preventDefault();
     }, {passive:false});
 
