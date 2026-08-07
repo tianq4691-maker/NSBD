@@ -180,6 +180,14 @@
         .timeline-range span { text-align: center; }
         .timeline-legend { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: .45rem; margin: .25rem .1rem 0; color: var(--ink-soft); font: .64rem/1.2 sans-serif; }
         .timeline-legend i { display: inline-grid; min-width: 17px; height: 17px; padding: 0 4px; place-items: center; border-radius: 9px; color: #fff; background: var(--red); font: 600 .58rem/17px sans-serif; font-style: normal; }
+        .timeline-scrubber-wrap { display: grid; grid-template-columns: 1fr auto; gap: .85rem; align-items: center; margin: .45rem .1rem .2rem; }
+        .timeline-scrubber { width: 100%; height: 26px; margin: 0; appearance: none; -webkit-appearance: none; border: 0; background: transparent; cursor: ew-resize; }
+        .timeline-scrubber::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--water-deep), var(--water), var(--amber)); }
+        .timeline-scrubber::-webkit-slider-thumb { width: 20px; height: 20px; margin-top: -8px; appearance: none; -webkit-appearance: none; border: 3px solid #f8f0dd; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 2px var(--amber), 0 0 0 7px rgba(201,133,53,.18); }
+        .timeline-scrubber::-moz-range-track { height: 4px; border: 0; border-radius: 2px; background: linear-gradient(90deg, var(--water-deep), var(--water), var(--amber)); }
+        .timeline-scrubber::-moz-range-thumb { width: 16px; height: 16px; border: 3px solid #f8f0dd; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 2px var(--amber), 0 0 0 7px rgba(201,133,53,.18); }
+        .timeline-scrubber:focus-visible { outline: 2px solid var(--water); outline-offset: 3px; }
+        .timeline-scrubber-status { min-width: 98px; color: var(--water-deep); font: .66rem/1.3 sans-serif; text-align: right; white-space: nowrap; }
         .timeline-scroll { overflow-x: auto; overflow-y: hidden; padding: .15rem .55rem .2rem; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--water) transparent; cursor: grab; user-select: none; touch-action: pan-y; }
         .timeline-scroll.dragging { cursor: grabbing; scroll-behavior: auto; }
         .timeline-scale { position: relative; min-width: 1960px; height: 76px; margin: 0 14px; }
@@ -242,6 +250,8 @@
             .timeline-range { grid-template-columns: 52px 1fr 52px; }
             .timeline-range span { font-size: .62rem; }
             .timeline-legend { justify-content: center; }
+            .timeline-scrubber-wrap { grid-template-columns: 1fr; gap: .15rem; }
+            .timeline-scrubber-status { text-align: center; }
             .image-card, .image-card:nth-child(1), .image-card:nth-child(2) { grid-column: 1 / -1; }
             .source-panel { grid-template-columns: 1fr; }
         }
@@ -299,7 +309,8 @@
 
         <nav class="timeline-rail-wrap" aria-label="1952至1979连续时间轴">
             <div class="timeline-range"><b id="timeline-start">1952</b><span id="timeline-range-title">南水北调早期纪事 · 连续时间轴</span><b id="timeline-end">1979</b></div>
-            <div class="timeline-legend" aria-label="时间轴图例"><span>按住时间轴左右拖动，图文事件同步切换</span><i aria-hidden="true">3</i><span>红色数字表示该年份收录的纪事数量</span></div>
+            <div class="timeline-legend" aria-label="时间轴图例"><span>拖动橙色圆点逐条浏览，点击年份直接跳转</span><i aria-hidden="true">3</i><span>红色数字表示该年份收录的纪事数量</span></div>
+            <div class="timeline-scrubber-wrap"><input class="timeline-scrubber" id="timeline-scrubber" type="range" min="0" max="58" value="0" step="1" aria-label="拖动切换纪事"><output class="timeline-scrubber-status" id="timeline-scrubber-status">第 1 / 59 条</output></div>
             <div class="timeline-scroll" id="timeline-scroll"><div class="timeline-scale" id="timeline-rail"></div></div>
         </nav>
 
@@ -412,6 +423,8 @@
     var empty = document.getElementById('empty-state');
     var visual = document.getElementById('event-visual');
     var timelineScroll = document.getElementById('timeline-scroll');
+    var timelineScrubber = document.getElementById('timeline-scrubber');
+    var timelineScrubberStatus = document.getElementById('timeline-scrubber-status');
     var timelineDragging = false;
     var timelineDragStartX = 0;
     var timelineDragStartScroll = 0;
@@ -446,6 +459,7 @@
         explorer.style.display = filtered.length ? 'grid' : 'none';
         empty.style.display = filtered.length ? 'none' : 'block';
         rail.parentElement.style.display = filtered.length ? 'block' : 'none';
+        timelineScrubber.disabled = !filtered.length;
         renderRail();
         renderEvent();
     }
@@ -468,16 +482,31 @@
             node.className = 'year-node' + (matching.length ? ' has-event' : '') + (filtered[current] && filtered[current].year === year ? ' active' : '');
             node.dataset.year = year;
             node.style.left = (years.length === 1 ? 50 : position / (years.length - 1) * 100) + '%';
-            node.disabled = !matching.length;
-            node.setAttribute('aria-label', matching.length ? year + '年，共' + matching.length + '个事件' : year + '年，暂无节点');
+            var hasAnyEvent = later ? matching.length > 0 : events.some(function (event) { return event.year === year && event.year <= 1979; });
+            node.disabled = !hasAnyEvent;
+            node.setAttribute('aria-label', matching.length ? year + '年，共' + matching.length + '个事件' : year + '年，点击查看完整纪事');
             node.innerHTML = (matching.length > 1 ? '<span class="year-count">' + matching.length + '</span>' : '') + '<b>' + year + '</b>';
-            if (matching.length) node.addEventListener('click', function () {
+            if (hasAnyEvent) node.addEventListener('click', function () {
                 if (suppressTimelineClick) return;
-                current = matching[0];
-                renderEvent();
+                jumpToYear(year);
             });
             rail.appendChild(node);
         });
+    }
+    function jumpToYear(year) {
+        var index = filtered.findIndex(function (event) { return event.year === year; });
+        if (index < 0 && year <= 1979) {
+            activeCategory = '1952—1979';
+            query = '';
+            document.getElementById('event-search').value = '';
+            filterRow.querySelectorAll('.filter-btn').forEach(function (button) { button.classList.toggle('active', button.textContent === activeCategory); });
+            applyFilter();
+            index = filtered.findIndex(function (event) { return event.year === year; });
+        }
+        if (index >= 0) {
+            current = index;
+            renderEvent();
+        }
     }
     function illustrationSVG(event) {
         var kind = event.cat === '工程建设' ? 'build' : event.cat === '移民安置' ? 'migrate' : event.cat === '蓄水发电' ? 'power' : event.cat === '规划接续' || event.cat === '后续历程' ? 'plan' : 'survey';
@@ -501,6 +530,9 @@
         document.getElementById('event-source').innerHTML = '<b>资料来源</b><br>' + SOURCE;
         document.getElementById('prev-event').disabled = current === 0;
         document.getElementById('next-event').disabled = current === filtered.length - 1;
+        timelineScrubber.max = Math.max(0, filtered.length - 1);
+        timelineScrubber.value = current;
+        timelineScrubberStatus.textContent = '第 ' + (current + 1) + ' / ' + filtered.length + ' 条';
         if (event.image) {
             visual.innerHTML = '<img src="' + event.image + '" alt="' + event.title + '"><p class="image-caption"><b>图像说明</b>' + event.caption + '</p>';
         } else {
@@ -550,6 +582,10 @@
     }
     document.getElementById('prev-event').addEventListener('click', function () { step(-1); });
     document.getElementById('next-event').addEventListener('click', function () { step(1); });
+    timelineScrubber.addEventListener('input', function (event) {
+        current = Number(event.target.value);
+        renderEvent();
+    });
     document.getElementById('event-search').addEventListener('input', function (event) { query = event.target.value.trim(); applyFilter(); });
     document.addEventListener('keydown', function (event) {
         if (document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
