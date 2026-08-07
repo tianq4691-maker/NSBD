@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b2022" />
+    <meta name="description" content="《渠上回声》迷宫成功片尾——从晨光到灯火的工地一日。" />
+    <title>从晨光到灯火｜渠上回声片尾动画</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="ending-demo-page">
+    <main class="ending-stage" id="demoStage" data-scene="0">
+      <div class="cinema-grain" aria-hidden="true"></div>
+      <div class="cinema-vignette" aria-hidden="true"></div>
+      <div class="letterbox top" aria-hidden="true"></div>
+      <div class="letterbox bottom" aria-hidden="true"></div>
+
+      <div class="ending-hud">
+        <div class="ending-brand"><b>渠上回声</b><span>工地一日 · 完整片尾</span></div>
+        <div class="scene-timeline" id="demoTimeline">
+          <span data-scene-dot="0"><i></i>晨工</span>
+          <span data-scene-dot="1"><i></i>修车</span>
+          <span data-scene-dot="2"><i></i>灶房</span>
+          <span data-scene-dot="3"><i></i>送饭</span>
+          <span data-scene-dot="4"><i></i>夜会</span>
+        </div>
+        <div class="ending-progress"><i id="demoProgress"></i></div>
+      </div>
+
+      <section class="cinema-scene day-scene scene-morning" aria-hidden="true">
+        <div class="scene-atmosphere dust-atmosphere" id="demoDust"></div>
+        <div class="story-cast morning-cast">
+          <img class="story-figure figure-1 at-work" src="assets/worker.png" alt="" style="--delay:.45s" />
+          <img class="story-figure figure-2 at-work" src="assets/carpenter.png" alt="" style="--delay:.63s" />
+          <img class="story-figure figure-3 at-work" src="assets/cook.png" alt="" style="--delay:.81s" />
+          <img class="story-figure figure-4 at-work" src="assets/doctor.png" alt="" style="--delay:.99s" />
+          <img class="story-figure figure-5 at-work" src="assets/water_carrier.png" alt="" style="--delay:1.17s" />
+          <img class="story-figure figure-6 at-work" src="assets/blacksmith.png" alt="" style="--delay:1.35s" />
+        </div>
+      </section>
+
+      <section class="cinema-scene day-scene scene-repair" aria-hidden="true">
+        <div class="repair-sparks" id="demoSparks"></div>
+        <div class="story-cast repair-cast">
+          <img class="story-figure figure-1 waiting" src="assets/worker.png" alt="" style="--delay:.45s" />
+          <img class="story-figure figure-2 repairing" src="assets/carpenter.png" alt="" style="--delay:.7s" />
+        </div>
+      </section>
+
+      <section class="cinema-scene day-scene scene-kitchen" aria-hidden="true">
+        <div class="kitchen-steam" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="story-cast kitchen-cast">
+          <img class="story-figure figure-3 cooking" src="assets/cook.png" alt="" style="--delay:.5s" />
+        </div>
+      </section>
+
+      <section class="cinema-scene day-scene scene-delivery" aria-hidden="true">
+        <div class="walking-shadow" aria-hidden="true"></div>
+        <div class="story-cast delivery-cast">
+          <img class="story-figure figure-3 delivering" src="assets/cook.png" alt="" style="--delay:.45s" />
+          <img class="story-figure figure-5 delivering" src="assets/water_carrier.png" alt="" style="--delay:.68s" />
+          <img class="story-figure figure-4 delivering" src="assets/doctor.png" alt="" style="--delay:.91s" />
+        </div>
+      </section>
+
+      <section class="cinema-scene day-scene scene-meeting" aria-hidden="true">
+        <div class="meeting-lamp" aria-hidden="true"></div>
+        <div class="story-cast meeting-cast">
+          <img class="story-figure figure-1 at-meeting" src="assets/worker.png" alt="" style="--delay:.45s" />
+          <img class="story-figure figure-2 at-meeting" src="assets/carpenter.png" alt="" style="--delay:.62s" />
+          <img class="story-figure figure-3 at-meeting" src="assets/cook.png" alt="" style="--delay:.79s" />
+          <img class="story-figure figure-4 at-meeting" src="assets/doctor.png" alt="" style="--delay:.96s" />
+          <img class="story-figure figure-5 at-meeting" src="assets/water_carrier.png" alt="" style="--delay:1.13s" />
+          <img class="story-figure figure-6 at-meeting" src="assets/blacksmith.png" alt="" style="--delay:1.3s" />
+        </div>
+      </section>
+
+      <div class="scene-caption" id="demoCaption">
+        <p id="demoKicker"></p>
+        <h3 id="demoTitle"></h3>
+        <span id="demoText"></span>
+      </div>
+      <div class="ending-quote" id="demoQuoteCard">
+        <p id="demoSpeaker"></p>
+        <blockquote id="demoQuote"></blockquote>
+      </div>
+
+      <article class="demo-end-card" id="demoEndCard" hidden>
+        <p>从晨光到灯火</p>
+        <h1>众人把渠线向前推了一程</h1>
+        <span>工具、饭菜、药箱和晚间灯火，共同构成了工地真实而具体的一天。</span>
+        <button id="demoReplayFromCard" type="button">再看一遍</button>
+      </article>
+
+      <div class="demo-controls">
+        <button id="demoSound" type="button" aria-pressed="false">开启声音</button>
+        <button id="demoReplay" type="button">重新播放</button>
+        <button id="demoSkip" type="button">直接看结尾</button>
+        <a href="index.html">返回网站</a>
+      </div>
+    </main>
+    <script src="ending-demo.js"></script>
+  </body>
+</html>

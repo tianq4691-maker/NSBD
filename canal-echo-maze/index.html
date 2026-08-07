@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#172f32" />
+    <meta
+      name="description"
+      content="渠上回声——以20世纪引汉、引丹工程口号史料为线索的平面迷宫互动游戏。"
+    />
+    <title>渠上回声｜南水北调口号迷宫</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="paper-noise" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" id="brandHome" href="#" aria-label="返回游戏首页">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><b>渠上回声</b><small>CANAL ECHOES · 1970</small></span>
+      </a>
+      <div class="header-actions">
+        <button class="header-slogan-button" id="globalMoreSlogansButton" type="button" data-open-slogans>
+          <span class="wide-label">了解更多口号</span><span class="compact-label">口号长卷</span>
+        </button>
+        <button class="icon-button" id="infoButton" type="button" aria-label="查看游戏说明">i</button>
+        <button class="sound-button" id="soundButton" type="button" aria-pressed="true">
+          <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="sound-label">音乐</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro-screen" id="introScreen" aria-labelledby="gameTitle">
+        <div class="intro-copy">
+          <p class="eyebrow"><span></span> 一九七〇年代 · 三山角工地</p>
+          <h1 id="gameTitle"><span>沿渠寻声</span><em>汇众成河</em></h1>
+          <p class="intro-lead">
+            六条岔路，六段留在纸上的工地回声。走进迷宫、补全口号，
+            把那些站在工程背后的人重新带回画面。
+          </p>
+
+          <div class="intro-actions">
+            <button class="primary-button" id="startButton" type="button">
+              <span>循声入卷</span><b aria-hidden="true">→</b>
+            </button>
+            <button class="secondary-button more-slogans-button" id="moreSlogansButton" type="button" data-open-slogans>
+              了解更多口号
+            </button>
+            <button class="text-button" id="continueButton" type="button" hidden>继续上次行程</button>
+          </div>
+
+          <div class="context-note">
+            <span class="archive-stamp" aria-hidden="true">史料<br />互动</span>
+            <p>
+              页面保留原文中的时代用语，仅作为特定历史语境下的工程记忆展示，
+              不代表当下立场。
+            </p>
+          </div>
+        </div>
+
+        <div class="intro-visual" aria-hidden="true">
+          <div class="sun-disc"></div>
+          <div class="mountains mountain-back"></div>
+          <div class="mountains mountain-front"></div>
+          <div class="canal-ribbon"><i></i><i></i><i></i></div>
+          <div class="route-line">
+            <span style="--x: 8%; --y: 76%">起</span>
+            <span style="--x: 34%; --y: 55%">寻</span>
+            <span style="--x: 64%; --y: 64%">汇</span>
+            <span style="--x: 88%; --y: 30%">河</span>
+          </div>
+          <div class="figure-preview">
+            <img src="assets/worker.png" alt="" />
+          </div>
+          <div class="vertical-title">口号迷宫互动档案</div>
+        </div>
+
+        <div class="scroll-cue" aria-hidden="true"><span>开始探索</span><i></i></div>
+      </section>
+
+      <section class="archive-screen" id="archiveScreen" aria-labelledby="archiveHallTitle" hidden>
+        <div class="journey-steps" aria-label="互动流程">
+          <span class="active"><b>01</b>渠声阅卷</span>
+          <i></i>
+          <span><b>02</b>三山角迷宫</span>
+          <i></i>
+          <span><b>03</b>工地一日</span>
+        </div>
+
+        <div class="archive-hall-head">
+          <div>
+            <p class="eyebrow"><span></span> 渠畔回声 · 行前阅卷</p>
+            <h2 id="archiveHallTitle">纸上闻渠声，循迹入迷宫</h2>
+          </div>
+          <p>六位同行者各携五则工程口号，共三十则。每个岔路将连续出现三道题，请先留意其中的岗位、工具、地名和关键句。</p>
+        </div>
+
+        <div class="archive-hall-layout">
+          <nav class="slogan-shelf" id="sloganShelf" aria-label="六组口号目录"></nav>
+          <article class="slogan-reader" id="sloganReader">
+            <div class="reader-paper-lines" aria-hidden="true"></div>
+            <div class="reader-number" id="readerNumber">01</div>
+            <div class="reader-content">
+              <p class="reader-unit" id="readerUnit"></p>
+              <h3 id="readerRole"></h3>
+              <div class="reader-slogan-tabs" id="readerSloganTabs" aria-label="本组的五则口号"></div>
+              <blockquote id="readerQuote"></blockquote>
+            </div>
+            <div class="reader-portrait"><span></span><img id="readerImage" src="" alt="" /></div>
+            <div class="reader-controls">
+              <button class="secondary-button" id="archivePrev" type="button">← 上一张</button>
+              <button class="secondary-button" id="archiveNext" type="button">下一张 →</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="archive-hall-footer">
+          <button class="text-button" id="archiveBack" type="button">← 返回首页</button>
+          <div class="reading-progress">
+            <span>已浏览 <b id="archiveReadCount">1</b> / 30</span>
+            <div><i id="archiveReadBar"></i></div>
+            <small>浏览任意6则后可进入迷宫</small>
+          </div>
+          <button class="primary-button" id="enterGameButton" type="button" disabled>
+            <span>还需浏览 5 则</span><b aria-hidden="true">→</b>
+          </button>
+        </div>
+      </section>
+
+      <section class="game-screen" id="gameScreen" aria-labelledby="mapHeading" hidden>
+        <div class="game-topbar">
+          <div>
+            <p class="eyebrow"><span></span> 三山角 · 口号迷宫</p>
+            <h2 id="mapHeading">沿着水渠，寻找六位同行者</h2>
+          </div>
+          <div class="game-top-actions">
+            <button class="secondary-button map-home-button" id="mapHomeButton" type="button">← 返回首页</button>
+            <div class="progress-cluster">
+              <div class="progress-label"><span>人物图鉴</span><b id="scoreText">0 / 6</b></div>
+              <div class="progress-track"><i id="progressBar"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-layout">
+          <div class="map-frame">
+            <div class="map-meta">
+              <div><span class="pulse-dot"></span><b id="locationText">起点 · 工棚</b></div>
+              <p id="statusText">使用方向键或下方按钮移动</p>
+            </div>
+            <div class="maze-wrap">
+              <div class="maze" id="maze" role="application" aria-label="三山角口号迷宫"></div>
+              <div class="map-legend" aria-hidden="true">
+                <span><i class="legend-checkpoint"></i>口号关卡</span>
+                <span><i class="legend-player"></i>你的位置</span>
+                <span><i class="legend-finish"></i>终点</span>
+              </div>
+            </div>
+            <div class="control-console">
+              <div class="control-copy">
+                <b>方向操控盘</b>
+                <span>点击或按住移动，也可使用 W A S D 与方向键</span>
+              </div>
+              <div class="dpad" aria-label="前后左右移动控制盘">
+                <button data-move="up" type="button" aria-label="向前移动"><i>↑</i><span>前</span></button>
+                <button data-move="left" type="button" aria-label="向左移动"><i>←</i><span>左</span></button>
+                <span class="dpad-center" aria-hidden="true"><i></i></span>
+                <button data-move="right" type="button" aria-label="向右移动"><i>→</i><span>右</span></button>
+                <button data-move="down" type="button" aria-label="向后移动"><i>↓</i><span>后</span></button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="ledger" aria-labelledby="ledgerHeading">
+            <div class="ledger-head">
+              <div><span>人物档案</span><h3 id="ledgerHeading">渠首同行者</h3></div>
+              <small>答对口号后解锁</small>
+            </div>
+            <div class="portrait-grid" id="portraitGrid"></div>
+            <div class="ledger-tip">
+              <b>行路提示</b>
+              <p>每个红色路标包含三道题，答对至少两题即可点亮人物；一题失误仍有机会追回。</p>
+            </div>
+            <button class="reset-button" id="resetButton" type="button">重新开始本轮</button>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal-layer" id="questionModal" role="dialog" aria-modal="true" aria-labelledby="questionTitle" hidden>
+      <div class="modal-backdrop"></div>
+      <article class="question-card">
+        <div class="question-ribbon"><span id="questionIndex">关卡 01 / 06</span><b id="questionType">对句</b></div>
+        <div class="question-person">
+          <div class="person-silhouette" id="questionPortrait"><img src="" alt="" /></div>
+          <div><p id="questionUnit">林扒团 · 引汉战士</p><h3 id="questionTitle">把散落的工地回声接起来</h3></div>
+        </div>
+        <div class="source-lines" id="sourceLines"></div>
+        <p class="question-prompt" id="questionPrompt"></p>
+        <div class="answer-area" id="answerArea"></div>
+        <div class="question-feedback" id="questionFeedback" aria-live="polite"></div>
+        <div class="question-actions">
+          <div class="question-tools">
+            <button class="secondary-button" id="questionHomeButton" type="button">← 返回首页</button>
+            <button class="secondary-button" id="refreshQuestionButton" type="button">换一道题（2）</button>
+            <button class="secondary-button" id="hintButton" type="button">查看线索</button>
+            <button class="secondary-button" type="button" data-open-slogans>了解更多口号</button>
+          </div>
+          <button class="primary-button compact" id="submitAnswer" type="button"><span>确认答案</span><b>→</b></button>
+        </div>
+      </article>
+    </div>
+
+    <div class="modal-layer" id="archiveModal" role="dialog" aria-modal="true" aria-labelledby="archiveName" hidden>
+      <div class="modal-backdrop" data-close="archive"></div>
+      <article class="archive-card">
+        <button class="close-button" type="button" data-close="archive" aria-label="关闭">×</button>
+        <div class="archive-portrait"><img id="archiveImage" src="" alt="" /></div>
+        <div class="archive-copy">
+          <p class="eyebrow"><span></span> 已解锁人物档案</p>
+          <h3 id="archiveName"></h3>
+          <p class="archive-role" id="archiveRole"></p>
+          <blockquote id="archiveQuote"></blockquote>
+          <p class="archive-story" id="archiveStory"></p>
+          <button class="secondary-button inline-slogan-button" type="button" data-open-slogans>了解更多口号</button>
+        </div>
+      </article>
+    </div>
+
+    <div class="modal-layer slogan-library-layer" id="sloganLibraryModal" role="dialog" aria-modal="true" aria-labelledby="allSlogansTitle" hidden>
+      <div class="modal-backdrop" data-close="all-slogans"></div>
+      <article class="slogan-library-card">
+        <button class="close-button" type="button" data-close="all-slogans" aria-label="关闭全部口号">×</button>
+        <header class="slogan-library-head">
+          <div>
+            <p class="eyebrow"><span></span> 渠声长卷</p>
+            <h2 id="allSlogansTitle">纸上渠声，汇入一条长河</h2>
+            <p>九十八组留在纸上的工地回声，仍在一字一句间奔涌。</p>
+          </div>
+          <label class="slogan-search">
+            <span>搜索口号</span>
+            <input id="sloganSearchInput" type="search" placeholder="例如：引汉、木工、卫生" autocomplete="off" />
+          </label>
+        </header>
+        <div class="slogan-library-layout">
+          <nav class="slogan-group-nav" id="sloganGroupNav" aria-label="按团别筛选口号"></nav>
+          <section class="slogan-results" aria-live="polite">
+            <div class="slogan-results-meta">
+              <b id="sloganResultsTitle">全部口号</b>
+              <span id="sloganResultCount">98 组</span>
+            </div>
+            <div class="all-slogan-list" id="allSloganList"></div>
+          </section>
+        </div>
+      </article>
+    </div>
+
+    <div class="modal-layer info-layer" id="infoModal" role="dialog" aria-modal="true" aria-labelledby="infoTitle" hidden>
+      <div class="modal-backdrop" data-close="info"></div>
+      <article class="info-card">
+        <button class="close-button" type="button" data-close="info" aria-label="关闭">×</button>
+        <p class="eyebrow"><span></span> 游戏说明</p>
+        <h2 id="infoTitle">如何寻找“渠上回声”</h2>
+        <div class="info-columns">
+          <section><b>01 · 阅卷</b><p>进入迷宫前先在渠声展厅浏览三十则原文；“了解更多口号”可打开完整九十八组口号集。</p></section>
+          <section><b>02 · 行走</b><p>使用地图下方的前后左右操控盘；电脑端也支持 W A S D 与方向键。</p></section>
+          <section><b>03 · 作答</b><p>每个红色路标从游戏前展厅展示的口号中抽取三题，提交前可换两次新题；答对两题即可点亮人物。</p></section>
+          <section><b>04 · 结局</b><p>抵达终点后，根据寻回人物数量播放28、41或56秒的“工地一日”有声片尾。</p></section>
+        </div>
+        <div class="info-actions">
+          <button class="secondary-button" type="button" data-open-slogans>了解更多口号</button>
+          <button class="primary-button compact" type="button" data-close="info"><span>明白了</span><b>✓</b></button>
+        </div>
+      </article>
+    </div>
+
+    <div class="ending-layer" id="endingLayer" role="dialog" aria-modal="true" aria-labelledby="endingTitle" hidden>
+      <div class="ending-stage" id="endingStage">
+        <div class="cinema-grain" aria-hidden="true"></div>
+        <div class="cinema-vignette" aria-hidden="true"></div>
+        <div class="letterbox top" aria-hidden="true"></div>
+        <div class="letterbox bottom" aria-hidden="true"></div>
+
+        <div class="ending-hud">
+          <div class="ending-brand"><b>渠上回声</b><span id="endingTierLabel">短片结局</span><button type="button" data-open-slogans>口号长卷</button></div>
+          <div class="scene-timeline" id="sceneTimeline">
+            <span data-scene-dot="0"><i></i>晨工</span>
+            <span data-scene-dot="1"><i></i>修车</span>
+            <span data-scene-dot="2"><i></i>灶房</span>
+            <span data-scene-dot="3"><i></i>送饭</span>
+            <span data-scene-dot="4"><i></i>夜会</span>
+          </div>
+          <div class="ending-progress"><i id="endingProgressBar"></i></div>
+        </div>
+
+        <section class="cinema-scene day-scene scene-morning" aria-hidden="true">
+          <div class="scene-atmosphere dust-atmosphere" id="dustField"></div>
+          <div class="story-cast morning-cast" id="morningCast"></div>
+        </section>
+
+        <section class="cinema-scene day-scene scene-repair" aria-hidden="true">
+          <div class="repair-sparks" id="repairSparks"></div>
+          <div class="story-cast repair-cast" id="repairCast"></div>
+        </section>
+
+        <section class="cinema-scene day-scene scene-kitchen" aria-hidden="true">
+          <div class="kitchen-steam" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="story-cast kitchen-cast" id="kitchenCast"></div>
+        </section>
+
+        <section class="cinema-scene day-scene scene-delivery" aria-hidden="true">
+          <div class="walking-shadow" aria-hidden="true"></div>
+          <div class="story-cast delivery-cast" id="deliveryCast"></div>
+        </section>
+
+        <section class="cinema-scene day-scene scene-meeting" aria-hidden="true">
+          <div class="meeting-lamp" aria-hidden="true"></div>
+          <div class="story-cast meeting-cast" id="meetingCast"></div>
+        </section>
+
+        <div class="scene-caption">
+          <p id="endingSceneKicker"></p>
+          <h3 id="endingSceneTitle"></h3>
+          <span id="endingSceneText"></span>
+        </div>
+        <div class="ending-quote" id="endingQuoteCard">
+          <p id="endingQuoteSpeaker"></p>
+          <blockquote id="endingQuoteText"></blockquote>
+        </div>
+        <button class="skip-ending" id="skipEnding" type="button">跳过动画</button>
+      </div>
+      <article class="ending-summary" id="endingSummary" hidden>
+        <p class="eyebrow"><span></span> 本轮行程完成</p>
+        <h2 id="endingTitle"></h2>
+        <p id="endingDescription"></p>
+        <div class="ending-score"><b id="endingScore">0</b><span>/ 6<br />人物立绘</span></div>
+        <div class="ending-actions">
+          <button class="primary-button" id="replayButton" type="button"><span>再次寻访</span><b>↻</b></button>
+          <button class="secondary-button" id="returnMapButton" type="button">回看迷宫</button>
+          <a class="secondary-button ending-demo-link" href="ending-animation.html" target="_blank" rel="noopener">单独观看完整片尾</a>
+          <button class="secondary-button" type="button" data-open-slogans>了解更多口号</button>
+        </div>
+      </article>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="slogans-data.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
