@@ -46,14 +46,63 @@
   </main>
   <script src="qa-events.js?v=20260808-1"></script>
   <script>
-  const aliases={"毛主席":"毛泽东","开建":"开工","修建":"建设","建成":"完成","水电":"发电","水库蓄水":"下闸蓄水","搬家":"搬迁","搬走":"外迁","政策":"原则","什么时候":"","哪一年":"","哪天":"","发生了什么":"","做了什么":"","干了什么":"","有什么":"","为什么":"","为何":"","请问":"","请介绍":""};
+  const aliases={"毛主席":"毛泽东","开建":"开工","修建":"建设","水电":"发电","水库蓄水":"下闸蓄水","搬家":"搬迁","搬走":"外迁","政策":"原则","什么时候":"","哪一年":"","哪天":"","发生了什么":"","做了什么":"","干了什么":"","有什么":"","为什么":"","为何":"","请问":"","请介绍":""};
   const stopWords=['的','了','是','在','与','和','及','何时','什么','怎么','为何','关于','相关','情况','进行'];
+  const entityLex=['丹江口水利枢纽','丹江口水电站','陶岔引丹电灌站','南水北调规划办公室','汉丹铁路','三三〇工程','三三○工程','引江济黄','引汉济黄','南水北调','丹江口','白龙江','西汉水','大柴湖','汉江','黄河','长江','淅川','湖北','河南','武汉','毛泽东','王化云','林一山','周恩来','李先念','朱德','任仕舜','陈云','钱正英','张体学','华罗庚'];
+  const termLex=['围堰','截流','蓄水','发电','机组','移民','搬迁','安置','开工','建成','完成','竣工','通车','投产','质量','裂缝','规划','勘测','坝址','水库','大坝','水利枢纽','铁路','通水','政策','原则','线路','渠道'];
+  const genericTerms=new Set(['完成','建设','工程','进行','问题','情况','相关','线路']);
   let state={query:'',cat:'全部',from:1952,to:1979,view:'grid',facet:'全部'};
-  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+  const $=s=>document.querySelector(s), $=s=>[...document.querySelectorAll(s)];
   function normalize(q){let n=q.trim().toLowerCase().replace(/[？?，,。！!：:、]/g,' ');Object.entries(aliases).forEach(([a,b])=>n=n.split(a).join(b));return n.replace(/\s+/g,' ').trim()}
-  function tokens(q){const n=normalize(q);const out=[];const years=n.match(/19\d{2}/g)||[];out.push(...years);const lex=['毛泽东','王化云','林一山','周恩来','李先念','朱德','任仕舜','丹江口','汉江','黄河','长江','白龙江','西汉水','大柴湖','淅川','湖北','河南','武汉','围堰','截流','蓄水','发电','机组','移民','搬迁','安置','开工','建成','完成','质量','裂缝','规划','勘测','坝址','水库','大坝','水利枢纽','南水北调','引江济黄','引汉济黄','铁路','通水','政策','原则'];lex.forEach(w=>{if(n.includes(w))out.push(w)});n.split(/\s+/).filter(w=>w.length>1&&!stopWords.includes(w)).forEach(w=>out.push(w));return [...new Set(out)]}
-  function scoreEvent(e,q){const n=normalize(q),ts=tokens(q),hay=(e.date+' '+e.year+' '+e.cat+' '+e.title+' '+e.text).toLowerCase();let score=0,reasons=[];const years=ts.filter(t=>/^19\d{2}$/.test(t));if(years.includes(String(e.year))||years.some(y=>e.date.includes(y))){score+=14;reasons.push('年份')}else if(years.length)score-=12;if(n&&hay.includes(n)){score+=24;reasons.push('完整语义')}ts.filter(t=>!/^19\d{2}$/.test(t)).forEach(t=>{if(e.title.includes(t)){score+=8;reasons.push(t)}else if(e.text.includes(t)||e.cat.includes(t)){score+=4;reasons.push(t)}});if(n.includes(e.cat)){score+=8;reasons.push('主题')}return{event:e,score,reasons:[...new Set(reasons)].slice(0,4)}}
-  function currentData(){let data=events.filter(e=>e.year>=state.from&&e.year<=state.to&&(state.cat==='全部'||e.cat===state.cat)&&(state.facet==='全部'||e.cat===state.facet));if(!state.query)return data.map(e=>({event:e,score:0,reasons:[]}));const semanticTokens=tokens(state.query).filter(t=>!/^19\d{2}$/.test(t));const threshold=semanticTokens.length>1?8:4;const ranked=data.map(e=>scoreEvent(e,state.query)).filter(x=>x.score>=threshold).sort((a,b)=>b.score-a.score||a.event.year-b.event.year||a.event.sourceRow-b.event.sourceRow);return ranked}
+  function eventHay(e){return (e.date+' '+e.year+' '+e.cat+' '+e.title+' '+e.text).toLowerCase()}
+  function inferredEntities(q){
+    const compact=normalize(q).replace(/19\d{2}/g,'').replace(/\s+/g,'');
+    const found=[];
+    for(let len=Math.min(8,compact.length);len>=3;len--){
+      for(let i=0;i<=compact.length-len;i++){
+        const phrase=compact.slice(i,i+len);
+        if(stopWords.some(w=>phrase===w)||genericTerms.has(phrase))continue;
+        const df=events.reduce((count,e)=>count+(eventHay(e).includes(phrase)?1:0),0);
+        if(df>0&&df<=8)found.push({phrase,df});
+      }
+    }
+    return found.sort((a,b)=>b.phrase.length-a.phrase.length||a.df-b.df)
+      .filter((x,i,all)=>!all.slice(0,i).some(y=>y.phrase.includes(x.phrase)))
+      .slice(0,4).map(x=>x.phrase);
+  }
+  function entityTokens(q){
+    const n=normalize(q);
+    const found=[...entityLex.filter(w=>n.includes(w)),...inferredEntities(q)];
+    return [...new Set(found)].sort((a,b)=>b.length-a.length)
+      .filter((w,i,all)=>!all.slice(0,i).some(longer=>longer.includes(w)));
+  }
+  function tokens(q){
+    const n=normalize(q),out=[];
+    out.push(...(n.match(/19\d{2}/g)||[]),...entityTokens(q));
+    termLex.forEach(w=>{if(n.includes(w))out.push(w)});
+    n.split(/\s+/).filter(w=>w.length>1&&!stopWords.includes(w)).forEach(w=>out.push(w));
+    return [...new Set(out)];
+  }
+  function scoreEvent(e,q){
+    const n=normalize(q),ts=tokens(q),entities=entityTokens(q),hay=eventHay(e);
+    let score=0,reasons=[],entityHits=0;
+    const years=ts.filter(t=>/^19\d{2}$/.test(t));
+    if(years.includes(String(e.year))||years.some(y=>e.date.includes(y))){score+=18;reasons.push('年份')}else if(years.length)score-=14;
+    if(n&&hay.includes(n)){score+=32;reasons.push('完整短语')}
+    entities.forEach(t=>{
+      if(e.title.includes(t)){score+=42;entityHits++;reasons.push('专名：'+t)}
+      else if(e.text.includes(t)||e.cat.includes(t)){score+=28;entityHits++;reasons.push('专名：'+t)}
+    });
+    if(entities.length&&!entityHits)score-=36;
+    ts.filter(t=>!/^19\d{2}$/.test(t)&&!entities.includes(t)).forEach(t=>{
+      const weight=genericTerms.has(t)?2:6;
+      if(e.title.includes(t)){score+=weight*2;reasons.push(t)}
+      else if(e.text.includes(t)||e.cat.includes(t)){score+=weight;reasons.push(t)}
+    });
+    if(n.includes(e.cat)){score+=8;reasons.push('主题')}
+    return{event:e,score,reasons:[...new Set(reasons)].slice(0,5)}
+  }
+  function currentData(){let data=events.filter(e=>e.year>=state.from&&e.year<=state.to&&(state.cat==='全部'||e.cat===state.cat)&&(state.facet==='全部'||e.cat===state.facet));if(!state.query)return data.map(e=>({event:e,score:0,reasons:[]}));const semanticTokens=tokens(state.query).filter(t=>!/^19\d{2}$/.test(t));const threshold=entityTokens(state.query).length?10:(semanticTokens.length>1?8:4);const ranked=data.map(e=>scoreEvent(e,state.query)).filter(x=>x.score>=threshold).sort((a,b)=>b.score-a.score||a.event.year-b.event.year||a.event.sourceRow-b.event.sourceRow);return ranked}
   function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
   function highlight(s){const ts=tokens(state.query).filter(t=>t.length>1).sort((a,b)=>b.length-a.length);let safe=esc(s);ts.forEach(t=>safe=safe.replace(new RegExp(esc(t).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'),m=>'<mark>'+m+'</mark>'));return safe}
   function renderFacets(data){const counts={};events.filter(e=>e.year>=state.from&&e.year<=state.to&&(state.cat==='全部'||e.cat===state.cat)).forEach(e=>counts[e.cat]=(counts[e.cat]||0)+1);$('#facetList').innerHTML=['全部',...Object.keys(counts)].map(c=>`<button class="facet-item ${state.facet===c?'active':''}" data-facet="${c}"><span>${c}</span><span class="facet-count">${c==='全部'?Object.values(counts).reduce((a,b)=>a+b,0):counts[c]}</span></button>`).join('');$$('[data-facet]').forEach(b=>b.onclick=()=>{state.facet=b.dataset.facet;render()})}
