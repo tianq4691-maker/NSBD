@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <base href="https://tianq4691-maker.github.io/NSBD/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>故土迁流 · 岁月亲历 - 南水北调</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* 基础重置（简化选择器） */
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family:'Noto Sans SC',sans-serif;
+            font-family:'Microsoft YaHei','PingFang SC',sans-serif;
             background:#000;
             color:#fff;
             overflow:hidden;
@@ -55,7 +52,7 @@
 
         /* 选择区（简化选择器） */
         .choices-box { position:absolute; bottom:180px; left:50%; transform:translateX(-50%); z-index:50; display:flex; flex-direction:column; gap:10px; max-width:520px; width:90%; }
-        .choice-btn { display:block; width:100%; padding:13px 20px; background:rgba(6,30,28,0.78); border:1.5px solid rgba(13,148,136,0.35); border-radius:10px; color:rgba(255,255,255,0.88); font-size:0.95rem; cursor:pointer; transition:all 0.3s ease; text-align:center; letter-spacing:1px; backdrop-filter:blur(6px); font-family:'Noto Sans SC',sans-serif; }
+        .choice-btn { display:block; width:100%; padding:13px 20px; background:rgba(6,30,28,0.78); border:1.5px solid rgba(13,148,136,0.35); border-radius:10px; color:rgba(255,255,255,0.88); font-size:0.95rem; cursor:pointer; transition:all 0.3s ease; text-align:center; letter-spacing:1px; backdrop-filter:blur(6px); font-family:'Microsoft YaHei','PingFang SC',sans-serif; }
         .choice-btn:hover { background:rgba(13,148,136,0.25); border-color:rgba(34,211,238,0.6); color:#fff; transform:translateY(-1px); box-shadow:0 4px 20px rgba(0,0,0,0.3); }
         .choice-label { font-size:0.72rem; color:rgba(34,211,238,0.7); margin-bottom:2px; letter-spacing:2px; }
 
@@ -66,7 +63,7 @@
         .ending-type { font-size:1.1rem; color:rgba(34,211,238,0.8); margin-bottom:24px; letter-spacing:3px; }
         .ending-quote { font-size:1.05rem; color:rgba(255,255,255,0.7); max-width:500px; text-align:center; line-height:2; margin-bottom:16px; }
         .ending-dedication { font-size:0.9rem; color:rgba(255,255,255,0.4); margin-top:20px; letter-spacing:2px; line-height:1.8; text-align:center; }
-        .ending-btn { margin-top:20px; padding:10px 28px; background:rgba(34,211,238,0.15); border:1px solid rgba(34,211,238,0.4); border-radius:25px; color:rgba(34,211,238,0.9); font-size:0.9rem; cursor:pointer; letter-spacing:2px; transition:all 0.3s; font-family:'Noto Sans SC',sans-serif; }
+        .ending-btn { margin-top:20px; padding:10px 28px; background:rgba(34,211,238,0.15); border:1px solid rgba(34,211,238,0.4); border-radius:25px; color:rgba(34,211,238,0.9); font-size:0.9rem; cursor:pointer; letter-spacing:2px; transition:all 0.3s; font-family:'Microsoft YaHei','PingFang SC',sans-serif; }
         .ending-btn:hover { background:rgba(34,211,238,0.25); color:#fff; }
 
         /* 加载画面（简化选择器） */
@@ -95,7 +92,7 @@
 
 <!-- 背景（给图片加独立类，方便操作） -->
 <div class="bg-layer">
-    <img id="bgImage" class="bg-layer-img" src="P0_01.png" alt="">
+    <img id="bgImage" class="bg-layer-img" alt="" decoding="async">
     <div class="bg-vignette"></div>
 </div>
 
@@ -110,7 +107,7 @@
 
 <!-- 顶部 -->
 <div class="top-bar">
-    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>
+    <a href="index.html" class="back-btn"><span aria-hidden="true">←</span> 返回首页</a>
     <span class="title-badge">故土迁流 · 岁月亲历</span>
 </div>
 
@@ -262,48 +259,89 @@ const choicesBox = document.getElementById('choicesBox');
 const textBox = document.getElementById('textBox');
 const dots = document.querySelectorAll('.ch-dot');
 
-// ========== 预加载图片（优化：加超时兜底，避免卡加载） ==========
-function preloadImages() {
-    const allImages = new Set();
-    Object.values(script).forEach(chapter => {
-        chapter.forEach(line => {
-            if (line.bg) allImages.add(line.bg);
-        });
-    });
-    allImages.add('C5_end_hard.png');
-    allImages.add('C5_end_normal.png');
-    allImages.add('bg_ending_black.png');
-    let loaded=0;
-    const total = allImages.size;
-    if (total === 0) {
-        hideLoading();
-        return;
-    }
-    allImages.forEach(src=>{
-        const img=new Image();
-        img.onload=img.onerror=()=>{
-            loaded++;
-            if(loaded >= total) hideLoading();
-        };
-        img.src=src;
-    });
-    // 超时兜底（防止某张图加载失败卡界面）
-    setTimeout(()=>hideLoading(), 4000);
+// ========== 场景资源：本仓库 WebP + 首图优先加载 ==========
+const PAGE_ROOT = new URL('./', window.location.href).href;
+const sceneCache = new Set();
+let loadingHidden = false;
+let bgRequestId = 0;
+
+function resolveSceneAsset(src) {
+    if (!src || /^(?:https?:|data:|blob:)/i.test(src)) return src;
+    const filename = src.split('/').pop().replace(/\.png$/i, '.webp');
+    return `${PAGE_ROOT}guxiang-assets/${filename}`;
 }
+
+function preloadAsset(src) {
+    const resolved = resolveSceneAsset(src);
+    if (!resolved || sceneCache.has(resolved)) return;
+    sceneCache.add(resolved);
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = resolved;
+}
+
+function preloadFollowing(idx) {
+    const chapter = script[currentChapterKey];
+    if (!chapter) return;
+    for (let i = idx + 1; i < chapter.length; i++) {
+        if (chapter[i].bg) {
+            preloadAsset(chapter[i].bg);
+            break;
+        }
+    }
+}
+
+function preloadImages() {
+    const first = resolveSceneAsset('P0_01.png');
+    const img = new Image();
+    let settled = false;
+    const ready = () => {
+        if (settled) return;
+        settled = true;
+        bgImage.src = first;
+        bgImage.dataset.asset = first;
+        sceneCache.add(first);
+        hideLoading();
+        setTimeout(() => preloadAsset('P0_02.png'), 300);
+    };
+    img.onload = ready;
+    img.onerror = ready;
+    img.decoding = 'async';
+    img.src = first;
+    setTimeout(ready, 1800);
+}
+
 function hideLoading(){
+    if (loadingHidden) return;
+    loadingHidden = true;
     document.getElementById('loadingScreen').classList.add('hide');
     updateDialogue(0);
 }
 preloadImages();
 
-// ========== 核心逻辑（优化：合并DOM操作，减少重绘） ==========
+// ========== 核心逻辑：切换时才加载当前背景，并预热下一张 ==========
 function setBg(src) {
-    if (bgImage.src.includes(src.split('/').pop())) return;
-    bgImage.classList.add('fading');
-    setTimeout(() => {
-        bgImage.src = src;
+    const resolved = resolveSceneAsset(src);
+    if (!resolved || bgImage.dataset.asset === resolved) return;
+    const requestId = ++bgRequestId;
+    const next = new Image();
+    next.decoding = 'async';
+    next.onload = () => {
+        if (requestId !== bgRequestId) return;
+        bgImage.classList.add('fading');
+        setTimeout(() => {
+            if (requestId !== bgRequestId) return;
+            bgImage.src = resolved;
+            bgImage.dataset.asset = resolved;
+            sceneCache.add(resolved);
+            bgImage.classList.remove('fading');
+        }, 180);
+    };
+    next.onerror = () => {
+        if (requestId !== bgRequestId) return;
         bgImage.classList.remove('fading');
-    }, 250);
+    };
+    next.src = resolved;
 }
 
 function getSpeakerClass(speaker) {
@@ -344,6 +382,7 @@ function updateDialogue(idx) {
     dialogueText.textContent = line.text;
     clickHint.style.display = '';
     state.waitingForChoice = false;
+    preloadFollowing(idx);
 }
 
 function showChoices(choices, idx) {
