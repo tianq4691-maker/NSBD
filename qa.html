@@ -29,8 +29,8 @@
   <div class="bg-layer"><img class="bg-img" src="assets/map-overall.jpg" alt="南水北调工程档案地图"><div class="bg-overlay"></div><div class="water-ripple"></div></div>
   <main class="qa-main">
     <section class="qa-hero">
-      <div><p class="eyebrow">1952—1979 · EARLY CHRONICLE</p><h1>世纪问水<br><span>大事记智能检索</span></h1><p class="hero-intro">从构想勘测、工程建设到移民安置与蓄水发电，以时间、人物、地点和事件为线索，在早期南水北调大事记中定位历史答案。</p></div>
-      <div class="hero-stats"><div class="hero-stat"><b id="eventTotal">30</b><span>条大事记</span></div><div class="hero-stat"><b>28</b><span>年历史跨度</span></div><div class="hero-stat"><b id="categoryTotal">5</b><span>主题阶段</span></div></div>
+      <div><p class="eyebrow">1952—1979 · EARLY CHRONICLE</p><h1>世纪问水<br><span>大事记智能检索</span></h1><p class="hero-intro">完整覆盖项目组时间线表格中1952—1979年的全部原始记录，以时间、人物、地点和事件为线索，在早期南水北调大事记中定位历史答案。</p></div>
+      <div class="hero-stats"><div class="hero-stat"><b id="eventTotal">199</b><span>条原始记录</span></div><div class="hero-stat"><b>28</b><span>年历史跨度</span></div><div class="hero-stat"><b id="categoryTotal">5</b><span>主题阶段</span></div></div>
     </section>
     <section class="search-stage" aria-label="智能检索">
       <div class="search-label"><h2>输入你的问题</h2><span class="scope-note">检索范围：1952—1979 年</span></div>
@@ -40,51 +40,20 @@
     </section>
     <section id="answerPanel" class="answer-panel" aria-live="polite"><div class="answer-meta"><span class="answer-kicker">检索结论</span><div class="answer-confidence"><b id="confidence">—</b><span>匹配度</span></div></div><div class="answer-body"><h2 id="answerTitle"></h2><p id="answerText"></p><div id="answerEvidence" class="answer-evidence"></div><p class="answer-note">答案由现有大事记条目匹配生成，请结合下方关联条目核对。</p></div></section>
     <div class="results-layout">
-      <aside class="facets"><h3>检索概览</h3><div class="facet-summary"><strong id="resultCount">30</strong><span id="resultLabel">条早期大事记</span></div><div id="facetList" class="facet-list"></div><div class="source-box"><b>资料依据</b>《南水北调大事记》（项目组提供文本）<br>页面答案仅基于条目匹配，不调用外部生成内容。</div></aside>
+      <aside class="facets"><h3>检索概览</h3><div class="facet-summary"><strong id="resultCount">199</strong><span id="resultLabel">条早期大事记</span></div><div id="facetList" class="facet-list"></div><div class="source-box"><b>资料依据</b>《南水北调时间线》（项目组提供表格）<br>1952—1979年共199条原始记录；其中197条含事件正文，2条原表正文为空，已按原行保留并标记待补。</div></aside>
       <section class="results-section"><div class="results-head"><div><h2 id="resultsTitle">1952—1979 年大事记</h2><p id="resultsSub">按时间顺序呈现，可输入自然语言问题缩小范围</p></div><div class="view-toggle"><button class="active" data-view="grid">卡片</button><button data-view="timeline">时间轴</button></div></div><div id="eventList" class="event-list"></div></section>
     </div>
   </main>
+  <script src="qa-events.js?v=20260808-1"></script>
   <script>
-  const events = [
-    {date:'1952年8—12月',year:1952,cat:'构想勘测',title:'长江上游引水济黄研究起步',text:'为研究黄河流域水资源不足问题，黄河水利委员会开展黄河源查勘，研究通天河色吾曲至黄河多曲的引水线路，成为从长江上游引水济黄研究的开端。'},
-    {date:'1952年10月30日',year:1952,cat:'构想勘测',title:'首次提出南水北调宏伟设想',text:'毛泽东视察黄河，听取黄河水利委员会主任王化云关于引江济黄设想的汇报后，提出“南方水多，北方水少，如有可能，借点水来也是可以的”。'},
-    {date:'1952年10月',year:1952,cat:'构想勘测',title:'查勘汉江与丹江口坝址',text:'水利部负责人、水利专家及苏联专家组成近百人查勘团，查勘汉江中下游，重点考察丹江口与碾盘山坝址，随后加快汉江流域规划和丹江口工程勘测设计。'},
-    {date:'1953年2月19—22日',year:1953,cat:'构想勘测',title:'长江舰上继续追问调水可能',text:'毛泽东乘“长江舰”视察长江，听取林一山汇报，逐一询问白龙江、西汉水、汉江和丹江口等处引水的可能性，并要求进一步研究汉江引水方案。'},
-    {date:'1954年10月',year:1954,cat:'构想勘测',title:'再次查勘汉江干流与丹江口',text:'国家计委、水利部、燃料工业部会同黄河规划苏联专家组查勘汉江干流，重点考察丹江口坝址，提出综合利用、梯级开发的初步意见。'},
-    {date:'1955年',year:1955,cat:'规划接续',title:'丹江口水库列入“一五”重点工程',text:'兴建丹江口水库被列入国家第一个五年计划重点建设工程之一，汉江流域规划工作持续推进。'},
-    {date:'1956年3—7月',year:1956,cat:'构想勘测',title:'丹江口确定为汉江综合利用一期工程',text:'长江流域规划办公室提出《汉江流域规划简要报告》，水利部审查后肯定丹江口水利枢纽为第一期工程，并开展勘测、初步设计、水工布置和施工规划。'},
-    {date:'1957年3月',year:1957,cat:'构想勘测',title:'研究水库正常蓄水位方案',text:'水利部部长办公会议讨论《汉江流域规划要点报告》，同意丹江口为第一期工程；长江流域规划办公室对多个正常高水位方案展开研究。'},
-    {date:'1958年3月',year:1958,cat:'规划接续',title:'成都会议研究重大调水设想',text:'中共中央成都会议形成长江流域规划相关文件，再次研究引江、引汉济黄和引黄济卫等重大调水设想，并作出兴建丹江口水利枢纽工程的决定。'},
-    {date:'1958年8月',year:1958,cat:'规划接续',title:'“南水北调”进入中央正式文献',text:'北戴河政治局扩大会议通过《关于水利工作的指示》，提出以南水北调为主要目的，将江、淮、河、汉、海各流域联系为统一水利系统的长远规划。'},
-    {date:'1958年9月1日',year:1958,cat:'工程建设',title:'丹江口水利枢纽正式开工',text:'汉江丹江口工程举行开工典礼。湖北、河南及有关地区负责人、施工职工和民工等五千多人参加，工程局局长任仕舜发布开工令。'},
-    {date:'1958年11月5日',year:1958,cat:'工程建设',title:'右岸低水围堰开始施工',text:'丹江口水利枢纽右岸低水围堰开工，拉开工程建设序幕。经过50天奋战，第一期右岸工程低水围堰于12月25日合龙。'},
-    {date:'1958年11月15日',year:1958,cat:'工程建设',title:'工地开展挑土比赛',text:'丹江口工地组织劳动竞赛。项目现有照片原说明记录“穆桂英排”和“武松排”在这一天进行挑土比赛。'},
-    {date:'1959年3月31日',year:1959,cat:'工程建设',title:'低水围堰经受三月洪水',text:'汉江出现有水文记录以来的三月份最大洪水，洪峰流量5500立方米每秒，低水围堰发生溃口。经现场组织抢险，工程脱险。'},
-    {date:'1959年12月26日',year:1959,cat:'工程建设',title:'190分钟完成汉江截流',text:'丹江口水利工程完成汉江截流。中共中央政治局委员、国务院副总理李先念参加合龙庆祝大会并讲话。'},
-    {date:'1961年11月',year:1961,cat:'工程建设',title:'大坝质量问题进入系统检查',text:'水电部党组和湖北省委共同组成质量检查组进驻工地。检查报告指出，坝基处理、坝体混凝土裂缝、混凝土强度和浇筑质量等方面存在严重问题，但经妥善处理仍可达到质量要求。'},
-    {date:'1962年2月8日',year:1962,cat:'工程建设',title:'停下浇筑，集中处理质量',text:'周恩来主持丹江口工程质量处理会议，要求停下主体浇筑、认真研究并处理质量问题，施工服从设计，同时加强防汛和队伍整训。'},
-    {date:'1964年4月21日',year:1964,cat:'移民安置',title:'豫鄂商定库区移民原则',text:'湖北、河南两省负责人在武汉研究丹江口水库移民工作，商定“河南管迁，湖北管安，标准一致，财务公开”的原则。'},
-    {date:'1964年12月16日',year:1964,cat:'工程建设',title:'坝体混凝土浇筑恢复',text:'国务院同意按照防洪结合发电的方案进行设计与施工后，丹江口水利工程恢复坝体混凝土浇筑。'},
-    {date:'1966年1月1日',year:1966,cat:'工程建设',title:'汉丹铁路全线通车',text:'汉丹铁路建成通车，为丹江口工程大施工期间的材料运输和大型机械设备进场提供条件。'},
-    {date:'1966年3—4月',year:1966,cat:'移民安置',title:'首批外迁移民搬迁至大柴湖等地',text:'丹江口水库蓄水准备推进，淅川县首批外迁移民14868人完成搬迁，分别安置在原湖北省钟祥县大柴湖区和原荆门县。'},
-    {date:'1967年11月',year:1967,cat:'蓄水发电',title:'丹江口水库下闸蓄水',text:'11月5日工程举行下闸蓄水典礼；11月18日水库落闸蓄水，月底淅川县马镫镇以下被水淹没。'},
-    {date:'1968年10月1日',year:1968,cat:'蓄水发电',title:'首台水轮发电机组开始发电',text:'丹江口水电站第一台水轮发电机组开始发电，151个单位的627名代表参加发电典礼，工程开始发挥发电效益。'},
-    {date:'1969年5月',year:1969,cat:'移民安置',title:'移民安置转向近迁与后靠',text:'湖北、河南两省举行丹江口水库移民联席会议，提出“远迁不如近迁，近迁不如就地后靠自安”的办法，此后淅川移民不再跨省安置。'},
-    {date:'1970年7月29日',year:1970,cat:'工程建设',title:'丹江口第一期工程基本完成',text:'丹江口大坝浇筑至162米高程，第一期工程基本完成。'},
-    {date:'1971年5月6日',year:1971,cat:'蓄水发电',title:'第三号机组开始发电',text:'丹江口水电站第三号机组开始发电，这是我国第一台自制的15万千瓦大型水轮发电机组。'},
-    {date:'1973年',year:1973,cat:'蓄水发电',title:'大坝建成，第六号机组投产',text:'丹江口大坝建设完工，坝顶高程162米、全长2494米；9月第六号水轮发电机组发电并正式投产。'},
-    {date:'1974年2月24日',year:1974,cat:'工程建设',title:'丹江口初期工程胜利建成',text:'《人民日报》报道汉江丹江口水利枢纽初期工程胜利建成。此前展示丹江口模型时，朱德询问将水引到华北的可能性。'},
-    {date:'1974年9月14日',year:1974,cat:'蓄水发电',title:'丹江渠道主体工程建成通水',text:'《人民日报》报道丹江渠道主体工程建成通水，成为汉江丹江口水利枢纽工程的重要组成部分。'},
-    {date:'1978—1979年',year:1978,cat:'规划接续',title:'南水北调进入政策执行阶段',text:'1978年五届全国人大一次会议通过的《政府工作报告》正式提出兴建把长江水引到黄河以北的南水北调工程。1979年12月，水利部成立南水北调规划办公室，统筹协调全国相关工作。'}
-  ];
-  const aliases={"毛主席":"毛泽东","开建":"开工","修建":"建设","建成":"完成","水电":"发电","水库蓄水":"下闸蓄水","搬家":"搬迁","搬走":"外迁","政策":"原则","什么时候":"何时","哪一年":"何时","哪天":"何时","发生了什么":"","有什么":""};
+  const aliases={"毛主席":"毛泽东","开建":"开工","修建":"建设","建成":"完成","水电":"发电","水库蓄水":"下闸蓄水","搬家":"搬迁","搬走":"外迁","政策":"原则","什么时候":"","哪一年":"","哪天":"","发生了什么":"","做了什么":"","干了什么":"","有什么":"","为什么":"","为何":"","请问":"","请介绍":""};
   const stopWords=['的','了','是','在','与','和','及','何时','什么','怎么','为何','关于','相关','情况','进行'];
   let state={query:'',cat:'全部',from:1952,to:1979,view:'grid',facet:'全部'};
   const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
   function normalize(q){let n=q.trim().toLowerCase().replace(/[？?，,。！!：:、]/g,' ');Object.entries(aliases).forEach(([a,b])=>n=n.split(a).join(b));return n.replace(/\s+/g,' ').trim()}
   function tokens(q){const n=normalize(q);const out=[];const years=n.match(/19\d{2}/g)||[];out.push(...years);const lex=['毛泽东','王化云','林一山','周恩来','李先念','朱德','任仕舜','丹江口','汉江','黄河','长江','白龙江','西汉水','大柴湖','淅川','湖北','河南','武汉','围堰','截流','蓄水','发电','机组','移民','搬迁','安置','开工','建成','完成','质量','裂缝','规划','勘测','坝址','水库','大坝','水利枢纽','南水北调','引江济黄','引汉济黄','铁路','通水','政策','原则'];lex.forEach(w=>{if(n.includes(w))out.push(w)});n.split(/\s+/).filter(w=>w.length>1&&!stopWords.includes(w)).forEach(w=>out.push(w));return [...new Set(out)]}
   function scoreEvent(e,q){const n=normalize(q),ts=tokens(q),hay=(e.date+' '+e.year+' '+e.cat+' '+e.title+' '+e.text).toLowerCase();let score=0,reasons=[];const years=ts.filter(t=>/^19\d{2}$/.test(t));if(years.includes(String(e.year))||years.some(y=>e.date.includes(y))){score+=14;reasons.push('年份')}else if(years.length)score-=12;if(n&&hay.includes(n)){score+=24;reasons.push('完整语义')}ts.filter(t=>!/^19\d{2}$/.test(t)).forEach(t=>{if(e.title.includes(t)){score+=8;reasons.push(t)}else if(e.text.includes(t)||e.cat.includes(t)){score+=4;reasons.push(t)}});if(n.includes(e.cat)){score+=8;reasons.push('主题')}return{event:e,score,reasons:[...new Set(reasons)].slice(0,4)}}
-  function currentData(){let data=events.filter(e=>e.year>=state.from&&e.year<=state.to&&(state.cat==='全部'||e.cat===state.cat)&&(state.facet==='全部'||e.cat===state.facet));if(!state.query)return data.map(e=>({event:e,score:0,reasons:[]}));const ranked=data.map(e=>scoreEvent(e,state.query)).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.event.year-b.event.year);return ranked}
+  function currentData(){let data=events.filter(e=>e.year>=state.from&&e.year<=state.to&&(state.cat==='全部'||e.cat===state.cat)&&(state.facet==='全部'||e.cat===state.facet));if(!state.query)return data.map(e=>({event:e,score:0,reasons:[]}));const semanticTokens=tokens(state.query).filter(t=>!/^19\d{2}$/.test(t));const threshold=semanticTokens.length>1?8:4;const ranked=data.map(e=>scoreEvent(e,state.query)).filter(x=>x.score>=threshold).sort((a,b)=>b.score-a.score||a.event.year-b.event.year||a.event.sourceRow-b.event.sourceRow);return ranked}
   function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
   function highlight(s){const ts=tokens(state.query).filter(t=>t.length>1).sort((a,b)=>b.length-a.length);let safe=esc(s);ts.forEach(t=>safe=safe.replace(new RegExp(esc(t).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'),m=>'<mark>'+m+'</mark>'));return safe}
   function renderFacets(data){const counts={};events.filter(e=>e.year>=state.from&&e.year<=state.to&&(state.cat==='全部'||e.cat===state.cat)).forEach(e=>counts[e.cat]=(counts[e.cat]||0)+1);$('#facetList').innerHTML=['全部',...Object.keys(counts)].map(c=>`<button class="facet-item ${state.facet===c?'active':''}" data-facet="${c}"><span>${c}</span><span class="facet-count">${c==='全部'?Object.values(counts).reduce((a,b)=>a+b,0):counts[c]}</span></button>`).join('');$$('[data-facet]').forEach(b=>b.onclick=()=>{state.facet=b.dataset.facet;render()})}
@@ -93,7 +62,7 @@
   function search(){state.query=$('#searchInput').value.trim();state.facet='全部';render();if(state.query)$('#answerPanel').scrollIntoView({behavior:'smooth',block:'center'})}
   function initYears(){const from=$('#yearFrom'),to=$('#yearTo');for(let y=1952;y<=1979;y++){from.insertAdjacentHTML('beforeend',`<option value="${y}">${y}</option>`);to.insertAdjacentHTML('beforeend',`<option value="${y}" ${y===1979?'selected':''}>${y}</option>`)}from.onchange=e=>{state.from=+e.target.value;if(state.from>state.to){state.to=state.from;to.value=state.to}render()};to.onchange=e=>{state.to=+e.target.value;if(state.to<state.from){state.from=state.to;from.value=state.from}render()}}
   $('#searchBtn').onclick=search;$('#searchInput').onkeydown=e=>{if(e.key==='Enter')search()};$$('[data-query]').forEach(b=>b.onclick=()=>{$('#searchInput').value=b.dataset.query;search()});$$('[data-cat]').forEach(b=>b.onclick=()=>{$$('[data-cat]').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.cat=b.dataset.cat;state.facet='全部';render()});$$('[data-view]').forEach(b=>b.onclick=()=>{$$('[data-view]').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.view=b.dataset.view;render()});$('#clearBtn').onclick=()=>{$('#searchInput').value='';state={query:'',cat:'全部',from:1952,to:1979,view:state.view,facet:'全部'};$('#yearFrom').value=1952;$('#yearTo').value=1979;$$('[data-cat]').forEach((b,i)=>b.classList.toggle('active',i===0));render()};
-  $('#eventTotal').textContent=events.length;$('#categoryTotal').textContent=new Set(events.map(e=>e.cat)).size;initYears();render();
+  $('#eventTotal').textContent=events.length;$('#categoryTotal').textContent=new Set(events.filter(e=>!e.pending).map(e=>e.cat)).size;initYears();render();
   </script>
   <script src="archive-shell.js?v=20260807-4"></script>
 </body>
