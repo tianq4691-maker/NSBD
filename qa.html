@@ -61,7 +61,7 @@
     for(let len=Math.min(8,compact.length);len>=3;len--){
       for(let i=0;i<=compact.length-len;i++){
         const phrase=compact.slice(i,i+len);
-        if(stopWords.some(w=>phrase===w)||genericTerms.has(phrase))continue;
+        if(stopWords.some(w=>phrase===w)||genericTerms.has(phrase)||termLex.some(w=>phrase.includes(w))||/^(第一|第二|第三|第四|第五|第六|首台)/.test(phrase))continue;
         const df=events.reduce((count,e)=>count+(eventHay(e).includes(phrase)?1:0),0);
         if(df>0&&df<=8)found.push({phrase,df});
       }
