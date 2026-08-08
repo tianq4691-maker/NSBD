@@ -29,8 +29,8 @@
   <div class="bg-layer"><img class="bg-img" src="assets/map-overall.jpg" alt="南水北调工程档案地图"><div class="bg-overlay"></div><div class="water-ripple"></div></div>
   <main class="qa-main">
     <section class="qa-hero">
-      <div><p class="eyebrow">1952—1979 · EARLY CHRONICLE</p><h1>世纪问水<br><span>大事记智能检索</span></h1><p class="hero-intro">完整覆盖项目组时间线表格中1952—1979年的全部原始记录，以时间、人物、地点和事件为线索，在早期南水北调大事记中定位历史答案。</p></div>
-      <div class="hero-stats"><div class="hero-stat"><b id="eventTotal">199</b><span>条原始记录</span></div><div class="hero-stat"><b>28</b><span>年历史跨度</span></div><div class="hero-stat"><b id="categoryTotal">5</b><span>主题阶段</span></div></div>
+      <div><p class="eyebrow">1952—1979 · EARLY CHRONICLE</p><h1>世纪问水<br><span>大事记智能检索</span></h1><p class="hero-intro">汇集1952—1979年的197条有效大事记，以时间、人物、地点和事件为线索，在早期南水北调历史进程中定位相关记录。</p></div>
+      <div class="hero-stats"><div class="hero-stat"><b id="eventTotal">197</b><span>条原始记录</span></div><div class="hero-stat"><b>28</b><span>年历史跨度</span></div><div class="hero-stat"><b id="categoryTotal">5</b><span>主题阶段</span></div></div>
     </section>
     <section class="search-stage" aria-label="智能检索">
       <div class="search-label"><h2>输入你的问题</h2><span class="scope-note">检索范围：1952—1979 年</span></div>
@@ -40,11 +40,11 @@
     </section>
     <section id="answerPanel" class="answer-panel" aria-live="polite"><div class="answer-meta"><span class="answer-kicker">检索结论</span><div class="answer-confidence"><b id="confidence">—</b><span>匹配度</span></div></div><div class="answer-body"><h2 id="answerTitle"></h2><p id="answerText"></p><div id="answerEvidence" class="answer-evidence"></div><p class="answer-note">答案由现有大事记条目匹配生成，请结合下方关联条目核对。</p></div></section>
     <div class="results-layout">
-      <aside class="facets"><h3>检索概览</h3><div class="facet-summary"><strong id="resultCount">199</strong><span id="resultLabel">条早期大事记</span></div><div id="facetList" class="facet-list"></div><div class="source-box"><b>资料依据</b>《南水北调时间线》（项目组提供表格）<br>1952—1979年共199条原始记录；其中197条含事件正文，2条原表正文为空，已按原行保留并标记待补。</div></aside>
+      <aside class="facets"><h3>检索概览</h3><div class="facet-summary"><strong id="resultCount">199</strong><span id="resultLabel">条早期大事记</span></div><div id="facetList" class="facet-list"></div><div class="source-box"><b>资料依据</b>《南水北调时间线》（专题整理）<br>收录1952—1979年197条有效大事记，按时间、主题与关键词提供检索。</div></aside>
       <section class="results-section"><div class="results-head"><div><h2 id="resultsTitle">1952—1979 年大事记</h2><p id="resultsSub">按时间顺序呈现，可输入自然语言问题缩小范围</p></div><div class="view-toggle"><button class="active" data-view="grid">卡片</button><button data-view="timeline">时间轴</button></div></div><div id="eventList" class="event-list"></div></section>
     </div>
   </main>
-  <script src="qa-events.js?v=20260808-1"></script>
+  <script src="qa-events.js?v=20260808-2"></script>
   <script>
   const aliases={"毛主席":"毛泽东","开建":"开工","修建":"建设","水电":"发电","水库蓄水":"下闸蓄水","搬家":"搬迁","搬走":"外迁","政策":"原则","什么时候":"","哪一年":"","哪天":"","发生了什么":"","做了什么":"","干了什么":"","有什么":"","为什么":"","为何":"","请问":"","请介绍":""};
   const stopWords=['的','了','是','在','与','和','及','何时','什么','怎么','为何','关于','相关','情况','进行'];
@@ -111,7 +111,7 @@
   function search(){state.query=$('#searchInput').value.trim();state.facet='全部';render();if(state.query)$('#answerPanel').scrollIntoView({behavior:'smooth',block:'center'})}
   function initYears(){const from=$('#yearFrom'),to=$('#yearTo');for(let y=1952;y<=1979;y++){from.insertAdjacentHTML('beforeend',`<option value="${y}">${y}</option>`);to.insertAdjacentHTML('beforeend',`<option value="${y}" ${y===1979?'selected':''}>${y}</option>`)}from.onchange=e=>{state.from=+e.target.value;if(state.from>state.to){state.to=state.from;to.value=state.to}render()};to.onchange=e=>{state.to=+e.target.value;if(state.to<state.from){state.from=state.to;from.value=state.from}render()}}
   $('#searchBtn').onclick=search;$('#searchInput').onkeydown=e=>{if(e.key==='Enter')search()};qsa('[data-query]').forEach(b=>b.onclick=()=>{$('#searchInput').value=b.dataset.query;search()});qsa('[data-cat]').forEach(b=>b.onclick=()=>{qsa('[data-cat]').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.cat=b.dataset.cat;state.facet='全部';render()});qsa('[data-view]').forEach(b=>b.onclick=()=>{qsa('[data-view]').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.view=b.dataset.view;render()});$('#clearBtn').onclick=()=>{$('#searchInput').value='';state={query:'',cat:'全部',from:1952,to:1979,view:state.view,facet:'全部'};$('#yearFrom').value=1952;$('#yearTo').value=1979;qsa('[data-cat]').forEach((b,i)=>b.classList.toggle('active',i===0));render()};
-  $('#eventTotal').textContent=events.length;$('#categoryTotal').textContent=new Set(events.filter(e=>!e.pending).map(e=>e.cat)).size;initYears();render();
+  $('#eventTotal').textContent=events.length;$('#categoryTotal').textContent=new Set(events.map(e=>e.cat)).size;initYears();render();
   </script>
   <script src="archive-shell.js?v=20260807-4"></script>
 </body>
